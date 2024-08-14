@@ -203,7 +203,8 @@ def request_booklet():
     st.toast("To request a booklet, \n please send an email to \n social.from.scratch@proton.me")
 
 def body():
-    st.markdown("# Join the discussion")
+    st.divider()
+    st.markdown("# <center> Join the initiative</center>", unsafe_allow_html=True)
     links_row = row(4, vertical_align="center", gap="small")
     links_row.button(
         "I am an author",
@@ -240,18 +241,37 @@ def discourse():
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
     st.divider()
     st.markdown(f"# <center>Chapter 0</center> ", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
-    
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        st.markdown("""
+The **_social contract_** is a foundational concept in political philosophy, suggesting that individuals consent, either implicitly or explicitly, to form a so- ciety and abide by its rules, norms, and laws for mutual benefit. 
+
+It posits that in exchange for giving up certain freedoms, individuals receive protection and order provided by the collective governance structure.
+Historically articulated by philosophers, the social contract addresses questions of legitimacy, au- thority, and the origins of societal organisation. 
+
+Right now, social inequalities, political polarisation, and breaches of trust between the governed and governing are calling into question the effectiveness and fairness of our current systems.
+
+We wish to articulate this discourse with you.
+""")
 def tabs():
-    st.markdown("# The panel discussion")
+    st.markdown("# <center> The panel discussion</center>", unsafe_allow_html=True)
     
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["# Overview", "Contributions", "Minimal Glossary", "Frequency Asked Questions", "Acknowledgements", "Contacts"])
     
 if __name__ == "__main__":
+    alert_text = """
+The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance in an era marked by simultaneous and interconnected 'polycrises'. 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Systemic inequality, environmental degradation, resource scarcity, and geopolitical tensions, all of them challenge the effectiveness of traditional multilateral frameworks.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Consider your personal interests and join us ONLY IF they fit within your vision and plans. We address systemic issues, framing the importance of philanthropy on an international scale.
+
+Are you happy to proceed?
+"""
     disclaimed = ui.alert_dialog(show=not st.session_state["alerted"], 
                     title="Alert Dialog", 
-                    description="This is an alert dialog an alert dialog an alert dialog an alert dialog", 
-                    confirm_label="OK", cancel_label="Cancel", 
+                    description=alert_text, 
+                    confirm_label="Yes", cancel_label="I dont' agree", 
                     key="alert_dialog_1")
     # st.write(disclaimed)
     

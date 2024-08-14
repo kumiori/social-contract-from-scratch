@@ -4,3 +4,9 @@ h2, h1, h3, [class*="css"] {
     /* font-size: 18px; */
     /* font-weight: 500; */
 }
+
+p {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 18px;
+    /* font-weight: 400; */
+}
