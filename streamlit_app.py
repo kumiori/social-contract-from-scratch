@@ -31,6 +31,7 @@ from datetime import datetime
 from philoui.io import conn, QuestionnaireDatabase as IODatabase
 import streamlit_shadcn_ui as ui
 import pandas as pd
+from streamlit_extras.add_vertical_space import add_vertical_space 
 
 with open("assets/discourse.css", "r") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -205,27 +206,35 @@ def request_booklet():
 def body():
     st.divider()
     st.markdown("# <center> Join the initiative</center>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        st.markdown("""
+Philanthropy is our choice as a source of initial external support for our activity, helping fill in funding gaps: it is not charity but a way to connect and engage.
+    """)
+    add_vertical_space(3)
+        
     links_row = row(4, vertical_align="center", gap="small")
     links_row.button(
-        "I am an author",
+        "I am a participant",
         use_container_width=True,
         on_click=request_booklet,
         type="secondary"
     )
     links_row.button(
-        "Request the booklet",
+        "Download the booklet",
         use_container_width=True,
         on_click=request_booklet,
         type="primary"
     )
     links_row.button(
-        "I am a supporter",
+        "I want to support",
         use_container_width=True,
         on_click=request_booklet,
     )
     links_row.link_button(
         "I want to know more",
-        "https://www.europeindiscourse.eu/",
+        "#the-social-contract-from-scratch",
+        # "https://www.europeindiscourse.eu/",
         use_container_width=True,
         type="primary"
     )
@@ -251,13 +260,14 @@ Historically articulated by philosophers, the social contract addresses question
 
 Right now, social inequalities, political polarisation, and breaches of trust between the governed and governing are calling into question the effectiveness and fairness of our current systems.
 
-We wish to articulate this discourse with you.
+We wish to articulate this discourse with you, because all voices have a role.
 """)
 def tabs():
     st.markdown("# <center> The panel discussion</center>", unsafe_allow_html=True)
     
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["# Overview", "Contributions", "Minimal Glossary", "Frequency Asked Questions", "Acknowledgements", "Contacts"])
     
+
 if __name__ == "__main__":
     alert_text = """
 The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance in an era marked by simultaneous and interconnected 'polycrises'. 
@@ -267,22 +277,32 @@ Systemic inequality, environmental degradation, resource scarcity, and geopoliti
 Consider your personal interests and join us ONLY IF they fit within your vision and plans. We address systemic issues, framing the importance of philanthropy on an international scale.
 
 Are you happy to proceed?
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Click twice on the 'Yes' button to go forward.
+
 """
     disclaimed = ui.alert_dialog(show=not st.session_state["alerted"], 
                     title="Alert Dialog", 
                     description=alert_text, 
-                    confirm_label="Yes", cancel_label="I dont' agree", 
+                    confirm_label="Yes", 
+                    cancel_label="Whatever...", 
                     key="alert_dialog_1")
     # st.write(disclaimed)
     
-    if not disclaimed:
-        # st.dialog("Alert Dialog")
-        st.write("Alerted")
-        import sys
-        sys.exit()
-    else:
+    # if not disclaimed:
+    #     # st.dialog("Alert Dialog")
+    #     st.write("Alerted")
+    #     import sys
+    #     sys.exit()
+    # else:
+    #     st.session_state.alerted = True
+    if disclaimed:
         st.session_state.alerted = True
-        
+        # st.rerun()  # Immediately rerun to refresh the page
+    else:
+        st.write("You must agree to proceed.")
+        st.stop()
+                
     intro()
         
     st.toast("Welcome to the Social Contract from Scratch")
@@ -291,4 +311,4 @@ Are you happy to proceed?
     
     discourse()
     body()
-    tabs()
+    # tabs()
