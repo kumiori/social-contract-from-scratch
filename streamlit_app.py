@@ -52,9 +52,24 @@ item_count = len(df)
 
 @st.dialog("Join the whitelist")
 def join_waitlist():
-    """docstring for join_waitlist"""
-    st.write("Join the whitelist")
-    st.write("We are working on the whitelist feature. Please check back later.") 
+    from email_validator import validate_email, EmailNotValidError
+    st.markdown("**Welcome aboard**")
+    st.markdown("""
+We're excited that you are interested in joining our initiative. As we build a focused and passionate community, your interest is a great step, and we'd love to learn more about you and your ideas. 
+
+Joining the whitelist is our way of creating a supportive environment where individuals can collaborate and contribute meaningfully.
+             """)
+    email = st.text_input("Your email address")
+    if email:
+        try:
+            valid = validate_email(email)
+            email = valid.email
+        except EmailNotValidError as e:
+            st.error(str(e))
+        name = st.text_input("Your name")
+        if name:
+            st.write(f"Thank you `{name}` for your interest. We will get back to you shortly.")
+    # st.write("We are working on the whitelist feature. Please check back later.") 
     
     
 def blurscape():
@@ -191,7 +206,7 @@ def body():
     st.markdown("# Join the discussion")
     links_row = row(4, vertical_align="center", gap="small")
     links_row.button(
-        "I am a participant",
+        "I am an author",
         use_container_width=True,
         on_click=request_booklet,
         type="secondary"
@@ -227,6 +242,10 @@ def discourse():
     st.markdown(f"# <center>Chapter 0</center> ", unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
+def tabs():
+    st.markdown("# The panel discussion")
+    
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["# Overview", "Contributions", "Minimal Glossary", "Frequency Asked Questions", "Acknowledgements", "Contacts"])
     
 if __name__ == "__main__":
     disclaimed = ui.alert_dialog(show=not st.session_state["alerted"], 
@@ -252,3 +271,4 @@ if __name__ == "__main__":
     
     discourse()
     body()
+    tabs()
