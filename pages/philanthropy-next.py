@@ -244,7 +244,7 @@ def dataset_to_intro(dataset):
         leaning = ", leaning `to the bright`." if resonance > 0.5 and resonance < 1. else ", leaning `to the dark`." if resonance < .5 and resonance > 0. else "."
 
         formatted_text += f", my outlook for the future is a `{outlook}`{leaning}."
-    return formatted_text + ". Looking forward."
+    return formatted_text
 
 def extract_info(data):
     checkouts = st.session_state.custom_donor
@@ -556,7 +556,7 @@ def investment(survey):
 
 def body():
     st.divider()
-    st.markdown("# <center> Step 0:  / Awareness</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 0:  / Awareness</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         """
@@ -570,7 +570,7 @@ def body():
 
     """
     
-    st.markdown("# <center> Step 1:  / Reflection</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 1:  / Reflection</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
 
     with col2:
@@ -591,7 +591,7 @@ def body():
     # We are populating the table of our shared elementary values, would you like to play
 
 def authentication():
-    st.markdown("# <center> Step X: Access key</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Access key</center>", unsafe_allow_html=True)
     if st.session_state['authentication_status'] is None:
         col1, col2, col3 = st.columns([1, 9, 1])
         """### Towards our conference in Athens _Europe in Discourse_"""
@@ -613,7 +613,7 @@ def authentication():
         st.warning('Please use your access key')
 
 def engagement():
-    st.markdown("# <center> Step 2: Engagement</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 2: Engagement</center>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 9, 1])
 
@@ -658,22 +658,25 @@ def engagement():
     #     engage = None
 
 def access():
-    st.markdown("# <center> Step 3: Open your access</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 3: Open your access</center>", unsafe_allow_html=True)
     """
-    We've collected some info so far...
+    We've collected some insight so far...
     """
     # st.write(survey.data)
     col1, col2, col3 = st.columns([1, 9, 1])
 
     with col2:
-        st.write('### You ' + dataset_to_intro(survey.data)[7:-1] + '!')
+        st.write('### You ' + dataset_to_intro(survey.data)[7::] + '!')
+    """
+    ### _We are looking forward._"""
     
-    """
-    Let us forge an access key for you to proceed.
-    """
+
     if st.session_state['authentication_status'] is None:
         # authenticator.login('Connect', 'main', fields = fields_connect)
         # st.warning('Please use your access key')
+        """
+        Let us forge an access key for you to proceed.
+        """
         try:
             match = True
             success, access_key, response = authenticator.register_user(data = match, captcha=True, pre_authorization=False, fields = fields_forge)
@@ -682,12 +685,13 @@ def access():
                 st.toast(f'Access key: {access_key}')
                 st.session_state['username'] = access_key
                 # st.write(response)
-                st.markdown(f"### Your access key is `{access_key}`. Keep it safe: it will allow you to access the next steps.")
+                st.markdown(f"### My access key is `{access_key}`. Keep it safe: it will allow you to access the next steps.")
         except Exception as e:
             st.error(e)
-
+    else:
+        st.markdown(f"### My access key is already forged, its signature is `{mask_string(st.session_state['username'])}`.")
 def question():
-    # st.markdown("# <center> Step X: $\mathcal{Q}$uestion</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 3</center>", unsafe_allow_html=True)
     st.markdown("# <center> How do you _feel_ about the future?</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
@@ -725,7 +729,7 @@ We are populating the table of our shared elementary values. This is more than j
 
 def datacollection():
 
-    st.markdown("# <center> Step 3: Data Collection</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 3: Data Collection</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -751,7 +755,7 @@ Why should the banking ledger be _trusted_? The information we seek will be enco
     
 def story():
     # st.write(st.session_state)
-    st.markdown("# <center> Step 4: Personal Story</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 4: Personal Story</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -785,7 +789,7 @@ What is your story?
         st.markdown('### #' + f'{list(philanthropic_profiles.items())[st.session_state["profile"]-1][0]}') 
         
 def preferences():
-    st.markdown("# <center> Step 5: Participation / expression</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 5: Participation / expression</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -816,11 +820,12 @@ If philanthropy is your choice to connect and engage, join us at the upcoming _E
         """
         Your input helps us better understand which aspects of our initiative resonate with you and ensure that your philanthropic contributions are directed towards areas that are most meaningful to you.
                 """
+
 def donation():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
 
-        st.markdown("# <center> Step X: Access / IF DONATION</center>", unsafe_allow_html=True)
+        st.markdown("## <center> Step X: Access / IF DONATION</center>", unsafe_allow_html=True)
         """
         ### **Donation Options:**
         - **Custom Donation:** Allows you to pick your preferred number.
@@ -891,7 +896,7 @@ def donation():
             st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {donation_type(exp_value, actual_value)}")
 
 def offer():
-    st.markdown("# <center> Step X: Access / IF INVESTMENT</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Access / IF INVESTMENT</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -903,7 +908,7 @@ def offer():
     investment(survey)
 
 def contribution():
-    st.markdown("# <center> Step X:  / IF SUPPORT</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X:  / IF SUPPORT</center>", unsafe_allow_html=True)
     """
     In Kind or Economic Contribution
     """
@@ -916,7 +921,6 @@ def contribution():
     a disposizione asset e non solo denaro"""
     # col1, col2, col3 = st.columns([1, 9, 1])
     
-
 def timeflow():
 
         
@@ -976,7 +980,7 @@ def timeflow():
     
 def reading():
     # with col2:
-    st.markdown("# <center> Step X: Example reading / xxx</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Did we get it?</center>", unsafe_allow_html=True)
     st.write(dataset_to_text(survey.data))
 
 
@@ -992,7 +996,7 @@ def reading():
         #             use_container_width=True)       
 
 
-    st.markdown("# <center> Step X: Connect / commit</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Connect / commit</center>", unsafe_allow_html=True)
     st.markdown(
 """
 We aim at _covering expenses_, however - in case of any surplus funds, _we invite_ donors to participate in a future initiative, following the project's progress."""
@@ -1011,7 +1015,7 @@ We aim at _covering expenses_, however - in case of any surplus funds, _we invit
     # generate string based on data
 
     tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
-    st.markdown(f"# <center>Short code:</center> \n # <center>`SCFS{tx_tag}`</center>", unsafe_allow_html=True)
+    st.markdown(f"# <center>Short code: `SCFS{tx_tag}`</center>", unsafe_allow_html=True)
     # " + '•' + '<code>' + str(st.session_state["username"]) + "</code>
     # st.write(st.session_state["username"])
     # st.write(extract_info(survey.data))
@@ -1020,7 +1024,7 @@ We aim at _covering expenses_, however - in case of any surplus funds, _we invit
     """
     st.markdown("# <center> SCFS XX YY Z - P</center>", unsafe_allow_html=True)
     """
-    In this code:
+    Where:
 
         •	SCFS stands for Social Contract From Scratch.
         •	XX represents the engagement type: whether you chose 
@@ -1031,21 +1035,27 @@ We aim at _covering expenses_, however - in case of any surplus funds, _we invit
         •	P corresponds to your philanthropic profile.
 
 """
-    f"""
-    To make a step forward, these simple but key informations are encoded numerically into a small number `xx`, where `xx` in this case equals **{convert_string_to_decimal(tx_tag)}**.
-    """
+
+def price():
+    tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
+    
     base = 10 if qualitative_value == "2" else 1 if qualitative_value == "1" else 11 if qualitative_value == "10" else 100
     # base = qualitative_value
     # base = 1
 
     price = float(f"{base}.{convert_string_to_decimal(tx_tag)}")
     st.session_state["price"] = price
-    st.markdown(f" # The price of commitment? \n # <center> {price} EUR<center>", unsafe_allow_html=True)
-
+    st.markdown(f" # _Price_ commitment _value_? \n # <center> {price} EUR<center>", 
+                unsafe_allow_html=True)
     f"""
     ### Why is this computed?
+    We use numbers to encode information about your commitment. This number is then used to create a transaction that reflects your parameters.
+    To make a step forward, these simple but key informations are encoded numerically into a two-digits number `xx`, where `xx` in this case equals **{convert_string_to_decimal(tx_tag)}**.
+    """
+
+    f"""
     
-    The encoding of information into a small number (`xx`) and committing it through a transaction of **1.**`xx` EUR if SUPPORT, **10.**`xx` if INVESTMENT, **11**.`xx` if DONATION, **100.**`xx` OTHERWISE. 
+    This number (`xx`) is appended to another number to form a transaction code of the type **1.**`xx` EUR if SUPPORT, **10.**`xx` if INVESTMENT, **11**.`xx` if DONATION, **100.**`xx` OTHERWISE. 
     
     This serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
     
@@ -1053,7 +1063,7 @@ We aim at _covering expenses_, however - in case of any surplus funds, _we invit
     
     In this way, we can perform very sophisticated data analysis and pattern recognition, _transparently_, while ensuring the privacy and security of the data.
     """
-    
+
     
 import requests
 
@@ -1173,7 +1183,7 @@ def get_checkout_info(checkout_id):
     
     
 def checkout():
-    st.markdown("# <center> Step X: Create digital trace</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Create digital trace</center>", unsafe_allow_html=True)
     st.markdown(
 """
     For this, we need your signature
@@ -1182,7 +1192,7 @@ def checkout():
     _signature = st.session_state["username"]
     signature = mask_string(_signature)
     
-    st.markdown(f"#### <center> My signature is `{signature}`</center>", unsafe_allow_html=True)
+    st.markdown(f"### <center> My signature is `{signature}`</center>", unsafe_allow_html=True)
     
     st.markdown("Confirm with a glance, and proceed to the next step.")
     import requests
@@ -1198,7 +1208,7 @@ def checkout():
         st.session_state['sumup'] = None
 
 
-    st.markdown("## To wrap up, we integrate payment channels")
+    st.markdown("## We connect to payment channels")
     st.markdown("Click the expand button below to know more about the payment mechanics.")
     with st.expander("Payments and ledger", expanded=False):
         st.write("The payment data is stored in your session's _state_ and can be accessed by your end for further processing. On _this_ end, we use the SumUp API (sumup.com) to create checkouts and process payments. Finally, we rely on CCF bank, a French commercial bank founded in 1894 and acquired by HSBC in 2000, as the (_untrusted_) ledger.")
@@ -1209,7 +1219,7 @@ def checkout():
     else:
         st.warning("We are integrating _money_ into the game. This requires your authorisation.")
 
-    st.write("Click the link below to authorise the reception of the commitment trace. If everything is in order, you will read above a message of success, and a unique ID below.")
+    st.write("Click the link below to authorise _payments_. Your authorisation is key to proceed. If everything is in order, you will read above a message of success, or a unique ID below.")
     if st.button("It is OK to bring money into the game", type='primary', key="authorise", use_container_width=True):
         try:
             sumup = OAuth2Session(
@@ -1246,8 +1256,10 @@ def checkout():
     st.markdown(f'# <center> Commit # {st.session_state["price"]}</center>', unsafe_allow_html=True)
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
-    
-    if st.button("Trace Commitment", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True):
+    """
+    The button below will create a record to be verified on the ledger. This entry will be a trace of your commitment, a digital footprint of your intention and action.
+    """
+    if st.button("Create record", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True):
         reference = reference[0:10]+f"-{int(now.strftime('%S'))}"
         st.write(f"Full reference {reference}. (computed as a function of the current time)")
         checkout = create_commit_checkout(reference, st.session_state["price"], description + signature)
@@ -1257,7 +1269,7 @@ def checkout():
     st.write("Commits:")
     if st.button("List commits", key="list_checkouts", use_container_width=True):
         if len(st.session_state['checkouts']) == 0:
-            st.warning("No commits found.")
+            st.warning("There is nothing to commit, yet.")
             
         else:
             st.json(st.session_state['checkouts'])    
@@ -1278,8 +1290,6 @@ def checkout():
                 st.write(f"**Status:** {checkout_info['status']}")
 
 
-    st.write("Click the link below to commit a commitment trace:")
-
     """
     Let's save essential data (e.g., preferences, ideas, initial information) before the payment to ensure nothing is lost if the payment fails (some will _indeed_ fail!). 
     
@@ -1288,6 +1298,7 @@ def checkout():
 
 def integrate(reference, _signature):
         
+    st.markdown("## <center> Step X: Integrate the data</center>", unsafe_allow_html=True)
     
     csv_filename = f"my_philanthropic_question_map_1_{reference}.data"
     with st.expander("Show the data", expanded=False):
@@ -1296,23 +1307,24 @@ def integrate(reference, _signature):
 
     if st.download_button(label=f"Download datafile", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='primary'):
         st.success(f"Saved {csv_filename}")
-
-    st.title("Integrate the data")
+    """
+    ### How do we store the data? 
+    """
     st.markdown(
     """
-    The data you provide is securely stored in two databases. These data are a complementary snapshot of your intention and action, a digital trace of your session through this initiative.
+    The data you provide is stored in two databases. These two sources provide a complementary snapshot of your intention and action, like _two halves_ of a digital trace of your session.
     """
     )
     """
-    Each of the buttons below (if any) correspond to a specific commitment. Clicking on a button will integrate yours into our database.
+    Each of the buttons below (if any) correspond to a specific commitment. Clicking on a button will integrate yours into our lightweight database.
     """
     if st.button(f":material/sunny:", key=f"commit", help=f"Commit", use_container_width=True):
         _submit(survey.data, _signature)
         
     """
-    Then, after successful _ledger_ commitment, we shall update and refine our sources with confirmation details and additional secure information.
+    After successful _ledger_ commitment, we shall update and refine our sources with confirmation details and additional secure information.
     """
-    st.title("Send the signal (commit)")
+    st.title("Signal the ledger")
     
     # st.write(f"Full signature: {_signature}")
     # st.write(f"Full username: {st.session_state['username']}")
@@ -1330,7 +1342,34 @@ def integrate(reference, _signature):
     if st.button(f"Clear all and restart", key=f"restart", type='primary', use_container_width=True):
         st.session_state.clear()
         st.rerun()
+
+def intro():
+    from pages.philanthropy import join_waitlist
     
+    cols = st.columns(4, vertical_alignment="center")
+    today = datetime.now()
+    target_date = datetime(today.year, 9, 26)
+
+    # Calculate the time delta
+    time_delta = target_date - today
+        
+    with cols[0]:
+        ui.metric_card(title=".", content='Nan', description="Expenses, so far.", key="card1")
+    # with cols[1]:
+    #     ui.metric_card(title="Total GAME", content="0.1 €", description="Since  _____ we start", key="card2")
+    with cols[2]:
+        ui.metric_card(title="Days to go", content=f"{time_delta.days}", description="Before start of the conference", key="card3")
+    with cols[3]:
+        st.markdown("#### Questions")
+        ui.badges(badge_list=[("experimental", "secondary")], class_name="flex gap-2", key="viz_badges2")
+        # ui.badges(badge_list=[("production", "outline")], class_name="flex gap-2", key="viz_badges3")
+        # switch_value = ui.switch(default_checked=True, label="Enable economic", key="switch1")
+        whitelist = ui.button(text="Join the whitelist", url="", key="link_btn")
+        if whitelist:
+            # st.toast("Whitelist")
+            join_waitlist()
+
+
 if __name__ == "__main__":
     alert_text = """
 The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance in an era marked by simultaneous and interconnected 'polycrises'. 
@@ -1364,59 +1403,45 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
+    
+    
+    
+    
+    
+    intro()
+
+    st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
+    st.markdown("## <center>The intersection of Human and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
+    # st.markdown('<center>`wait a minute`</center>', unsafe_allow_html=True)
+    st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
+    st.divider()
+    st.markdown(f"# <center>Philanthropy Application</center> ", unsafe_allow_html=True)
+
     body()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
+
     engagement()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    # question()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
+    question()
     access()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    # datacollection()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
+    datacollection()
     story()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    # preferences()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    # donation()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    # offer()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    # contribution()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
+    preferences()
+
+    if survey.data["Qualitative"]["value"] == "10":
+        donation()
+    elif survey.data["Qualitative"]["value"] == "2":
+        offer()
+    elif survey.data["Qualitative"]["value"] == "1":
+        contribution()
+    # else:
+        # """
+        # ELSE PARTICIPATE
+        # """
+
     reading()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    authentication()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
+    price()
+    # authentication()
 
     # timeflow()
     reference, _signature = checkout()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    # timeflow()
     integrate(reference, _signature)
+    
