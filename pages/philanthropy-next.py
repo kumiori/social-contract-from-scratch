@@ -80,31 +80,41 @@ fields_forge = {'Form name':'Forge access key', 'Email':'Email', 'Username':'Use
 mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
 
 
-@st.dialog('Cast your preferences')
-def _submit():
-    # st.write('Thanks, expand below to see your data')    
-    signature = st.session_state["username"]
+if 'serialised_data' not in st.session_state:
+    st.session_state.serialised_data = {}
     
+
+@st.dialog('Cast your preferences')
+def _submit(serialised_data, signature):
+    # st.write('Thanks, expand below to see your data')    
+    # signature = st.session_state["username"]
     with st.spinner("Checking your signature..."):
         # time.sleep(2)
         preferences_exists = db.check_existence(signature)
-        st.write(f"Integrating signature preferences `{mask_string(signature)}`")
+        # st.write(f"Integrating signature preferences `{mask_string(signature)}`")
+        st.write(f"Integrating signature preferences ``")
         _response = "Yes!" if preferences_exists else "Not yet"
         st.info(f"Some of your preferences exist...{_response}")
-        serialised_data = st.session_state['serialised_data']
+        # serialised_data = st.session_state['serialised_data']
 
         try:
             data = {
                 'signature': signature,
-                'practical_questions_01': json.dumps(serialised_data)
+                'philanthropy_01': json.dumps(serialised_data)
             }
+            # throw an error if signature is null
+            if not signature:
+                raise ValueError("Signature cannot be null or empty.")
+            
             query = conn.table('discourse-data')                \
                    .upsert(data, on_conflict=['signature'])     \
                    .execute()
             
             if query:
                 st.success("🎊 Preferences integrated successfully!")
-                
+
+        except ValueError as ve:
+            st.error(f"Data error: {ve}")                
         except Exception as e:
             st.error("🫥 Sorry! Failed to update data.")
             st.write(e)
@@ -191,7 +201,6 @@ def convert_string_to_decimal(input_string):
 
     # Split the string into binary part and base-10 part
     binary_part, base10_part = input_string.split('-')
-    print(binary_part, base10_part)
     
     # Convert the binary part to a decimal integer
     binary_decimal = int(binary_part, 2)
@@ -408,10 +417,9 @@ def dataset_to_text(dataset):
 
         investment_profile = f"My investing profile has a `{risk_appetite}` risk appetite. In terms of revenues, I prefer to express return rates in terms of `{expression_return_rates}`. Quantitatively, my investment bracket spans `{expected_return}`% and `{dream_return}`%."
 
-        print(expected_return , dream_return)
-        print('or', expected_return or dream_return)
+        # print(expected_return , dream_return)
+        # print('or', expected_return or dream_return)
 
-        print(bool(expected_return and dream_return))
         if bool(expected_return and dream_return) is False:
             text = text + ("""
                         However, something looks wrong in the return rates above. Let's check the data again.
@@ -1216,7 +1224,8 @@ def checkout():
     reference = f"SCFS1011-3-SS"
     # reference = f"SCFS1011-3-{int(now.strftime('%S'))}"
     description = "Social Contract from Scratch•"
-    signature = mask_string("77868affa87ca77cdeb146c89593bac64ec6dd2ee7265dfeec61941d87529845")
+    _signature = "77868affa87ca77cdeb146c89593bac64ec6dd2ee7265dfeec61941d87529845"
+    signature = mask_string(_signature)
     st.markdown(f"# <center> Commit: {amount}</center>", unsafe_allow_html=True)
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
@@ -1244,16 +1253,29 @@ def checkout():
     st.write("Click the link below to commit a commitment trace:")
 
     """
-    Let's save essential data (e.g., preferences preferences, initial information) before the payment to ensure nothing is lost if the payment fails (some will _indeed_ fail!). 
+    Let's save essential data (e.g., preferences, ideas, initial information) before the payment to ensure nothing is lost if the payment fails (some will _indeed_ fail!). 
     
-    Then, after successful ledger commitment, we shall update and refine the database with confirmation details and additional secure information.
     """
 
     st.title("Integrate the data")
 
+    
+    csv_filename = f"my_philanthropic_question_map_1_{reference}.data"
+    if st.download_button(label=f"Download datafile", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='primary'):
+        st.success(f"Saved {csv_filename}")
 
+    if st.button(f":material/sunny:", key=f"commit", help=f"Commit", use_container_width=True):
+        _submit(survey.data, _signature)
+        
+    """
+    Then, after successful ledger commitment, we shall update and refine the database with confirmation details and additional secure information.
+    
+    """
     st.title("Send the signal (commit)")
     
+    st.write(survey.data)
+    st.write(f"Full signature: {_signature}")
+    st.write(f"Full username: {st.session_state['username']}")
     
     for checkout in st.session_state['checkouts']:
         if st.button(f":material/step_out:", key=f"pay-{checkout}", help=f"{checkout}", use_container_width=True):
