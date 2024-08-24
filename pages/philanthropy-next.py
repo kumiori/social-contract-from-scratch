@@ -780,9 +780,9 @@ What is your story?
             st.write(list(philanthropic_profiles.items())[st.session_state['profile']-1][1]["description"])    
         
         with col3:  
-            st.markdown('# ' + f'{list(philanthropic_profiles.items())[st.session_state['profile']-1][1]["icon"]}') 
+            st.markdown('# ' + f"{list(philanthropic_profiles.items())[st.session_state['profile']-1][1]['icon']}") 
 
-        st.markdown('### #' + f'{list(philanthropic_profiles.items())[st.session_state['profile']-1][0]}') 
+        st.markdown('### #' + f'{list(philanthropic_profiles.items())[st.session_state["profile"]-1][0]}') 
         
 def preferences():
     st.markdown("# <center> Step 5: Participation / expression</center>", unsafe_allow_html=True)
