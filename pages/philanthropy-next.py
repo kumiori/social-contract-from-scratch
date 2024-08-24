@@ -112,7 +112,24 @@ def exp_to_actual(value):
     return 10**value
     return min_actual_value * (max_actual_value / min_actual_value) ** ((value - min_exp_value) / (max_exp_value - min_exp_value))
 
-def extract_info(data, custom_donation = False):
+def convert_string_to_decimal(input_string):
+    # Split the string into binary part and base-10 part
+    binary_part, base10_part = input_string.split('-')
+    
+    # Convert the binary part to a decimal integer
+    binary_decimal = int(binary_part, 2)
+    
+    # Convert the base-10 part to an integer
+    base10_integer = int(base10_part)
+    
+    # Add the two values
+    result = binary_decimal + base10_integer
+    
+    return result
+
+def extract_info(data):
+    custom_donation = st.session_state.custom_donation
+    
     # Determine the tier based on the value of Qualitative
     qualitative_value = data.get("Qualitative", {}).get("value", None)
 
@@ -125,7 +142,6 @@ def extract_info(data, custom_donation = False):
     elif int(qualitative_value) == 10:
         tier = "11"
     # else:
-    print(tier)
     # Determine the type based on donation options
     if qualitative_value is not None:
         if data.get("coffee", {}).get("value", False):
@@ -142,8 +158,8 @@ def extract_info(data, custom_donation = False):
             # donation_type = "custom donation"
             # type_value = "11"
         else:
-            donation_type = "invest"
-            type_value = "XY"
+            donation_type = "other"
+            type_value = "11"
         
         if custom_donation:
             donation_type = "custom"
@@ -152,12 +168,15 @@ def extract_info(data, custom_donation = False):
         donation_type = "XX"
         type_value = "00"
 
+    interests = [
+        data[f"equaliser_{i}"]["value"] for i in range(4)
+    ]
+    interest_level = "high" if sum(interests) > 150 else "low"
+    interest_marker = "1" if interest_level == "high" else "0"
     
-    
-    # Combine to form the string
-    result_string = tier + type_value + donation_type
+    result_string = tier + type_value + interest_marker + '-' + str(st.session_state['profile'])
 
-    return result_string, (tier, type_value, donation_type)
+    return result_string, (tier, type_value, donation_type), qualitative_value, interest_level
 
 philanthropic_profiles = {
 'Communitarian': {
@@ -421,7 +440,7 @@ def body():
         """ 
     It's a process in several steps.
 
-First question is served after a pause. This process will take approximately 10 minutes take at moment take a moment one minute to reflect on your motivation.
+First question is served after a pause. This process will take approximately the time of a good tea. Pause for a minute to think about why you're here.
     """
     st.markdown("# <center> Step 1:  / Reflection</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
@@ -431,24 +450,16 @@ First question is served after a pause. This process will take approximately 10 
         Take a moment, maybe even  one full minute, to reflect on your motivation for participating in this journey. This process will guide your actions and decisions over the next 10 minutes.
     """)
 
-    st.markdown("# <center> Step 2: Engagement</center>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 9, 1])
-    
-    with col2:
-        st.markdown(
-        """
-        Have you ever found the key out of the portal?
-        """
-        )
-
-        # We are populating the table of our shared elementary values, would you like to play
+    # We are populating the table of our shared elementary values, would you like to play
 
 def authentication():
     if st.session_state['authentication_status'] is None:
+        col1, col2, col3 = st.columns([1, 9, 1])
         """### Towards our conference in Athens _Europe in Discourse_"""
-        """
-        Our primary objective is covering expenses for travel, accommodation, and meals. Any extra funds will support current development projects in decision-making, scientific research, and artistic endeavors.
-        """
+        with col2:
+            """
+            Our primary objective is covering expenses for travel, accommodation, and meals. Any extra funds will support current development projects in decision-making, scientific research, and artistic endeavors.
+            """
 
     if st.session_state['authentication_status']:
         st.toast('Initialised authentication model')
@@ -488,6 +499,10 @@ def engagement():
 def resonance():
     st.markdown("# <center> Step X: Access key</center>", unsafe_allow_html=True)
     """
+    We've collected some info so far...
+    """
+    
+    """
     Generate access key to proceed with the journey.
     """
     if st.session_state['authentication_status'] is None:
@@ -512,18 +527,17 @@ We are populating the table of our shared elementary values. This is more than j
 Would you like to play? grey is uncertain, Black yes, white no 
 """
         )
-        create_dichotomy(key = "executive", id= "executive",
-                                            kwargs={'survey': survey,
-                                                'label': 'resonance', 
-                                                'question': 'Click to express your viewpoint: the gray area represents uncertainty, the two extremes: clarity.',
-                                                'gradientWidth': 20,
-                                                'height': 250,
-                                                'title': '',
-                                                'name': 'intuition',
-                                                'messages': ["Yes, it's a good idea", "No, it's not a good idea", "I'm not sure"],
-                                                # 'inverse_choice': inverse_choice,
-                                                'callback': lambda x: ''})
-
+    create_dichotomy(key = "executive", id= "executive",
+                        kwargs={'survey': survey,
+                            'label': 'resonance', 
+                            'question': 'Click to express your viewpoint: the gray area represents uncertainty, the two extremes: clarity.',
+                            'gradientWidth': 20,
+                            'height': 250,
+                            'title': '',
+                            'name': 'intuition',
+                            'messages': ["Yes, it's a good idea", "No, it's not a good idea", "I'm not sure"],
+                            # 'inverse_choice': inverse_choice,
+                            'callback': lambda x: ''})
 
 def profiles():
 
@@ -532,8 +546,6 @@ def profiles():
     with col2:
         st.markdown(
         """
-As we proceed, your decisions and actions will be stored in two different databases—one trusted and one untrusted. This distinction allows us to explore the dynamics of trust and value in a digital environment.
-
 Two aspects are key for us:
 """
         )
@@ -544,19 +556,23 @@ Two aspects are key for us:
         """
         
         """
-        **Remark:** Data will be stored in two databases. One trusted and one is not trusted why is the Banking ledger the information we want to retrieve will be encoded in a transaction?
+        **Remark:** 
+As we proceed, we will store your information in two separate databases: a 'trusted' one for verified data and an 'untrusted' one for data that needs further validation. This helps us ensure accuracy and transparency in our actions, while exploring the dynamics of trust and value in a digital environment.
+        One of the two databases of choice is a simple _relational_ database, the other is a banking ledger.
         """
     st.toast(
         """Side Note:
-Why is the banking ledger trusted? The information we seek will be encoded in a transaction, ensuring transparency and integrity."""
+Why should the banking ledger be _trusted_? The information we seek will be encoded in a transaction, ensuring transparency and integrity."""
     )
     
+
+def story():
     st.markdown("# <center> Step 4: Personal Story / profile</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
         """
-We’re curious to learn more about the individuals behind these decisions. Your story matters and contributes to the richness of this journey, as a collective.
+We're curious to learn more about the individuals behind these decisions. Your story matters and contributes to the richness of this journey, as a collective.
 What is your story?
 """
         )
@@ -581,13 +597,14 @@ What is your story?
 
         st.markdown('### #' + f'{list(philanthropic_profiles.items())[st.session_state['profile']-1][0]}') 
             
+def preferences():
     st.markdown("# <center> Step 5: Participation / expression</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
         """
 
-If philanthropy is your choice to connect and engage, we invite you to join us at our next event, the European Discourse Conference. It’s the perfect opportunity to further your engagement and see how your actions translate into real-world impact.
+If philanthropy is your choice to connect and engage, join us at the upcoming _Europe in Discourse_ conference. It's the perfect opportunity to further our engagement and see how your actions translate into real-world impact.
 """
         )
 
@@ -601,6 +618,10 @@ If philanthropy is your choice to connect and engage, we invite you to join us a
 
         create_equaliser(key = "equaliser", id= "equaliser", kwargs={"survey": survey, "data": equaliser_data})
     
+def donation():
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+
         st.markdown("# <center> Step X: Access / IF DONATION</center>", unsafe_allow_html=True)
         """
         ### **Donation Options:**
@@ -644,7 +665,9 @@ If philanthropy is your choice to connect and engage, we invite you to join us a
             with col4:
                 if survey.button(label = f"{options['Partial Travel']['icon']} •", id="travel"):
                     st.write("Thank you for supporting our travels!")
-            
+        
+        else:
+            st.session_state.custom_donation = True
 
             st.write("Thank you for your generous intention!")
             
@@ -669,7 +692,7 @@ If philanthropy is your choice to connect and engage, we invite you to join us a
             # st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {int(exp_value)}")
             st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {donation_type(exp_value, actual_value)}")
 
-    
+def offer():
     st.markdown("# <center> Step X: Access / IF INVESTMENT</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
@@ -681,10 +704,12 @@ If philanthropy is your choice to connect and engage, we invite you to join us a
         risk_tolerance = survey.radio("Risk Appetite:", options=["Low", "Medium", "High"], horizontal=True, key="risk_appetite", captions=["Play it safe through the maze", "Play like adventure", "Play like a pro"])
     investment(survey)
 
+def contribution():
     st.markdown("# <center> Step X:  / IF CONTRIBUTION</center>", unsafe_allow_html=True)
 
     # col1, col2, col3 = st.columns([1, 9, 1])
     
+def reading():
     # with col2:
     st.markdown("# <center> Step X: Example reading / xxx</center>", unsafe_allow_html=True)
     st.write(dataset_to_text(survey.data))
@@ -723,12 +748,41 @@ To cover expenses and manage potential surplus funds, follow these steps:
     # generate string based on data
     mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
 
-    st.markdown("## `SCFS10110`" + '•' + '<code>' + mask_string("asdasdasdasdasdasda") + "</code>", unsafe_allow_html=True)
-    tx_tag, (tier, type_value, donation_type) = extract_info(survey.data, custom_donation)
-    st.markdown(f"## `SCFS{tx_tag}`" + '•' + '<code>' + mask_string('asd') + "</code>", unsafe_allow_html=True)
+    tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
+    st.markdown(f"# <center>Transaction code:</center> \n # <center>`SCFS{tx_tag}`" + '•' + '<code>' + mask_string('asd') + "</code></center>", unsafe_allow_html=True)
     # st.write(st.session_state["username"])
-    st.write(extract_info(survey.data, custom_donation))
+    st.write(extract_info(survey.data))
+    """
+    The transaction code is formatted in this way to encode the key details of the transaction in a compact and meaningful way.
+    """
+    st.markdown("# <center> SCFS XX YY Z - P</center>", unsafe_allow_html=True)
+    """
+    In this code:
+
+        •	SCFS stands for Social Contract From Scratch.
+        •	XX represents the engagement type: whether you chose 
+                    to support, invest, or donate.
+        •	YY indicates the tier: options include coffee, food, 
+                    accommodation/travel, or custom.
+        •	Z reflects the interest level: either high or low.
+        •	P corresponds to your philanthropic profile.
+
+"""
+    f"""
+    To make a step forward, these simple but key informations are encoded numerically into a small number `xx`, where `xx` in this case equals **{convert_string_to_decimal(tx_tag)}**.
+    """
+    base = 10 if tier == "2" else 1
+    base = qualitative_value
+
+    st.markdown(f" # The price of commitment? \n # <center> {base}.{convert_string_to_decimal(tx_tag)} EUR<center>", unsafe_allow_html=True)
+
+    f"""
+    ### Why is this computed?
     
+    The encoding of information into a small number (`xx`) and committing it through a transaction of `1 or 2`.`xx` EUR serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
+    
+    This method not only protects the integrity of the data but also provides transparency, allowing anyone to attempt tracing the encoded details back to the transaction.
+    """
 if __name__ == "__main__":
     alert_text = """
 The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance in an era marked by simultaneous and interconnected 'polycrises'. 
@@ -759,25 +813,46 @@ Click twice on the 'Yes' button _twice_ to go forward.
             
     #     st.stop()
                 
-
-    # body()
     """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    body()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     engagement()
     """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     authentication()
     """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    resonance()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     values()
     """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    resonance()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     profiles()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    story()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    preferences()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    donation()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    offer()
+    contribution()
+    reading()
+    
