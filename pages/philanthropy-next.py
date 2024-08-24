@@ -22,23 +22,22 @@ if st.secrets["runtime"]["STATUS"] == "Production":
         unsafe_allow_html=True,
     )
 
-from streamlit_extras.row import row
-
-import yaml
-from yaml import SafeLoader
-import philoui
-from datetime import datetime
-from philoui.io import conn, QuestionnaireDatabase as IODatabase
-from philoui.io import create_qualitative, create_dichotomy, create_equaliser
-from philoui.survey import CustomStreamlitSurvey
-import streamlit_shadcn_ui as ui
-import pandas as pd
-from streamlit_extras.add_vertical_space import add_vertical_space 
-from streamlit_extras.row import row
-from philoui.authentication_v2 import AuthenticateWithKey
-from streamlit_timeline import timeline
-import streamlit.components.v1 as components
 import json
+from datetime import datetime
+
+import pandas as pd
+import philoui
+import streamlit.components.v1 as components
+import streamlit_shadcn_ui as ui
+import yaml
+from philoui.authentication_v2 import AuthenticateWithKey
+from philoui.io import QuestionnaireDatabase as IODatabase
+from philoui.io import conn, create_dichotomy, create_equaliser, create_qualitative
+from philoui.survey import CustomStreamlitSurvey
+from streamlit_extras.add_vertical_space import add_vertical_space
+from streamlit_extras.row import row
+from streamlit_timeline import timeline
+from yaml import SafeLoader
 
 db = IODatabase(conn, "discourse-data")
 
@@ -92,9 +91,6 @@ if 'serialised_data' not in st.session_state:
 if 'price' not in st.session_state:
     st.session_state.price = 100.01
     
-if "profile" not in st.session_state:
-    st.session_state["profile"] = None
-
 @st.dialog('Cast your preferences')
 def _submit(serialised_data, signature):
     # st.write('Thanks, expand below to see your data')    
@@ -606,8 +602,10 @@ def authentication():
 
     if st.session_state['authentication_status']:
         st.toast('Initialised authentication model')
-        authenticator.logout()
-        st.write(f'`Your signature is {st.session_state["username"][0:4]}***{st.session_state["username"][-4:]}`')
+        col1, col2, col3 = st.columns([1, 1, 1])
+        # with col2:
+            # authenticator.logout()
+        st.write(f'`Your signature is {mask_string(st.session_state["username"])}`')
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
     elif st.session_state['authentication_status'] is None:
@@ -659,8 +657,8 @@ def engagement():
     #     survey.data["Qualitative"]["value"] = None
     #     engage = None
 
-def resonance():
-    st.markdown("# <center> Step X: Access key</center>", unsafe_allow_html=True)
+def access():
+    st.markdown("# <center> Step 3: Open access with key</center>", unsafe_allow_html=True)
     """
     We've collected some info so far...
     """
@@ -668,10 +666,10 @@ def resonance():
     col1, col2, col3 = st.columns([1, 9, 1])
 
     with col2:
-        st.write(dataset_to_intro(survey.data))
+        st.write('### You ' + dataset_to_intro(survey.data)[7:-1] + '!')
     
     """
-    Let us forge an access key for you, to proceed with the journey.
+    Let us forge an access key for you to proceed.
     """
     if st.session_state['authentication_status'] is None:
         # authenticator.login('Connect', 'main', fields = fields_connect)
@@ -680,9 +678,11 @@ def resonance():
             match = True
             success, access_key, response = authenticator.register_user(data = match, captcha=True, pre_authorization=False, fields = fields_forge)
             if success:
-                st.success('Registered successfully')
+                st.success('Key successfully forged')
                 st.toast(f'Access key: {access_key}')
-                st.write(response)
+                st.session_state['username'] = access_key
+                # st.write(response)
+                st.markdown(f"### Your access key is `{access_key}`. Keep it safe: it will allow you to access the next steps.")
         except Exception as e:
             st.error(e)
 
@@ -722,6 +722,7 @@ We are populating the table of our shared elementary values. This is more than j
 
 """
         )
+
 def datacollection():
 
     st.markdown("# <center> Step 3: Data Collection</center>", unsafe_allow_html=True)
@@ -748,8 +749,8 @@ As we proceed, we will store your information in two separate databases: a 'trus
 Why should the banking ledger be _trusted_? The information we seek will be encoded in a transaction, ensuring transparency and integrity."""
     )
     
-
 def story():
+    # st.write(st.session_state)
     st.markdown("# <center> Step 4: Personal Story</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
@@ -992,7 +993,6 @@ def reading():
 
 
     st.markdown("# <center> Step X: Connect / commit</center>", unsafe_allow_html=True)
-    st.json(survey.data, expanded=False)
     st.markdown(
 """
 We aim at _covering expenses_, however - should there be any surplus funds, _we invite_ donors to participate in a future initiative, following the project's progress."""
@@ -1014,7 +1014,7 @@ We aim at _covering expenses_, however - should there be any surplus funds, _we 
     st.markdown(f"# <center>Transaction code:</center> \n # <center>`SCFS{tx_tag}`</center>", unsafe_allow_html=True)
     # " + '•' + '<code>' + str(st.session_state["username"]) + "</code>
     # st.write(st.session_state["username"])
-    st.write(extract_info(survey.data))
+    # st.write(extract_info(survey.data))
     """
     The transaction code is formatted in this way to encode the key details of the transaction in a compact and meaningful way.
     """
@@ -1045,7 +1045,9 @@ We aim at _covering expenses_, however - should there be any surplus funds, _we 
     f"""
     ### Why is this computed?
     
-    The encoding of information into a small number (`xx`) and committing it through a transaction of `1`.`xx` EUR if CONTRIBUTION, `10`.`xx` if INVESTMENT, `11`.`xx` if DONATION, 100.`xx` OTHERWISE, serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
+    The encoding of information into a small number (`xx`) and committing it through a transaction of **1.**`xx` EUR if CONTRIBUTION, **10.**`xx` if INVESTMENT, **11**.`xx` if DONATION, **100.**`xx` OTHERWISE. 
+    
+    This serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
     
     This method not only protects the integrity of the data but also provides transparency, allowing anyone to attempt tracing the encoded details back to the transaction.
     
@@ -1054,7 +1056,6 @@ We aim at _covering expenses_, however - should there be any surplus funds, _we 
     
     
 import requests
-
 
 # Replace with your SumUp API credentials
 API_BASE_URL = 'https://api.sumup.com/v0.1'
@@ -1097,7 +1098,7 @@ def create_commit_checkout(reference, amount, description):
         return None
 
 
-@st.dialog("This is the development a dialogue")
+@st.dialog("This is the development of a dialogue")
 def sumup_widget(checkout_id):
         # st.markdown("""
         #     <script src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
@@ -1170,16 +1171,26 @@ def get_checkout_info(checkout_id):
         st.warning(f'Error: {response.text}')
         return None
     
+    
+    
+    
 def checkout():
     st.markdown("# <center> Step X: Create digital trace</center>", unsafe_allow_html=True)
     st.markdown(
 """
+    For this, we need your signature
 """)
-    from sumup_oauthsession import OAuth2Session
+    
+    _signature = st.session_state["username"]
+    signature = mask_string(_signature)
+    
+    st.markdown(f"#### <center> My signature is `{signature}`</center>", unsafe_allow_html=True)
+    
+    st.markdown("Confirm with a glance, and proceed to the next step.")
     import requests
     import streamlit.components.v1 as components
-
     from requests.exceptions import RequestException
+    from sumup_oauthsession import OAuth2Session
 
     base_url = "https://api.sumup.com/"
     redirect_uri = "https://individual-choice.streamlit.app/"
@@ -1189,10 +1200,10 @@ def checkout():
         st.session_state['sumup'] = None
 
 
-    st.title("To wrap up, we integrate payment channels")
-    st.markdown("Click the expand button below to know more about the payment data.")
-    with st.expander("Payment Data", expanded=False):
-        st.write("The payment data is stored in the session state and can be accessed by the backend for further processing.")
+    st.markdown("## To wrap up, we integrate payment channels")
+    st.markdown("Click the expand button below to know more about the payment mechanics.")
+    with st.expander("Payments and ledger", expanded=False):
+        st.write("The payment data is stored in your session's _state_ and can be accessed by your end for further processing. On _this_ end, we use the SumUp API (sumup.com) to create checkouts and process payments. Finally, we rely on CCF bank, a French commercial bank founded in 1894 and acquired by HSBC in 2000, as the (_untrusted_) ledger.")
     
     # print authorisation status
     if st.session_state['sumup'] is not None:
@@ -1200,9 +1211,8 @@ def checkout():
     else:
         st.warning("We are integrating _money_ into the game. This requires your authorisation.")
 
-
-    st.write("Click the link below to authorise the reception of the commitment trace .....")
-    if st.button("Authorise", type='primary', key="authorise"):
+    st.write("Click the link below to authorise the reception of the commitment trace. If everything is in order, you will read above a message of success, and a unique ID below.")
+    if st.button("It is OK to bring money into the game", type='primary', key="authorise", use_container_width=True):
         try:
             sumup = OAuth2Session(
                 base_url=base_url,
@@ -1224,19 +1234,27 @@ def checkout():
     
     reference = f"SCFS1011-3-SS"
     description = "Social Contract from Scratch•"
-    _signature = "77868affa87ca77cdeb146c89593bac64ec6dd2ee7265dfeec61941d87529845"
+    
+    # _signature = "77868affa87ca77cdeb146c89593bac64ec6dd2ee7265dfeec61941d87529845"
 
-    signature = mask_string(_signature)
 
+    @st.dialog("Full Signature")
+    def _show_sig():
+        st.write(st.session_state["username"])
+    # if st.button('Show full signature', type='primary', on_click=lambda: _show_sig):
+        # st.write(f'Full signature {_signature}')
+        
+        
     st.markdown(f"# <center> Commit # {st.session_state["price"]}</center>", unsafe_allow_html=True)
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
-    if st.button("Create Commitment trace", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True):
+    
+    if st.button("Trace Commitment", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True):
         reference = reference[0:10]+f"-{int(now.strftime('%S'))}"
         st.write(f"Full reference {reference}. (computed as a function of the current time)")
         checkout = create_commit_checkout(reference, st.session_state["price"], description + signature)
-        if checkout:
-            st.json(checkout)
+        # if checkout:
+            # st.json(checkout)
 
     st.write("Commits:")
     if st.button("List commits", key="list_checkouts", use_container_width=True):
@@ -1273,32 +1291,44 @@ def checkout():
 
 def integrate(reference, _signature):
         
-    st.title("Integrate the data")
     
     csv_filename = f"my_philanthropic_question_map_1_{reference}.data"
-    
+    with st.expander("Show the data", expanded=False):
+        st.json(survey.data)
+
+
     if st.download_button(label=f"Download datafile", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='primary'):
         st.success(f"Saved {csv_filename}")
 
+    st.title("Integrate the data")
+    st.markdown(
+    """
+    The data you provide is securely stored in two databases. These data are a complementary snapshot of your intention and action, a digital trace of your session through this initiative.
+    """
+    )
+    """
+    Each of the buttons below (if any) correspond to a specific commitment. Clicking on a button will integrate yours into our database.
+    """
     if st.button(f":material/sunny:", key=f"commit", help=f"Commit", use_container_width=True):
         _submit(survey.data, _signature)
         
     """
-    Then, after successful ledger commitment, we shall update and refine the database with confirmation details and additional secure information.
-    
+    Then, after successful _ledger_ commitment, we shall update and refine our sources with confirmation details and additional secure information.
     """
     st.title("Send the signal (commit)")
     
-    st.write(survey.data)
-    st.write(f"Full signature: {_signature}")
-    st.write(f"Full username: {st.session_state['username']}")
-    st.markdown("# :material/barefoot:, :material/rainy_snow:, :material/online_prediction:, :material/alarm_off:, :material/award_star:, :material/draw:,  ")
+    # st.write(f"Full signature: {_signature}")
+    # st.write(f"Full username: {st.session_state['username']}")
+    # st.markdown("# :material/barefoot:, :material/rainy_snow:, :material/online_prediction:, :material/alarm_off:, :material/award_star:, :material/draw:,  :material/step_out:")
+    st.markdown(dataset_to_intro(survey.data))
+    """
+    Each of the buttons below (if any) correspond to a specific commitment. Clicking on a button will integrate yours, writing into the ledger's _records_.
+    """
     for checkout in st.session_state['checkouts']:
-        if st.button(f":material/step_out:", key=f"pay-{checkout}", help=f"{checkout}", use_container_width=True):
+        if st.button(f":material/rainy_snow:", key=f"pay-{checkout}", help=f"{checkout}", use_container_width=True):
             sumup_widget(checkout)
             
-    st.write(survey.data)
-    st.markdown(dataset_to_intro(survey.data))
+    # st.write(survey.data)
     
     if st.button(f"Clear all and restart", key=f"restart", type='primary', use_container_width=True):
         st.session_state.clear()
@@ -1337,7 +1367,7 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    # body()
+    body()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
@@ -1345,15 +1375,11 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    question()
+    # question()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    # resonance()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    # authentication()
+    access()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
@@ -1385,6 +1411,11 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
+    authentication()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+
     # timeflow()
     reference, _signature = checkout()
     """
