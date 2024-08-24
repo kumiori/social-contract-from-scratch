@@ -37,6 +37,7 @@ from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.row import row
 from philoui.authentication_v2 import AuthenticateWithKey
 from streamlit_timeline import timeline
+import streamlit.components.v1 as components
 
 
 with open("assets/discourse.css", "r") as f:
@@ -74,6 +75,46 @@ fields_forge = {'Form name':'Forge access key', 'Email':'Email', 'Username':'Use
             'Password':'Password', 'Repeat password':'Repeat password',
             'Register':' Here • Now ', 'Captcha':'Captcha'}
 
+mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
+
+def my_create_dichotomy(key, id = None, kwargs = {}):
+    dico_style = """<style>
+    div[data-testid='stVerticalBlock']:has(div#dicho_inner):not(:has(div#dicho_outer)) {background-color: #F5F5DC};
+    </style>
+    """
+    script = """<div id = 'dicho_outer'></div>"""
+    st.markdown(script, unsafe_allow_html=True)
+    st.markdown(dico_style, unsafe_allow_html=True) 
+     
+    with st.container(border=True):
+        script = """<div id = 'dicho_inner'></div>"""
+        st.markdown(script, unsafe_allow_html=True)
+        # st.title('asd')
+        survey = kwargs.get('survey')
+        label = kwargs.get('label', 'Confidence')
+        name = kwargs.get('name', 'there')
+        question = kwargs.get('question', 'Dychotomies, including time...')
+        messages = kwargs.get('messages', ["🖤", "Meh. Balloons?", "... in between ..."])
+        inverse_choice = kwargs.get('inverse_choice', lambda x: x)
+        _response = kwargs.get('response', '## You can always change your mind.')
+        col1, col2, col3 = st.columns([3, .1, 1])
+        response = survey.dichotomy(name=name, 
+                                label=label,
+                                question=question,
+                                gradientWidth = kwargs.get('gradientWidth', 30), 
+                                key=key)
+        if response:
+            st.markdown('\n')            
+            if float(response) < 0.1:
+                st.success(messages[0])
+            if float(response) > 0.9:
+                st.info(messages[1])
+            elif 0.1 < float(response) < 0.9:
+                st.success(messages[2])
+        else:
+            st.markdown(f'#### Take your time:', unsafe_allow_html=True)
+            st.markdown(_response)
+    return response
 
 def handle_callback(id):
     st.session_state["current_pathway"] = id
@@ -121,13 +162,15 @@ def convert_string_to_decimal(input_string):
     binary_decimal = int(binary_part, 2)
     
     # Convert the base-10 part to an integer
-    base10_integer = int(base10_part)
+    if base10_part == 'None':
+        base10_integer = 0
+    else:
+        base10_integer = int(base10_part)
     
     # Add the two values
     result = binary_decimal + base10_integer
     
     return result
-
 
 def dataset_to_intro(dataset):
     formatted_text = "#### "
@@ -150,7 +193,6 @@ def dataset_to_intro(dataset):
 
         formatted_text += f", my outlook for the future is a `{outlook}`{leaning}"
     return formatted_text
-
 
 def extract_info(data):
     custom_donation = st.session_state.custom_donor
@@ -193,9 +235,15 @@ def extract_info(data):
         donation_type = "XX"
         type_value = "00"
 
-    interests = [
-        data[f"equaliser_{i}"]["value"] for i in range(4)
-    ]
+    
+    # if exists data[f"equaliser_{i}"]
+    
+    if "equaliser_0" not in data:
+        interests = [0, 0, 0, 0]
+    else:    
+        interests = [
+            data[f"equaliser_{i}"]["value"] for i in range(4)
+        ]
     interest_level = "high" if sum(interests) > 150 else "low"
     interest_marker = "1" if interest_level == "high" else "0"
     
@@ -291,15 +339,20 @@ def dataset_to_text(dataset):
     resonance_value = dataset.get("resonance", {}).get("value", False)
     resonance_text = "has't been considered yet." if bool(resonance_value) is False else "a lot" if float(resonance_value) >= .7 else "very little" if float(resonance_value) <= .3 else "moderately"
     # Determine interest mix
-    interests = [
-        dataset[f"equaliser_{i}"]["value"] for i in range(4)
-    ]
+    if "equaliser_0" not in dataset:
+        interests = [0, 0, 0, 0]
+        interest_labels = "the surface"
+    else:    
+        interests = [
+            dataset[f"equaliser_{i}"]["value"] for i in range(4)
+        ]
+        interest_labels = ", ".join(
+                [dataset[f"equaliser_{i}"]["label"] for i in range(4)]
+            )
+            
     interest_mixture = "mix well" if len(set(interests)) == 1 else "vary a lot"
     # st.write(interests)
     interest_level = "high" if sum(interests) > 150 else "low"
-    interest_labels = ", ".join(
-        [dataset[f"equaliser_{i}"]["label"] for i in range(4)]
-    )
     
     connector = "and" if interest_level == 'high' else "yet"
     # Create the text output
@@ -556,7 +609,11 @@ def resonance():
     """
     We've collected some info so far...
     """
-    st.write(survey.data)
+    # st.write(survey.data)
+    col1, col2, col3 = st.columns([1, 9, 1])
+
+    with col2:
+        st.write(dataset_to_intro(survey.data))
     
     """
     Let us forge an access key for you, to proceed with the journey.
@@ -574,9 +631,9 @@ def resonance():
         except Exception as e:
             st.error(e)
 
-def values():
+def question():
     st.markdown("# <center> Step X: $\mathcal{Q}$uestion</center>", unsafe_allow_html=True)
-    st.markdown("# <center> How confident are you in the future?</center>", unsafe_allow_html=True)
+    st.markdown("# <center> How do you _feel_ about the future?</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         """
@@ -588,7 +645,7 @@ def values():
         
         Your perspective helps us map the collective vision of what lies ahead.
         """
-    create_dichotomy(key = "executive", id= "executive",
+    my_create_dichotomy(key = "executive", id= "executive",
                         kwargs={'survey': survey,
                             'label': 'resonance', 
                             'question': 'Click to express your viewpoint.',
@@ -596,7 +653,7 @@ def values():
                             'height': 250,
                             'title': '',
                             'name': 'intuition',
-                            'messages': ["A dark impending storm", "Bright and positive", "An uncertain mix"],
+                            'messages': ["*The future looks* a dark impending storm", "*The future looks* bright and positive", "*The future looks* an uncertain mix"],
                             # 'inverse_choice': inverse_choice,
                             'callback': lambda x: ''
                             }
@@ -610,8 +667,7 @@ We are populating the table of our shared elementary values. This is more than j
 
 """
         )
-        st.write(dataset_to_intro(survey.data))
-def profiles():
+def datacollection():
 
     st.markdown("# <center> Step 3: Data Collection</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
@@ -787,7 +843,7 @@ def offer():
 
 """
         )
-        risk_tolerance = survey.radio("Risk Appetite:", options=["Low", "Medium", "High"], horizontal=True, key="risk_appetite", captions=["Play it safe through the maze", "Play like adventure", "Play like a pro"])
+        risk_tolerance = survey.radio("Risk Appetite:", options=["Low", "Medium", "High"], horizontal=True, key="risk_appetite", captions=["Play it safe in maze", "Play like an adventure", "Play like a pro"])
     investment(survey)
 
 def contribution():
@@ -901,7 +957,6 @@ To cover expenses and manage potential surplus funds, follow these steps:
     # if "profile" not in st.session_state:
         # st.session_state["profile"] = None
     # generate string based on data
-    mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
 
     tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
     st.markdown(f"# <center>Transaction code:</center> \n # <center>`SCFS{tx_tag}`" + '•' + '<code>' + mask_string('asd') + "</code></center>", unsafe_allow_html=True)
@@ -939,6 +994,227 @@ To cover expenses and manage potential surplus funds, follow these steps:
     
     This method not only protects the integrity of the data but also provides transparency, allowing anyone to attempt tracing the encoded details back to the transaction.
     """
+    
+    
+import requests
+
+
+# Replace with your SumUp API credentials
+API_BASE_URL = 'https://api.sumup.com/v0.1'
+ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
+
+def create_commit_checkout(reference, amount, description):
+    # Define the SumUp checkout endpoint URL
+    checkout_url = f'{API_BASE_URL}/checkouts'
+
+    headers = {
+        'Authorization': f'Bearer {ACCESS_TOKEN}'
+    }
+
+    # Define the payload for the API request
+    payload = {
+        'checkout_reference': reference,
+        'amount': amount,
+        'currency': 'EUR',
+        'pay_to_email': 'social.from.scratch@proton.me',
+        'description': description,
+        'merchant_code': st.secrets["sumup"]["MERCHANT_ID"],
+
+    }
+
+    # Make an HTTP POST request to the SumUp checkout endpoint
+    response = requests.post(checkout_url, headers=headers, json=payload)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code in [200, 201, 202, 204]:
+        # Extract the checkout ID from the response
+        checkout_id = response.json().get('id')
+        st.success(f'Success! Checkout ID: {checkout_id}')
+        st.session_state['checkouts'].append(checkout_id)
+        
+        return response.json()
+    else:
+        # Display an error message if the request failed
+        st.write(response)
+        st.warning(f'Error: {response.text}')
+        return None
+
+
+@st.dialog("This is the development a dialogue")
+def sumup_widget(checkout_id):
+        # st.markdown("""
+        #     <script src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
+        #     <script>
+        #         function initSumUpWidget() {
+        #             // Check if SumUpCard is available
+        #             console.log('initialising SumUpCard.');
+        #             if (window.SumUpCard) {
+        #                 // Example of mounting the payment widget
+        #                 const sumUpCard = window.SumUpCard;
+        #                 console.log('SumUpCard is available.');
+        #                 console.log('SumUpCard:', sumUpCard);                        
+        #             } else {
+        #                 console.error('SumUpCard is not available.');
+        #             }
+        #         }
+
+        #         // Initialize SumUp Widget after the script is loaded
+        #         document.addEventListener('DOMContentLoaded', function() {
+        #             initSumUpWidget();
+        #         });
+        #     </script>
+        # """, unsafe_allow_html=True)
+        
+        js_code = f"""
+                    <div id="sumup-card"></div>
+                    <script type="text/javascript" src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
+                    <script type="text/javascript">
+                        SumUpCard.mount({{
+                            id: 'sumup-card',
+                            checkoutId: '{checkout_id}',
+                            donateSubmitButton: false,
+                            showInstallments: true,
+                            onResponse: function (type, body) {{
+                            console.log('Type', type);
+                            console.log('Body', body);
+                            SumUpCard.unmount();
+                            }},
+                        }});
+                    </script>
+                    """
+        # st.write(js_code)
+        with st.container():
+            components.html(js_code, height=600)
+
+
+def get_checkout_info(checkout_id):
+    url = f'{API_BASE_URL}/checkouts/{checkout_id}'
+
+    headers = {
+        'Authorization': f'Bearer {ACCESS_TOKEN}'
+    }
+
+    # Define the payload for the API request
+    payload = {}
+
+    # Make an HTTP POST request to the SumUp checkout endpoint
+    response = requests.post(url, headers=headers, json=payload)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code in [200, 201, 202, 204]:
+        # Extract the checkout ID from the response
+        checkout_id = response.json().get('id')
+        st.success(f'Success! Checkout info retrieved')
+        
+        return response.json()
+    else:
+        # Display an error message if the request failed
+        st.write(response)
+        st.warning(f'Error: {response.text}')
+        return None
+    
+
+def checkout():
+    
+    st.markdown("# <center> Step X: Create trace / checkout</center>", unsafe_allow_html=True)
+    st.json(survey.data, expanded=False)
+    st.markdown(
+"""
+""")
+    from sumup_oauthsession import OAuth2Session
+    import requests
+    import streamlit.components.v1 as components
+
+    from requests.exceptions import RequestException
+
+
+    base_url = "https://api.sumup.com/"
+    redirect_uri = "https://individual-choice.streamlit.app/"
+
+    # initialise the sumup object in session state
+    if 'sumup' not in st.session_state:
+        st.session_state['sumup'] = None
+
+    if 'checkouts' not in st.session_state:
+        st.session_state['checkouts'] = []
+
+    st.title("To wrap up, we integrate payment channels")
+    st.markdown("Click the expand button below to know more about the payment data.")
+    with st.expander("Payment Data", expanded=False):
+        st.write("The payment data is stored in the session state and can be accessed by the backend for further processing.")
+    
+    # print authorisation status
+    if st.session_state['sumup'] is not None:
+        st.info("Authorisation successful!")
+    else:
+        st.warning("Authorisation required!")
+
+
+    st.write("Click the link below to authorise the reception of the commitment trace .....")
+    if st.button("Authorise", type='primary', key="authorise"):
+        try:
+            sumup = OAuth2Session(
+                base_url=base_url,
+                client_id=st.secrets["sumup"]["CLIENT_ID"],
+                client_secret=st.secrets["sumup"]["CLIENT_SECRET"],
+                redirect_uri=redirect_uri,
+            )
+
+            # st.write(sumup)
+            # st.write(sumup.authorization_url())
+            st.write('Authorisation #' + sumup.state)
+            st.session_state['sumup'] = sumup
+        except RequestException as e:
+            st.error(f"An error occurred during authorization: {e}")
+        except KeyError as e:
+            st.error(f"Missing configuration for {e}. Please check your secrets.")
+        except Exception as e:
+            st.error(f"An unexpected error occurred: {e}")
+    amount = 1.03
+    
+    
+    reference = f"SCFS1011-3-SS"
+    # reference = f"SCFS1011-3-{int(now.strftime('%S'))}"
+    description = "Social Contract from Scratch•"
+    signature = mask_string("77868affa87ca77cdeb146c89593bac64ec6dd2ee7265dfeec61941d87529845")
+    st.markdown(f"# <center> Commit: {amount}</center>", unsafe_allow_html=True)
+    st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
+    st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
+    if st.button("Create Commitment trace", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True):
+        reference = reference[0:10]+f"-{int(now.strftime('%S'))}"
+        st.write(f"full reference {reference}")
+        checkout = create_commit_checkout(reference, amount, description + signature)
+        if checkout:
+            st.json(checkout)
+
+    st.write("Commits:")
+    if st.button("List commits", key="list_checkouts", use_container_width=True):
+        if len(st.session_state['checkouts']) == 0:
+            st.warning("No commits found.")
+            
+        else:
+            st.json(st.session_state['checkouts'])    
+
+    for checkout in st.session_state['checkouts']:
+        if st.button(f"Get Commit Info for {mask_string(checkout)}", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
+            checkout_info = get_checkout_info(checkout)
+            st.json(checkout_info)
+
+
+    st.write("Click the link below to commit a commitment trace:")
+
+    st.title("Send the signal (commit)")
+    for checkout in st.session_state['checkouts']:
+        if st.button(f":material/step_out:", key=f"pay-{checkout}", help=f"{checkout}", use_container_width=True):
+            sumup_widget(checkout)
+            
+    st.write(survey.data)
+    st.markdown(dataset_to_intro(survey.data))
+    
+    if st.button(f"Clear all and restart", key=f"restart", type='primary', use_container_width=True):
+        st.session_state.clear()
+        st.stop()
+    
 if __name__ == "__main__":
     alert_text = """
 The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance in an era marked by simultaneous and interconnected 'polycrises'. 
@@ -972,26 +1248,26 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    body()
+    # body()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     engagement()
     """
     """
-    values()
+    question()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    resonance()
+    # resonance()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    authentication()
+    # authentication()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    profiles()
+    # datacollection()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
@@ -999,19 +1275,19 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    preferences()
+    # preferences()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    donation()
+    # donation()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    offer()
+    # offer()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    contribution()
+    # contribution()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
@@ -1019,5 +1295,6 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
-    timeflow()
+    # timeflow()
     
+    checkout()
