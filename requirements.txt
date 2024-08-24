@@ -1,4 +1,3 @@
-git+https://github.com/kumiori/philoui.git@main
 aiohttp==3.9.1
 aiosignal==1.3.1
 altair==5.1.2
@@ -36,8 +35,10 @@ decorator==5.1.1
 deprecation==2.1.0
 dill==0.3.7
 distro==1.9.0
+dnspython==2.6.1
 docutils==0.20.1
 duckdb==0.10.0
+email_validator==2.2.0
 emoji==2.9.0
 entrypoints==0.4
 executing==2.0.1
@@ -93,6 +94,7 @@ more-itertools==10.1.0
 mpmath==1.3.0
 msgpack==1.0.8
 multidict==6.0.4
+narwhals==1.4.1
 nest-asyncio==1.5.8
 networkx==3.3
 nh3==0.2.15
@@ -105,6 +107,7 @@ packaging==23.2
 pandas==2.1.1
 parso==0.8.3
 pexpect==4.9.0
+philoui @ git+https://github.com/kumiori/philoui.git@b1edca896814921cb3148f85b92a6e00bae64de4
 Pillow==10.1.0
 pkginfo==1.9.6
 platformdirs==4.0.0
@@ -147,6 +150,7 @@ scikit-learn==1.4.2
 scipy==1.11.4
 seaborn==0.13.2
 segment-analytics-python==2.2.3
+setuptools==72.2.0
 six==1.16.0
 smmap==5.0.1
 sniffio==1.3.0
@@ -181,7 +185,7 @@ streamlit-timeline==0.0.2
 streamlit-toggle-switch==1.0.2
 streamlit-vertical-slider==2.5.5
 StrEnum==0.4.15
-sumup-oauthsession @ git+https://github.com/CedricCook/sumup_oauthsession@d3a2cd550b8de3337c077c2253b6fe1e59a79d29
+sumup_oauthsession @ git+https://github.com/CedricCook/sumup_oauthsession@d3a2cd550b8de3337c077c2253b6fe1e59a79d29
 supabase==1.2.0
 supafunc==0.2.3
 sympy==1.12
