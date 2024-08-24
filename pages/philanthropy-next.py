@@ -83,6 +83,9 @@ mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
 if 'serialised_data' not in st.session_state:
     st.session_state.serialised_data = {}
     
+if 'price' not in st.session_state:
+    st.session_state.price = 100.01
+    
 
 @st.dialog('Cast your preferences')
 def _submit(serialised_data, signature):
@@ -699,7 +702,7 @@ def question():
                             'height': 250,
                             'title': '',
                             'name': 'intuition',
-                            'messages': ["*The future looks* a dark impending storm", "*The future looks* bright and positive", "*The future looks* an uncertain mix"],
+                            'messages': ["*The future looks* dark like an impending storm", "*The future looks* bright and positive", "*The future looks* like an uncertain mix"],
                             # 'inverse_choice': inverse_choice,
                             'callback': lambda x: ''
                             }
@@ -1031,12 +1034,14 @@ To cover expenses and manage potential surplus funds, follow these steps:
     # base = qualitative_value
     # base = 1
 
-    st.markdown(f" # The price of commitment? \n # <center> {base}.{convert_string_to_decimal(tx_tag)} EUR<center>", unsafe_allow_html=True)
+    price = float(f"{base}.{convert_string_to_decimal(tx_tag)}")
+    st.session_state["price"] = price
+    st.markdown(f" # The price of commitment? \n # <center> {price} EUR<center>", unsafe_allow_html=True)
 
     f"""
     ### Why is this computed?
     
-    The encoding of information into a small number (`xx`) and committing it through a transaction of `1`.`xx` EUR if CONTRIBUTION, `10`.`xx` if INVESTMENT, `11`.`xx` if DONATION, 100.`xx` if PARTICIPATION, serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
+    The encoding of information into a small number (`xx`) and committing it through a transaction of `1`.`xx` EUR if CONTRIBUTION, `10`.`xx` if INVESTMENT, `11`.`xx` if DONATION, 100.`xx` OTHERWISE, serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
     
     This method not only protects the integrity of the data but also provides transparency, allowing anyone to attempt tracing the encoded details back to the transaction.
     
@@ -1152,7 +1157,7 @@ def get_checkout_info(checkout_id):
     if response.status_code in [200, 201, 202, 204]:
         # Extract the checkout ID from the response
         checkout_id = response.json().get('id')
-        st.success(f'Success! Checkout info retrieved')
+        st.success(f'Success! Commit info retrieved')
         
         return response.json()
     else:
@@ -1195,7 +1200,7 @@ def checkout():
     if st.session_state['sumup'] is not None:
         st.info("Authorisation successful!")
     else:
-        st.warning("Authorisation required!")
+        st.warning("We are integrating _money_ into the game. This requires your authorisation.")
 
 
     st.write("Click the link below to authorise the reception of the commitment trace .....")
@@ -1226,13 +1231,13 @@ def checkout():
     description = "Social Contract from Scratch•"
     _signature = "77868affa87ca77cdeb146c89593bac64ec6dd2ee7265dfeec61941d87529845"
     signature = mask_string(_signature)
-    st.markdown(f"# <center> Commit: {amount}</center>", unsafe_allow_html=True)
+    st.markdown(f"# <center> Commit # {st.session_state["price"]}</center>", unsafe_allow_html=True)
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
     if st.button("Create Commitment trace", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True):
         reference = reference[0:10]+f"-{int(now.strftime('%S'))}"
-        st.write(f"full reference {reference}")
-        checkout = create_commit_checkout(reference, amount, description + signature)
+        st.write(f"Full reference {reference}. (computed as a function of the current time)")
+        checkout = create_commit_checkout(reference, st.session_state["price"], description + signature)
         if checkout:
             st.json(checkout)
 
@@ -1246,8 +1251,18 @@ def checkout():
 
     for checkout in st.session_state['checkouts']:
         if st.button(f"Get Commit Info for {mask_string(checkout)}", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
-            checkout_info = get_checkout_info(checkout)
-            st.json(checkout_info)
+            col1, col2, col3 = st.columns([2, 3, 2])
+            with col2:
+                checkout_info = get_checkout_info(checkout)
+                # st.json(checkout_info)
+                st.write(f"**Amount:** {checkout_info['amount']} {checkout_info['currency']}")
+                st.write(f"**Checkout Reference:** {checkout_info['checkout_reference']}")
+                st.write(f"**Date:** {checkout_info['date']}")
+                st.write(f"**Description:** {checkout_info['description']}")
+                st.write(f"**Transaction ID:** {checkout_info['id']}")
+                st.write(f"**Merchant Country:** {checkout_info['merchant_country']}")
+                st.write(f"**Merchant Name:** {checkout_info['merchant_name']}")
+                st.write(f"**Status:** {checkout_info['status']}")
 
 
     st.write("Click the link below to commit a commitment trace:")
