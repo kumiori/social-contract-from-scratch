@@ -128,6 +128,30 @@ def convert_string_to_decimal(input_string):
     
     return result
 
+
+def dataset_to_intro(dataset):
+    formatted_text = "#### "
+    qualitative_value = dataset["Qualitative"]["value"]
+    if qualitative_value == "1":
+        qualitative_desc = "supporting"
+    elif qualitative_value == "2":
+        qualitative_desc = "investing"
+    elif qualitative_value == "10":
+        qualitative_desc = "donating"
+    else:
+        qualitative_desc = "participating"
+
+    if dataset.get("resonance", {}).get("value") is not None:
+        resonance = float(dataset.get("resonance", {}).get("value", False))
+        formatted_text += f"I decide to start this journey `{qualitative_desc}` as a philanthropist"
+        
+        outlook = "bright horizon" if resonance >= 1 else "dark storm" if resonance < 0.5 else "grey mist"
+        leaning = ", leaning `to the bright`." if resonance > 0.5 and resonance < 1. else ", leaning `to the dark`." if resonance < .5 and resonance > 0. else "."
+
+        formatted_text += f", my outlook for the future is a `{outlook}`{leaning}"
+    return formatted_text
+
+
 def extract_info(data):
     custom_donation = st.session_state.custom_donor
     
@@ -217,6 +241,7 @@ philanthropic_profiles = {
     'icon': ':material/warning:'
 }
 }  
+
 def show_pathways(pathways, cols=3):
     links_row = row(len(pathways)//cols, vertical_align="center")
     
@@ -431,14 +456,13 @@ def body():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         """
-    Let's jump on the _action_ side of this philanthropic journey. This is 
+    Let's jump on the _action_ side of this philanthropic journey. 
     
-    a digital platform which we build to stimulate interaction, committment and actionable decisions, gathering your stories and engaging meaningfully.
+    This is a digital platform which we build to stimulate interaction, committment and actionable decisions, gathering your stories and engaging meaningfully.
     
+    Designed to engage with you on multiple levels while ensuring that your preferences, perceptions, and contributions, are integrated in a meaningful and impactful way. 
     
-    This journey is designed to engage with you on multiple levels while ensuring that your preferences, perceptions, and contributions, are integrated in a meaningful and impactful way. 
-    
-    The combination of reflection, interaction, and emotion-driven engagement sets the stage for unique collective experiences.
+    The combination of reflection, interaction, and emotion-driven engagement sets the stage for new collective experiences.
 
     """
     
@@ -493,9 +517,9 @@ def engagement():
         
         **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources.
         
-        **Invest**, means that you are interested in contributing financially to our initiative, with the expectation of a return. has to do with risk, more creative
+        **Invest**, means that you are interested in contributing financially to our initiative, with the expectation of a return. Introduces an element of risk, allowing to get more creative.
         
-        **Donate**, means that you are willing to contribute financially to our initiative, without expectation .
+        **Donate**, means that you are willing to contribute financially to our initiative, without expectation of financial gains. 
         
         **Remark:** in the long run, these options are not mutually exclusive.
         
@@ -507,7 +531,7 @@ def engagement():
                         kwargs={"survey": survey, 
                                 'label': 'categorical', 
                                 "name": "we are at a crossing point.",
-                                "question" : "Support, Invest, or Donate?",
+                                "question" : "Support (dark grey), Invest (light grey), or Donate (black)?",
                                 "categories": engage_categories
                         })
     
@@ -521,6 +545,8 @@ def engagement():
         st.markdown(feedback_messages.get(str(engage), "Thank you for your dedication so far!"))
     else:
         st.write("Thank you for your dedication so far.")
+        
+        
     # if st.button("Reset the choice"):
     #     survey.data["Qualitative"]["value"] = None
     #     engage = None
@@ -530,6 +556,7 @@ def resonance():
     """
     We've collected some info so far...
     """
+    st.write(survey.data)
     
     """
     Let us forge an access key for you, to proceed with the journey.
@@ -548,27 +575,42 @@ def resonance():
             st.error(e)
 
 def values():
-    st.markdown("# <center> Step X: GAME</center>", unsafe_allow_html=True)
+    st.markdown("# <center> Step X: $\mathcal{Q}$uestion</center>", unsafe_allow_html=True)
+    st.markdown("# <center> How confident are you in the future?</center>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        """
+        Is it a source of hope, a shadow of challenges, or a fog of uncertainty? 
+        
+        Imagine standing at the edge of tomorrow — do you see a bright horizon filled with light, a dark impending storm, or a grey mist that obscures all but the nearest steps? 
+        
+        Share your perception, whether it's a bright outlook, a dark foreboding, or an uncertain mix of both. 
+        
+        Your perspective helps us map the collective vision of what lies ahead.
+        """
+    create_dichotomy(key = "executive", id= "executive",
+                        kwargs={'survey': survey,
+                            'label': 'resonance', 
+                            'question': 'Click to express your viewpoint.',
+                            'gradientWidth': 30,
+                            'height': 250,
+                            'title': '',
+                            'name': 'intuition',
+                            'messages': ["A dark impending storm", "Bright and positive", "An uncertain mix"],
+                            # 'inverse_choice': inverse_choice,
+                            'callback': lambda x: ''
+                            }
+                        )
+    
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
         """
-We are populating the table of our shared elementary values. This is more than just a GAME. It is a collective discovery process.
-Would you like to play? grey is uncertain, Black yes, white no 
+We are populating the table of our shared elementary values. This is more than just a game, this is a collective discovery process.
+
 """
         )
-    create_dichotomy(key = "executive", id= "executive",
-                        kwargs={'survey': survey,
-                            'label': 'resonance', 
-                            'question': 'Click to express your viewpoint: the gray area represents uncertainty, the two extremes: clarity.',
-                            'gradientWidth': 20,
-                            'height': 250,
-                            'title': '',
-                            'name': 'intuition',
-                            'messages': ["Yes, it's a good idea", "No, it's not a good idea", "I'm not sure"],
-                            # 'inverse_choice': inverse_choice,
-                            'callback': lambda x: ''})
-
+        st.write(dataset_to_intro(survey.data))
 def profiles():
 
     st.markdown("# <center> Step 3: Data Collection</center>", unsafe_allow_html=True)
@@ -936,17 +978,16 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     engagement()
     """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    authentication()
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     values()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     resonance()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    authentication()
     """
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
