@@ -1343,8 +1343,30 @@ def integrate(reference, _signature):
         st.session_state.clear()
         st.rerun()
 
+
+@st.dialog("Join the whitelist")
+def join_waitlist():
+    from email_validator import EmailNotValidError, validate_email
+    st.markdown("**Welcome aboard**")
+    st.markdown("""
+We're excited that you are interested in joining our initiative. As we consolidate a focused and passionate community, your interest is a great step, and we'd love to learn more about you and your views. 
+
+Joining the whitelist is our way of creating a supportive environment where individuals can collaborate and contribute meaningfully.
+             """)
+    email = st.text_input("Your email address")
+    if email:
+        try:
+            valid = validate_email(email)
+            email = valid.email
+        except EmailNotValidError as e:
+            st.error(str(e))
+        name = st.text_input("Your name")
+        if name:
+            st.write(f"Thank you `{name}` for your interest. We will get back to you shortly.")
+    # st.write("We are working on the whitelist feature. Please check back later.") 
+    
+    
 def intro():
-    from pages.philanthropy import join_waitlist
     
     cols = st.columns(4, vertical_alignment="center")
     today = datetime.now()
