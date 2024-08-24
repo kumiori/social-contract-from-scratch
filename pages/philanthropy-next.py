@@ -36,6 +36,7 @@ import pandas as pd
 from streamlit_extras.add_vertical_space import add_vertical_space 
 from streamlit_extras.row import row
 from philoui.authentication_v2 import AuthenticateWithKey
+from streamlit_timeline import timeline
 
 
 with open("assets/discourse.css", "r") as f:
@@ -430,7 +431,9 @@ def body():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         """
-    Let’s jump on the _action_ side of this philanthropic journey. This is a digital platform which we build to stimulate interaction, committment and actionable decisions, gathering your stories and engaging meaningfully.
+    Let's jump on the _action_ side of this philanthropic journey. This is 
+    
+    a digital platform which we build to stimulate interaction, committment and actionable decisions, gathering your stories and engaging meaningfully.
     
     
     This journey is designed to engage with you on multiple levels while ensuring that your preferences, perceptions, and contributions, are integrated in a meaningful and impactful way. 
@@ -451,7 +454,7 @@ def body():
     """
 
         """
-    For now, our primary goal is to gather your commitment to philanthropic intentions and ensure that our objectives align. This process helps us understand your interests and motivations, setting the stage for meaningful collaboration. 
+    For now, our primary goal is to **gather your commitment to philanthropic intentions** and ensure that our objectives align. This process helps us understand your interests and motivations, setting the stage for meaningful collaboration. 
     
     Once we have established this connection and confirmed that our paths are in sync, we will reach out to discuss the next steps in more detail, ensuring that your contribution is impactful and aligns with our shared goals. 
     
@@ -482,6 +485,23 @@ def authentication():
 def engagement():
     st.markdown("# <center> Step 2: Engagement</center>", unsafe_allow_html=True)
 
+    col1, col2, col3 = st.columns([1, 9, 1])
+
+    with col2:
+        """
+        We're offering three different ways to engage with our initiative: **Support**, **Invest**, or **Donate**.
+        
+        **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources.
+        
+        **Invest**, means that you are interested in contributing financially to our initiative, with the expectation of a return. has to do with risk, more creative
+        
+        **Donate**, means that you are willing to contribute financially to our initiative, without expectation .
+        
+        **Remark:** in the long run, these options are not mutually exclusive.
+        
+        """
+        
+        
     engage_categories= {'1': 'Support', '2': 'Invest', '10': 'Donate'}
     engage = create_qualitative('trifurcation',
                         kwargs={"survey": survey, 
@@ -495,7 +515,8 @@ def engagement():
         '1': "## I have chosen to **`Support`** this initiative. \n ### _Thank you,_ your backing is essential in helping us move forward.",
         '2': "## I have chosen to **`Invest`** in a shared vision. \n ### _Thank you,_ your interest in investment will help us consolidate and expand our activity.",
         '10': "## I have chosen to **`Donate`** to our cause. \n ### _Thank you,_ your generosity makes a significant difference."
-}
+    }
+    
     if engage is not None:
         st.markdown(feedback_messages.get(str(engage), "Thank you for your dedication so far!"))
     else:
@@ -567,7 +588,7 @@ Two aspects are key for us:
         """
         **Remark:** 
 As we proceed, we will store your information in two separate databases: a 'trusted' one for verified data and an 'untrusted' one for data that needs further validation. This helps us ensure accuracy and transparency in our actions, while exploring the dynamics of trust and value in a digital environment.
-        One of the two databases of choice is a simple _relational_ database, the other is a banking ledger.
+        One of the two databases of choice is a simple **_relational_ database**, the other is a **banking ledger**.
         """
     st.toast(
         """Side Note:
@@ -617,9 +638,18 @@ def preferences():
         """
 
 If philanthropy is your choice to connect and engage, join us at the upcoming _Europe in Discourse_ conference. It's the perfect opportunity to further our engagement and see how your actions translate into real-world impact.
-"""
+        """
         )
-
+        """
+        
+        To gauge your interests and align our efforts, we invite you to participate in a brief interactive exercise. 
+        
+        The sliders represent different areas of our project, such as decision-making, science, arts, and events. 
+        
+        By adjusting the sliders, express your level of interest or engagement in each category.
+        
+        """
+        
         # st.write(engage)
         equaliser_data = [
             ("Decision Making", ""),
@@ -629,7 +659,9 @@ If philanthropy is your choice to connect and engage, join us at the upcoming _E
             ]
 
         create_equaliser(key = "equaliser", id= "equaliser", kwargs={"survey": survey, "data": equaliser_data})
-    
+        """
+        Your input helps us better understand which aspects of our initiative resonate with you and ensure that your philanthropic contributions are directed towards areas that are most meaningful to you.
+                """
 def donation():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
@@ -638,10 +670,10 @@ def donation():
         """
         ### **Donation Options:**
         - **Custom Donation:** Allows you to pick your preferred number.
-        - **Button 1:** "Sponsor a Coffee for the collective" – 17 EUR
-        - **Button 2:** "Cover a Light Lunch or Part of Dinner" – 100 EUR
-        - **Button 3:** "Support Our Accommodation" – 1000 EUR
-        - **Button 4:** "Support Our Travels" – 1111 EUR
+        - **:material/coffee: :** "Sponsor a Coffee for the collective" – 17 EUR
+        - **:material/restaurant: :** "Cover a Light Lunch or Part of Dinner" – 100 EUR
+        - **:material/hotel::** "Support Our Accommodation" – 1000 EUR
+        - **:material/jump_to_element: :** "Support Our Travels" – 1111 EUR
 
 
         """
@@ -688,7 +720,7 @@ def donation():
             min_exp_value = 0
             max_exp_value = 5
             min_actual_value = 1
-            max_actual_value = 100000
+            max_actual_value = 100000-0.1
 
             exp_value = survey.slider(label = "Sensitive Slider",
                                       id = "custom_donation_slider", 
@@ -718,8 +750,75 @@ def offer():
 
 def contribution():
     st.markdown("# <center> Step X:  / IF CONTRIBUTION</center>", unsafe_allow_html=True)
-
+    """
+    In Kind or Economic Contribution
+    """
+    
+    """For example, I have a restaurant, come eat at my venue
+    I'm happy to feed your ideas
+    
+    I'm happy to offer a room in my hotel
+    
+    a disposizione asset e non solo denaro"""
     # col1, col2, col3 = st.columns([1, 9, 1])
+    
+
+def timeflow():
+
+        
+    timeline_data = {
+        "title": {
+            "media": {
+            "url": "",
+            "caption": " <a target=\"_blank\" href=''>credits</a>",
+            "credit": ""
+            },
+            "text": {
+            "headline": "Welcome to<br>Athena's Timeline",
+            "text": "<p>A Timeline component by integrating ... from ...</p>"
+            }
+        },
+        "events": [
+        {
+            "media": {
+            "url": "https://vimeo.com/143407878",
+            "caption": "How to Use TimelineJS (<a target=\"_blank\" href='https://timeline.knightlab.com/'>credits</a>)"
+            },
+            "start_date": {
+            "year": "2024",
+            "month":"9",
+            "day":"26"
+            },
+            "end_date": {
+            "year": "2024",
+            "month":"9",
+            "day":"28"
+            },
+            "text": {
+            "headline": "Athena's Collective<br> participatory timelines.",
+            "text": "<p>Athena's Collective is ... </p>"
+            }
+        },
+        {
+            "start_date": {
+                "year": "2024",
+                "month":"10",
+                "day":"1"
+                },
+            "end_date": {
+                "year": "2024",
+                "month":"10",
+                "day":"3"
+                },
+            "text": {
+                "headline": "Athena's Collective<br> October timelines.",
+                "text": "<p>Athena's Collective is ... </p>"
+            }
+        }
+        ]
+        }
+    st.subheader("Timeline Widget")
+    timeline(timeline_data, height=800)
     
 def reading():
     # with col2:
@@ -746,11 +845,13 @@ def reading():
 To cover expenses and manage potential surplus funds, follow these steps:
 
 
-5. **Engage Further:** Invite donors to follow the project’s progress and participate in future initiatives."""
+5. **Engage Further:** Invite donors to follow the project's progress and participate in future initiatives."""
     )
     
     
-    # st.write(list(philanthropic_profiles.keys())[id-1])
+    # st.
+    # 
+    # write(list(philanthropic_profiles.keys())[id-1])
     # st.write(list(philanthropic_profiles.items())[id-1][1]['description'])
     # st.session_state["profile"] = id
     # st.markdown(id)
@@ -785,6 +886,7 @@ To cover expenses and manage potential surplus funds, follow these steps:
     """
     base = 10 if tier == "2" else 1
     base = qualitative_value
+    base = 1
 
     st.markdown(f" # The price of commitment? \n # <center> {base}.{convert_string_to_decimal(tx_tag)} EUR<center>", unsafe_allow_html=True)
 
@@ -865,6 +967,16 @@ Click twice on the 'Yes' button _twice_ to go forward.
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     offer()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
     contribution()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
     reading()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    timeflow()
     
