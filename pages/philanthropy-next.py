@@ -38,7 +38,9 @@ from streamlit_extras.row import row
 from philoui.authentication_v2 import AuthenticateWithKey
 from streamlit_timeline import timeline
 import streamlit.components.v1 as components
+import json
 
+db = IODatabase(conn, "discourse-data")
 
 with open("assets/discourse.css", "r") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -77,6 +79,36 @@ fields_forge = {'Form name':'Forge access key', 'Email':'Email', 'Username':'Use
 
 mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
 
+
+@st.dialog('Cast your preferences')
+def _submit():
+    # st.write('Thanks, expand below to see your data')    
+    signature = st.session_state["username"]
+    
+    with st.spinner("Checking your signature..."):
+        # time.sleep(2)
+        preferences_exists = db.check_existence(signature)
+        st.write(f"Integrating signature preferences `{mask_string(signature)}`")
+        _response = "Yes!" if preferences_exists else "Not yet"
+        st.info(f"Some of your preferences exist...{_response}")
+        serialised_data = st.session_state['serialised_data']
+
+        try:
+            data = {
+                'signature': signature,
+                'practical_questions_01': json.dumps(serialised_data)
+            }
+            query = conn.table('discourse-data')                \
+                   .upsert(data, on_conflict=['signature'])     \
+                   .execute()
+            
+            if query:
+                st.success("🎊 Preferences integrated successfully!")
+                
+        except Exception as e:
+            st.error("🫥 Sorry! Failed to update data.")
+            st.write(e)
+            
 def my_create_dichotomy(key, id = None, kwargs = {}):
     dico_style = """<style>
     div[data-testid='stVerticalBlock']:has(div#dicho_inner):not(:has(div#dicho_outer)) {background-color: #F5F5DC};
@@ -155,8 +187,11 @@ def exp_to_actual(value):
     return min_actual_value * (max_actual_value / min_actual_value) ** ((value - min_exp_value) / (max_exp_value - min_exp_value))
 
 def convert_string_to_decimal(input_string):
+    from decimal import Decimal
+
     # Split the string into binary part and base-10 part
     binary_part, base10_part = input_string.split('-')
+    print(binary_part, base10_part)
     
     # Convert the binary part to a decimal integer
     binary_decimal = int(binary_part, 2)
@@ -166,9 +201,12 @@ def convert_string_to_decimal(input_string):
         base10_integer = 0
     else:
         base10_integer = int(base10_part)
-    
+
     # Add the two values
-    result = binary_decimal + base10_integer
+    result = binary_decimal + base10_integer + 1
+
+    if len(str(result)) == 1:
+        result = '0' + str(result)
     
     return result
 
@@ -981,18 +1019,20 @@ To cover expenses and manage potential surplus funds, follow these steps:
     f"""
     To make a step forward, these simple but key informations are encoded numerically into a small number `xx`, where `xx` in this case equals **{convert_string_to_decimal(tx_tag)}**.
     """
-    base = 10 if tier == "2" else 1
-    base = qualitative_value
-    base = 1
+    base = 10 if qualitative_value == "2" else 1 if qualitative_value == "1" else 11 if qualitative_value == "10" else 100
+    # base = qualitative_value
+    # base = 1
 
     st.markdown(f" # The price of commitment? \n # <center> {base}.{convert_string_to_decimal(tx_tag)} EUR<center>", unsafe_allow_html=True)
 
     f"""
     ### Why is this computed?
     
-    The encoding of information into a small number (`xx`) and committing it through a transaction of `1 or 2`.`xx` EUR serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
+    The encoding of information into a small number (`xx`) and committing it through a transaction of `1`.`xx` EUR if CONTRIBUTION, `10`.`xx` if INVESTMENT, `11`.`xx` if DONATION, 100.`xx` if PARTICIPATION, serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
     
     This method not only protects the integrity of the data but also provides transparency, allowing anyone to attempt tracing the encoded details back to the transaction.
+    
+    In this way, we can perform very sophisticated data analysis and pattern recognition, _transparently_, while ensuring the privacy and security of the data.
     """
     
     
@@ -1029,7 +1069,7 @@ def create_commit_checkout(reference, amount, description):
     if response.status_code in [200, 201, 202, 204]:
         # Extract the checkout ID from the response
         checkout_id = response.json().get('id')
-        st.success(f'Success! Checkout ID: {checkout_id}')
+        st.success(f'Success! Commit ID: {checkout_id}')
         st.session_state['checkouts'].append(checkout_id)
         
         return response.json()
@@ -1203,12 +1243,23 @@ def checkout():
 
     st.write("Click the link below to commit a commitment trace:")
 
+    """
+    Let's save essential data (e.g., preferences preferences, initial information) before the payment to ensure nothing is lost if the payment fails (some will _indeed_ fail!). 
+    
+    Then, after successful ledger commitment, we shall update and refine the database with confirmation details and additional secure information.
+    """
+
+    st.title("Integrate the data")
+
+
     st.title("Send the signal (commit)")
+    
+    
     for checkout in st.session_state['checkouts']:
         if st.button(f":material/step_out:", key=f"pay-{checkout}", help=f"{checkout}", use_container_width=True):
             sumup_widget(checkout)
             
-    st.write(survey.data)
+    # st.write(survey.data)
     st.markdown(dataset_to_intro(survey.data))
     
     if st.button(f"Clear all and restart", key=f"restart", type='primary', use_container_width=True):
