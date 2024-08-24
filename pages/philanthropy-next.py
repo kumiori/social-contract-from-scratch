@@ -51,16 +51,22 @@ with open('assets/credentials.yml') as file:
     now = datetime.now()
     # st.markdown(f"`Now is {now.strftime('%s')}-{now.strftime('%f')}~` max is {st.session_state.range if st.session_state.range else ''}")
 
+survey = CustomStreamlitSurvey()
+
 if 'alerted' not in st.session_state:
     st.session_state.alerted = False
 
 if 'profile' not in st.session_state:
     st.session_state.profile = None
 
-if 'custom_donation' not in st.session_state:
+if 'custom_donor' not in st.session_state:
     st.session_state.custom_donor = False
 
-survey = CustomStreamlitSurvey()
+if 'checkouts' not in st.session_state:
+    st.session_state.checkouts = []
+
+if 'survey' not in st.session_state:
+    st.session_state['survey'] = {'data': {}}
 
 # @st.dialog("What is your story?", width="small")
 authenticator = AuthenticateWithKey(
@@ -86,6 +92,8 @@ if 'serialised_data' not in st.session_state:
 if 'price' not in st.session_state:
     st.session_state.price = 100.01
     
+if "profile" not in st.session_state:
+    st.session_state["profile"] = None
 
 @st.dialog('Cast your preferences')
 def _submit(serialised_data, signature):
@@ -164,9 +172,6 @@ def my_create_dichotomy(key, id = None, kwargs = {}):
 def handle_callback(id):
     st.session_state["current_pathway"] = id
 
-    if "profile" not in st.session_state:
-        st.session_state["profile"] = None
-
     st.toast(f"profile {st.session_state['profile']}")
 
 def vote_callback(id):
@@ -234,18 +239,19 @@ def dataset_to_intro(dataset):
     else:
         qualitative_desc = "participating"
 
+    formatted_text += f"I decide to start this journey `{qualitative_desc}` as a philanthropist"
+
     if dataset.get("resonance", {}).get("value") is not None:
         resonance = float(dataset.get("resonance", {}).get("value", False))
-        formatted_text += f"I decide to start this journey `{qualitative_desc}` as a philanthropist"
         
         outlook = "bright horizon" if resonance >= 1 else "dark storm" if resonance < 0.5 else "grey mist"
         leaning = ", leaning `to the bright`." if resonance > 0.5 and resonance < 1. else ", leaning `to the dark`." if resonance < .5 and resonance > 0. else "."
 
-        formatted_text += f", my outlook for the future is a `{outlook}`{leaning}"
-    return formatted_text
+        formatted_text += f", my outlook for the future is a `{outlook}`{leaning}."
+    return formatted_text + ". Looking forward."
 
 def extract_info(data):
-    custom_donation = st.session_state.custom_donor
+    checkouts = st.session_state.custom_donor
     
     # Determine the tier based on the value of Qualitative
     qualitative_value = data.get("Qualitative", {}).get("value", None)
@@ -278,9 +284,9 @@ def extract_info(data):
             donation_type = "other"
             type_value = "11"
         
-        if custom_donation:
-            donation_type = "custom"
-            type_value = "11"
+        # if custom_donation:
+        #     donation_type = "custom"
+        #     type_value = "11"
     else:
         donation_type = "XX"
         type_value = "00"
@@ -633,7 +639,7 @@ def engagement():
                         kwargs={"survey": survey, 
                                 'label': 'categorical', 
                                 "name": "we are at a crossing point.",
-                                "question" : "Support (dark grey), Invest (light grey), or Donate (black)?",
+                                "question" : "Support (1, dark grey), Invest (2, light grey), or Donate (10, black)?",
                                 "categories": engage_categories
                         })
     
@@ -646,7 +652,7 @@ def engagement():
     if engage is not None:
         st.markdown(feedback_messages.get(str(engage), "Thank you for your dedication so far!"))
     else:
-        st.write("Thank you for your dedication so far.")
+        st.write("Take your time to get used to this strange button, it's new _to us_ as well.")
         
         
     # if st.button("Reset the choice"):
@@ -681,7 +687,7 @@ def resonance():
             st.error(e)
 
 def question():
-    st.markdown("# <center> Step X: $\mathcal{Q}$uestion</center>", unsafe_allow_html=True)
+    # st.markdown("# <center> Step X: $\mathcal{Q}$uestion</center>", unsafe_allow_html=True)
     st.markdown("# <center> How do you _feel_ about the future?</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
@@ -702,7 +708,7 @@ def question():
                             'height': 250,
                             'title': '',
                             'name': 'intuition',
-                            'messages': ["*The future looks* dark like an impending storm", "*The future looks* bright and positive", "*The future looks* like an uncertain mix"],
+                            'messages': ["*The future looks* dark like an impending storm", "*The future looks* bright and positive", "*The future looks* gray like an uncertain mix"],
                             # 'inverse_choice': inverse_choice,
                             'callback': lambda x: ''
                             }
@@ -744,7 +750,7 @@ Why should the banking ledger be _trusted_? The information we seek will be enco
     
 
 def story():
-    st.markdown("# <center> Step 4: Personal Story / profile</center>", unsafe_allow_html=True)
+    st.markdown("# <center> Step 4: Personal Story</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -985,14 +991,11 @@ def reading():
         #             use_container_width=True)       
 
 
-    st.markdown("# <center> Step X: Finalise / commit</center>", unsafe_allow_html=True)
+    st.markdown("# <center> Step X: Connect / commit</center>", unsafe_allow_html=True)
     st.json(survey.data, expanded=False)
     st.markdown(
 """
-To cover expenses and manage potential surplus funds, follow these steps:
-
-
-5. **Engage Further:** Invite donors to follow the project's progress and participate in future initiatives."""
+We aim at _covering expenses_, however - should there be any surplus funds, _we invite_ donors to participate in a future initiative, following the project's progress."""
     )
     
     
@@ -1008,7 +1011,8 @@ To cover expenses and manage potential surplus funds, follow these steps:
     # generate string based on data
 
     tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
-    st.markdown(f"# <center>Transaction code:</center> \n # <center>`SCFS{tx_tag}`" + '•' + '<code>' + mask_string('asd') + "</code></center>", unsafe_allow_html=True)
+    st.markdown(f"# <center>Transaction code:</center> \n # <center>`SCFS{tx_tag}`</center>", unsafe_allow_html=True)
+    # " + '•' + '<code>' + str(st.session_state["username"]) + "</code>
     # st.write(st.session_state["username"])
     st.write(extract_info(survey.data))
     """
@@ -1166,11 +1170,8 @@ def get_checkout_info(checkout_id):
         st.warning(f'Error: {response.text}')
         return None
     
-
 def checkout():
-    
-    st.markdown("# <center> Step X: Create trace / checkout</center>", unsafe_allow_html=True)
-    st.json(survey.data, expanded=False)
+    st.markdown("# <center> Step X: Create digital trace</center>", unsafe_allow_html=True)
     st.markdown(
 """
 """)
@@ -1180,7 +1181,6 @@ def checkout():
 
     from requests.exceptions import RequestException
 
-
     base_url = "https://api.sumup.com/"
     redirect_uri = "https://individual-choice.streamlit.app/"
 
@@ -1188,8 +1188,6 @@ def checkout():
     if 'sumup' not in st.session_state:
         st.session_state['sumup'] = None
 
-    if 'checkouts' not in st.session_state:
-        st.session_state['checkouts'] = []
 
     st.title("To wrap up, we integrate payment channels")
     st.markdown("Click the expand button below to know more about the payment data.")
@@ -1223,14 +1221,13 @@ def checkout():
             st.error(f"Missing configuration for {e}. Please check your secrets.")
         except Exception as e:
             st.error(f"An unexpected error occurred: {e}")
-    amount = 1.03
-    
     
     reference = f"SCFS1011-3-SS"
-    # reference = f"SCFS1011-3-{int(now.strftime('%S'))}"
     description = "Social Contract from Scratch•"
     _signature = "77868affa87ca77cdeb146c89593bac64ec6dd2ee7265dfeec61941d87529845"
+
     signature = mask_string(_signature)
+
     st.markdown(f"# <center> Commit # {st.session_state["price"]}</center>", unsafe_allow_html=True)
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
@@ -1271,11 +1268,15 @@ def checkout():
     Let's save essential data (e.g., preferences, ideas, initial information) before the payment to ensure nothing is lost if the payment fails (some will _indeed_ fail!). 
     
     """
+    return reference, _signature
 
+
+def integrate(reference, _signature):
+        
     st.title("Integrate the data")
-
     
     csv_filename = f"my_philanthropic_question_map_1_{reference}.data"
+    
     if st.download_button(label=f"Download datafile", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='primary'):
         st.success(f"Saved {csv_filename}")
 
@@ -1291,17 +1292,17 @@ def checkout():
     st.write(survey.data)
     st.write(f"Full signature: {_signature}")
     st.write(f"Full username: {st.session_state['username']}")
-    
+    st.markdown("# :material/barefoot:, :material/rainy_snow:, :material/online_prediction:, :material/alarm_off:, :material/award_star:, :material/draw:,  ")
     for checkout in st.session_state['checkouts']:
         if st.button(f":material/step_out:", key=f"pay-{checkout}", help=f"{checkout}", use_container_width=True):
             sumup_widget(checkout)
             
-    # st.write(survey.data)
+    st.write(survey.data)
     st.markdown(dataset_to_intro(survey.data))
     
     if st.button(f"Clear all and restart", key=f"restart", type='primary', use_container_width=True):
         st.session_state.clear()
-        st.stop()
+        st.rerun()
     
 if __name__ == "__main__":
     alert_text = """
@@ -1342,6 +1343,7 @@ Click twice on the 'Yes' button _twice_ to go forward.
     """
     engagement()
     """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     question()
     """
@@ -1384,5 +1386,9 @@ Click twice on the 'Yes' button _twice_ to go forward.
     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """
     # timeflow()
-    
-    checkout()
+    reference, _signature = checkout()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    # timeflow()
+    integrate(reference, _signature)
