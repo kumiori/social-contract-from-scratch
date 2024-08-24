@@ -1243,7 +1243,7 @@ def checkout():
         # st.write(f'Full signature {_signature}')
         
         
-    st.markdown(f"# <center> Commit # {st.session_state["price"]}</center>", unsafe_allow_html=True)
+    st.markdown(f'# <center> Commit # {st.session_state["price"]}</center>', unsafe_allow_html=True)
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
     
