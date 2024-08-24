@@ -54,7 +54,7 @@ if 'profile' not in st.session_state:
     st.session_state.profile = None
 
 if 'custom_donation' not in st.session_state:
-    st.session_state.custom_donation = False
+    st.session_state.custom_donor = False
 
 survey = CustomStreamlitSurvey()
 
@@ -128,7 +128,7 @@ def convert_string_to_decimal(input_string):
     return result
 
 def extract_info(data):
-    custom_donation = st.session_state.custom_donation
+    custom_donation = st.session_state.custom_donor
     
     # Determine the tier based on the value of Qualitative
     qualitative_value = data.get("Qualitative", {}).get("value", None)
@@ -180,39 +180,39 @@ def extract_info(data):
 
 philanthropic_profiles = {
 'Communitarian': {
-    'description': '## **Doing good** makes sense for the community. Your contributions create ripple effects that strengthen social bonds and uplift those around you.',
+    'description': '## _**Doing good** makes sense for the community._ My contributions create ripple effects that strengthen social bonds and uplift all those around.',
     'icon': ':material/group:'
 },
 'Devout': {
-    'description': '## **Doing good** is the will of a higher power. Your philanthropy is a sacred duty, a way to serve and fulfill your spiritual obligations.',
+    'description': '## _**Doing good** is the will of a higher power_. My philanthropy is a sacred duty, a way to serve and fulfill my spiritual inspiration.',
     'icon': ':material/auto_awesome:'
 },
 'Investor': {
-    'description': '## **Doing good** is good business. You see philanthropy as an investment, generating returns not just for society, but for the world at large.',
+    'description': '## _**Doing good** is good business._ I see philanthropy as an investment, generating returns not just for society, but for the world at large.',
     'icon': ':material/monetization_on:'
 },
 'Socialite': {
-    'description': '## **Doing good** is sexy. Your generosity is a symbol of status and influence, making waves in social circles while benefiting the greater good.',
+    'description': '## _**Doing good** is sexy._ My generosity is a symbol of commitment and influence, making waves in social circles while benefiting the greater good.',
     'icon': ':material/party_mode:'
 },
 'Repayer': {
-    'description': '## **Time to give back**. You have received much from society, and now it’s your turn to return the favor and support the next generation.',
+    'description': '## _**Time to give back**._ I have received much from society, and now it\'s my turn to return the favor and support the what\'s coming.',
     'icon': ':material/replay:'
 },
 'Dynast': {
-    'description': '## **Following family tradition**. Philanthropy is in your blood, a legacy passed down through generations, and you proudly carry the torch.',
+    'description': '## _**Following family tradition**._ Philanthropy is in my blood, a legacy passed down through generations, and I proudly carry the torch.',
     'icon': ':material/family_restroom:'
 },
 'Altruist': {
-    'description': '## **Giving from the heart**. Your generosity knows no bounds; you give selflessly and with deep compassion, driven by a love for humanity.',
+    'description': '## _**Giving from the heart**._ My generosity expands my boundaries; I give selflessly and with deep compassion, driven by a love for humanity.',
     'icon': ':material/favorite:'
 },
 'Indifferent': {
-    'description': '## **I don\'t give a shit about** philanthropy or social causes. You believe that everyone should fend for themselves, and you see no reason to contribute.',
+    'description': '## _**I don\'t give a shit about philanthropy**_ or social causes. I believe that everyone should fend for themselves, and I see no reason to contribute.',
     'icon': ':material/block:'
 },
 'Deflector': {
-    'description': '## **It\'s somebody else\'s problem**. You believe that social issues and philanthropy are for others to worry about, not your concern or responsibility.',
+    'description': '## _**Social questions are somebody else\'s problem**._ I believe that social issues and philanthropy are for others to worry about, not my concern or responsibility.',
     'icon': ':material/warning:'
 }
 }  
@@ -430,29 +430,37 @@ def body():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         """
-    Let’s jump on the auction side of this philanthropic journey. This is a digital platform which we build to stimulate an action, commit a decision, populate a database, engage and interact.
+    Let’s jump on the _action_ side of this philanthropic journey. This is a digital platform which we build to stimulate interaction, committment and actionable decisions, gathering your stories and engaging meaningfully.
     
     
-    This journey is designed to engage with you on multiple levels—emotionally, intellectually, and socially—while ensuring that your preferences, perceptions, and contributions are meaningful and impactful. The combination of reflection, interaction, and data-driven engagement sets the stage for unique transformative experiences.
+    This journey is designed to engage with you on multiple levels while ensuring that your preferences, perceptions, and contributions, are integrated in a meaningful and impactful way. 
+    
+    The combination of reflection, interaction, and emotion-driven engagement sets the stage for unique collective experiences.
 
     """
     
-        """ 
-    It's a process in several steps.
-
-First question is served after a pause. This process will take approximately the time of a good tea. Pause for a minute to think about why you're here.
-    """
     st.markdown("# <center> Step 1:  / Reflection</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
 
     with col2:
-        st.markdown("""
-        Take a moment, maybe even  one full minute, to reflect on your motivation for participating in this journey. This process will guide your actions and decisions over the next 10 minutes.
-    """)
+        """ 
+    This is a process in several steps which interactively depend on your choices. 
+    After you make a decision, take a moment to consider _why_ you made this choice and  _how_ does it align with your personal goals and values.
 
+    This process will take approximately _the time of a good tea_. If you brew one, pause for a minute to think about why you're here.
+    """
+
+        """
+    For now, our primary goal is to gather your commitment to philanthropic intentions and ensure that our objectives align. This process helps us understand your interests and motivations, setting the stage for meaningful collaboration. 
+    
+    Once we have established this connection and confirmed that our paths are in sync, we will reach out to discuss the next steps in more detail, ensuring that your contribution is impactful and aligns with our shared goals. 
+    
+    We look forward to exploring this journey together.
+    """
     # We are populating the table of our shared elementary values, would you like to play
 
 def authentication():
+    st.markdown("# <center> Step X: Access key</center>", unsafe_allow_html=True)
     if st.session_state['authentication_status'] is None:
         col1, col2, col3 = st.columns([1, 9, 1])
         """### Towards our conference in Athens _Europe in Discourse_"""
@@ -503,7 +511,7 @@ def resonance():
     """
     
     """
-    Generate access key to proceed with the journey.
+    Let us forge an access key for you, to proceed with the journey.
     """
     if st.session_state['authentication_status'] is None:
         # authenticator.login('Connect', 'main', fields = fields_connect)
@@ -519,6 +527,7 @@ def resonance():
             st.error(e)
 
 def values():
+    st.markdown("# <center> Step X: GAME</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -576,27 +585,30 @@ We're curious to learn more about the individuals behind these decisions. Your s
 What is your story?
 """
         )
-    show_pathways(philanthropic_profiles, cols=1)
     col1, col2, col3 = st.columns([2, 6, 1], vertical_alignment="center")
+    custom_profile = False
     
     with col2:
-    
         if st.toggle("Custom profile", key="custom_profile"):
             """(Feel free to share as much or as little as you like.)"""
-            
-            survey.text_area("Enter your custom profile:", key="custom_profile_text")
+            custom_profile = True
+            profile_text = survey.text_area("Enter your custom profile:", key="custom_profile_text")
             st.session_state["profile"] = None         
 
-    if st.session_state["profile"] is not None:
-        # st.write(f"Your profile is {st.session_state['profile']}")
+    if not custom_profile: 
+        show_pathways(philanthropic_profiles, cols=1)
+
+    col1, col2, col3 = st.columns([2, 6, 1], vertical_alignment="center")
+    # if st.session_state["profile"] is not None:
+    if st.session_state["profile"] is not None and not custom_profile:
         with col2:
             st.write(list(philanthropic_profiles.items())[st.session_state['profile']-1][1]["description"])    
         
-        with col3:
+        with col3:  
             st.markdown('# ' + f'{list(philanthropic_profiles.items())[st.session_state['profile']-1][1]["icon"]}') 
 
         st.markdown('### #' + f'{list(philanthropic_profiles.items())[st.session_state['profile']-1][0]}') 
-            
+        
 def preferences():
     st.markdown("# <center> Step 5: Participation / expression</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
@@ -625,11 +637,11 @@ def donation():
         st.markdown("# <center> Step X: Access / IF DONATION</center>", unsafe_allow_html=True)
         """
         ### **Donation Options:**
-        - **Button 1:** "Offer a Coffee" – 17 EUR
+        - **Custom Donation:** Allows you to pick your preferred number.
+        - **Button 1:** "Sponsor a Coffee for the collective" – 17 EUR
         - **Button 2:** "Cover a Light Lunch or Part of Dinner" – 100 EUR
         - **Button 3:** "Support Our Accommodation" – 1000 EUR
         - **Button 4:** "Support Our Travels" – 1111 EUR
-        - **Custom Donation:** Allows you to pick your preferred number.
 
 
         """
@@ -667,12 +679,12 @@ def donation():
                     st.write("Thank you for supporting our travels!")
         
         else:
-            st.session_state.custom_donation = True
+            st.session_state.custom_donor = True
 
             st.write("Thank you for your generous intention!")
             
             # Exponential slider
-        if st.session_state.custom_donation:
+        if st.session_state.custom_donor:
             min_exp_value = 0
             max_exp_value = 5
             min_actual_value = 1
