@@ -35,6 +35,7 @@ import streamlit_shadcn_ui as ui
 import pandas as pd
 from streamlit_extras.add_vertical_space import add_vertical_space 
 from streamlit_extras.row import row
+from philoui.authentication_v2 import AuthenticateWithKey
 
 
 with open("assets/discourse.css", "r") as f:
@@ -52,7 +53,26 @@ if 'alerted' not in st.session_state:
 if 'profile' not in st.session_state:
     st.session_state.profile = None
 
+if 'custom_donation' not in st.session_state:
+    st.session_state.custom_donation = False
+
+survey = CustomStreamlitSurvey()
+
 # @st.dialog("What is your story?", width="small")
+authenticator = AuthenticateWithKey(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days'],
+    config['preauthorized']
+)
+fields_connect = {'Form name':'Have you ever found the key out of the portal?', 'Email':'Email', 'Username':'Username',
+            'Password':'Password', 'Repeat password':'Repeat password',
+            'Register':' Here • Now ', 'Captcha':'Captcha'}
+fields_forge = {'Form name':'Forge access key', 'Email':'Email', 'Username':'Username',
+            'Password':'Password', 'Repeat password':'Repeat password',
+            'Register':' Here • Now ', 'Captcha':'Captcha'}
+
 
 def handle_callback(id):
     st.session_state["current_pathway"] = id
@@ -62,10 +82,9 @@ def handle_callback(id):
 
     st.toast(f"profile {st.session_state['profile']}")
 
-
 def vote_callback(id):
-    st.write(list(philanthropic_profiles.keys())[id-1])
-    st.write(list(philanthropic_profiles.items())[id-1][1]['description'])
+    # st.write(list(philanthropic_profiles.keys())[id-1])
+    # st.write(list(philanthropic_profiles.items())[id-1][1]['description'])
     st.session_state["profile"] = id
     st.markdown(id)
 
@@ -75,18 +94,71 @@ def vote_callback(id):
     if "toast" not in st.session_state:
         st.session_state["toast"] = False
 
-    st.toast(f"profile {st.session_state['profile']}")
+    # st.toast(f"profile {st.session_state['profile']}")
 
-    if st.button("This is my profile", 
-                 type="primary",
-                key=f"vote_button_{id}", 
-                help="Click to vote for this pathway", 
-                use_container_width=True):
+    # if st.button("This is my profile", 
+    #              type="primary",
+    #             key=f"vote_button_{id}", 
+    #             help="Click to vote for this pathway", 
+    #             use_container_width=True):
 
-        st.session_state["profile"] = id
-        st.toast(f"Your profile id {id}")
-        st.toast(f"Your session profile id {st.session_state["profile"]}")
+    st.session_state["profile"] = id
+    # st.toast(f"Your profile id {id}")
+    # st.toast(f"Your session profile id {st.session_state["profile"]}")
+
+            
+# Convert exponential value to actual value
+def exp_to_actual(value):
+    return 10**value
+    return min_actual_value * (max_actual_value / min_actual_value) ** ((value - min_exp_value) / (max_exp_value - min_exp_value))
+
+def extract_info(data, custom_donation = False):
+    # Determine the tier based on the value of Qualitative
+    qualitative_value = data.get("Qualitative", {}).get("value", None)
+
+    if qualitative_value is None:
+        tier = "00"
+    elif int(qualitative_value) == 1:
+        tier = "01"
+    elif int(qualitative_value) == 2:
+        tier = "10"
+    elif int(qualitative_value) == 10:
+        tier = "11"
+    # else:
+    print(tier)
+    # Determine the type based on donation options
+    if qualitative_value is not None:
+        if data.get("coffee", {}).get("value", False):
+            donation_type = "coffee"
+            type_value = "00"
+        elif data.get("dinner", {}).get("value", False):
+            donation_type = "dinner"
+            type_value = "01"
+        elif data.get("accommodation", {}).get("value", False) or data.get("travel", {}).get("value", False):
+            donation_type = "accommodation or travel"
+            type_value = "10"
+            
+        # elif data.get("custom_donation", {}).get("value", False):
+            # donation_type = "custom donation"
+            # type_value = "11"
+        else:
+            donation_type = "invest"
+            type_value = "XY"
         
+        if custom_donation:
+            donation_type = "custom"
+            type_value = "11"
+    else:
+        donation_type = "XX"
+        type_value = "00"
+
+    
+    
+    # Combine to form the string
+    result_string = tier + type_value + donation_type
+
+    return result_string, (tier, type_value, donation_type)
+
 philanthropic_profiles = {
 'Communitarian': {
     'description': '## **Doing good** makes sense for the community. Your contributions create ripple effects that strengthen social bonds and uplift those around you.',
@@ -125,19 +197,19 @@ philanthropic_profiles = {
     'icon': ':material/warning:'
 }
 }  
-def show_pathways(list, cols=3):
-    links_row = row(len(list)//cols, vertical_align="center")
+def show_pathways(pathways, cols=3):
+    links_row = row(len(pathways)//cols, vertical_align="center")
     
     st.session_state["current_pathway"] = None
     
     # st.write(f"current_pathway {st.session_state["current_pathway"]}")
 
-    for id, (pathway, details) in enumerate(list.items(), start=1):
+    for id, (pathway, details) in enumerate(pathways.items(), start=1):
         icon = details['icon']
         description = details['description'] 
 
         button_text = f"{icon}"
-        links_row.button(button_text, help=description, key=id, 
+        profile_id = links_row.button(button_text, help=description, key=id, 
                          on_click = vote_callback, args = ((id),))
     
     st.write('''<style>
@@ -152,8 +224,69 @@ def show_pathways(list, cols=3):
     </style>''', unsafe_allow_html=True)
         
     # write current profile
-    st.write(f"profile {st.session_state['profile']}")
+    # __import__('pdb').set_trace()
+    
+    # st.write(philanthropic_profiles.keys())
 
+def dataset_to_text(dataset):
+    text = ""
+    # Start with the qualitative decision
+    qualitative_value = dataset["Qualitative"]["value"]
+    if qualitative_value == "1":
+        qualitative_desc = "supporting"
+    elif qualitative_value == "2":
+        qualitative_desc = "investing"
+    elif qualitative_value == "10":
+        qualitative_desc = "donating"
+    else:
+        qualitative_desc = "participating"
+
+    # Map the resonance
+    
+    resonance_value = dataset.get("resonance", {}).get("value", False)
+    resonance_text = "has't been considered yet." if bool(resonance_value) is False else "a lot" if float(resonance_value) >= .7 else "very little" if float(resonance_value) <= .3 else "moderately"
+    # Determine interest mix
+    interests = [
+        dataset[f"equaliser_{i}"]["value"] for i in range(4)
+    ]
+    interest_mixture = "mix well" if len(set(interests)) == 1 else "vary a lot"
+    # st.write(interests)
+    interest_level = "high" if sum(interests) > 150 else "low"
+    interest_labels = ", ".join(
+        [dataset[f"equaliser_{i}"]["label"] for i in range(4)]
+    )
+    
+    connector = "and" if interest_level == 'high' else "yet"
+    # Create the text output
+    text = (
+        f"I decide to start this journey `{qualitative_desc}` as a philanthropist. In this sense, the idea `{'resonates ' if resonance_value is not None else resonance_text}`. "
+        f"My current interest levels are `{interest_level}`, `{connector}` `{interest_mixture}` across `{interest_labels}`. "
+    )
+    # st.write(qualitative_desc)
+    # Risk appetite and return rates for investing profile
+    if qualitative_desc == "investing":
+        risk_appetite = dataset.get("Risk Appetite:", {}).get("value", "unknown")
+        expression_return_rates = dataset.get("Select how you want to express return rates:", {}).get("value", "unknown")
+        expected_return = dataset.get("Enter your expected return rate (%):", {}).get("value", "unknown")
+        dream_return = dataset.get("Enter your dream return rate (%):", {}).get("value", "unknown")
+
+        investment_profile = f"My investing profile has a `{risk_appetite}` risk appetite. In terms of revenues, I prefer to express return rates in terms of `{expression_return_rates}`. Quantitatively, my investment bracket spans `{expected_return}`% and `{dream_return}`%."
+
+        print(expected_return , dream_return)
+        print('or', expected_return or dream_return)
+
+        print(bool(expected_return and dream_return))
+        if bool(expected_return and dream_return) is False:
+            text = text + ("""
+                        However, something looks wrong in the return rates above. Let's check the data again.
+                        """)
+
+    else:
+        investment_profile = "I am observing the world from a different perspective."
+    
+    text = text + investment_profile
+
+    return text
 
 def investment(survey):
     st.title("Investment Opportunity Overview")
@@ -197,7 +330,36 @@ def investment(survey):
         st.write("Contact us for more details and personalized assistance.")
         st.title("Investment Opportunity Overview")
 
+    st.markdown("## First Steps")
+    st.write("Seize this investment opportunity tailored to your financial aspirations. "
+            "Set your expected and dream return rates today to embark on a journey towards financial success.")
+    st.write("Contact us for more details and personalized assistance.")
+
+    option = survey.radio("Select how you want to express return rates:",
+                            options = ("Percentage", "Leverage Factor", "Mixed mode"), horizontal=True)
+
+    col1, _spacer, col2= st.columns([3,1,3], vertical_alignment="center")
+    _spacer.markdown("# vs.")
+    if option == "Percentage":
+        col1.markdown("## Expected Return Rate (Percentage)")
+        expected_return_rate = survey.number_input("Enter your expected return rate (%):", min_value=0.0, step=1.)
+        col2.markdown("## Dream Return Rate (Percentage)")
+        dream_return_rate = survey.number_input("Enter your dream return rate (%):", min_value=0.0, step=1.)
+    elif option == "Leverage Factor":
+        col1.markdown("## Expected Return Rate (Leverage Factor)")
+        expected_return_rate = col1.number_input("Enter your expected leverage factor:", min_value=0, step=1)
+        col2.markdown("## Dream Return Rate (Leverage Factor)")
+        dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
+    else:
+        col1.markdown("## Expected Return Rate (Percentage)")
+        expected_return_rate = col1.number_input("Enter your expected return rate (%):", min_value=0.0, step=1.)
+        col2.markdown("## Dream Return Rate (Leverage Factor)")
+        dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
+    
     with st.expander("Investment Opportunity Overview", expanded=False):
+
+        st.divider()
+
         st.markdown("## Introduction")
         st.write("Explore a unique investment opportunity designed to redefine your approach to returns. "
                 "Our investment protocol allows you to set both an 'expected' and a 'dream' return rate, "
@@ -230,32 +392,6 @@ def investment(survey):
         st.write("- **Transparency:** Clear understanding of the investment process.")
         st.write("- **Expertise:** Backed by a team of financial experts.")
 
-        st.markdown("## Next Steps")
-        st.write("Seize this investment opportunity tailored to your financial aspirations. "
-                "Set your expected and dream return rates today to embark on a journey towards financial success.")
-        st.write("Contact us for more details and personalized assistance.")
-
-        option = survey.radio("Select how you want to express return rates:",
-                              options = ("Percentage", "Leverage Factor", "Mixed mode"), horizontal=True)
-
-        col1, _spacer, col2= st.columns([3,1,3], vertical_alignment="center")
-        _spacer.markdown("# vs.")
-        if option == "Percentage":
-            col1.markdown("## Expected Return Rate (Percentage)")
-            expected_return_rate = survey.number_input("Enter your expected return rate (%):", min_value=0.0, step=1.)
-            col2.markdown("## Dream Return Rate (Percentage)")
-            dream_return_rate = survey.number_input("Enter your dream return rate (%):", min_value=0.0, step=1.)
-        elif option == "Leverage Factor":
-            col1.markdown("## Expected Return Rate (Leverage Factor)")
-            expected_return_rate = col1.number_input("Enter your expected leverage factor:", min_value=0, step=1)
-            col2.markdown("## Dream Return Rate (Leverage Factor)")
-            dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
-        else:
-            col1.markdown("## Expected Return Rate (Percentage)")
-            expected_return_rate = col1.number_input("Enter your expected return rate (%):", min_value=0.0, step=1.)
-            col2.markdown("## Dream Return Rate (Leverage Factor)")
-            dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
-            
 
         st.markdown("## Summary")
         if option == "Percentage":
@@ -275,7 +411,10 @@ def body():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         """
-    Let’s jump on the auction side of this philanthropic journey. This will be a digital application which we build on top of our streamlet framework. It is intended to stimulate an action, commit a decision, populate a database, engage and interact.
+    Let’s jump on the auction side of this philanthropic journey. This is a digital platform which we build to stimulate an action, commit a decision, populate a database, engage and interact.
+    
+    
+    This journey is designed to engage with you on multiple levels—emotionally, intellectually, and socially—while ensuring that your preferences, perceptions, and contributions are meaningful and impactful. The combination of reflection, interaction, and data-driven engagement sets the stage for unique transformative experiences.
 
     """
     
@@ -289,7 +428,7 @@ First question is served after a pause. This process will take approximately 10 
 
     with col2:
         st.markdown("""
-        Take a moment, approximately one minute, to reflect on your motivation for participating in this journey. This process will guide your actions and decisions over the next 10 minutes.
+        Take a moment, maybe even  one full minute, to reflect on your motivation for participating in this journey. This process will guide your actions and decisions over the next 10 minutes.
     """)
 
     st.markdown("# <center> Step 2: Engagement</center>", unsafe_allow_html=True)
@@ -301,76 +440,82 @@ First question is served after a pause. This process will take approximately 10 
         Have you ever found the key out of the portal?
         """
         )
-        """
-        
-        We are populating the table of our shared elementary values, would you like to play
-?   """
 
+        # We are populating the table of our shared elementary values, would you like to play
+
+def authentication():
+    if st.session_state['authentication_status'] is None:
+        """### Towards our conference in Athens _Europe in Discourse_"""
+        """
+        Our primary objective is covering expenses for travel, accommodation, and meals. Any extra funds will support current development projects in decision-making, scientific research, and artistic endeavors.
+        """
+
+    if st.session_state['authentication_status']:
+        st.toast('Initialised authentication model')
+        authenticator.logout()
+        st.write(f'`Your signature is {st.session_state["username"][0:4]}***{st.session_state["username"][-4:]}`')
+    elif st.session_state['authentication_status'] is False:
+        st.error('Access key does not open')
+    elif st.session_state['authentication_status'] is None:
+        authenticator.login('Connect', 'main', fields = fields_connect)
+        st.warning('Please use your access key')
+
+def engagement():
     st.markdown("# <center> Step 2: Engagement</center>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 9, 1])
-    with col2:
-        st.markdown(
-        """
-we are populating the table of our shared elementary values. This is more than just a GAME. It is a collective discovery process.
-Would you like to play?
-"""
-        )
 
-    st.markdown("# <center> Step 3: Data Collection</center>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 9, 1])
-    with col2:
-        st.markdown(
-        """
-As we proceed, your decisions and actions will be stored in two different databases—one trusted and one untrusted. This distinction allows us to explore the dynamics of trust and value in a digital environment.
-"""
-        )
-    st.toast(
-        """Side Note:
-Why is the banking ledger trusted? The information we seek will be encoded in a transaction, ensuring transparency and integrity."""
-    )
-
-    st.markdown("# <center> Step 4: Step 4: Personal Story / profile</center>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 9, 1])
-    with col2:
-        st.markdown(
-        """
-We’re curious to learn more about the individuals behind these decisions. Your story matters and contributes to the richness of this collective journey.
-What is your story?
-(Feel free to share as much or as little as you like.)
-"""
-        )
-    st.markdown("# <center> Step 5: Invitation / xxx</center>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 9, 1])
-    with col2:
-        st.markdown(
-        """
-
-If philanthropy is your choice to connect and engage, we invite you to join us at our next event, the European Discourse Conference. It’s the perfect opportunity to further your engagement and see how your actions translate into real-world impact.
-This structured journey is designed to engage participants on multiple levels—emotionally, intellectually, and socially—while ensuring that their contributions are meaningful and impactful. The combination of reflection, interaction, and data-driven engagement sets the stage for a unique and transformative experience.
-"""
-        )
-        survey = CustomStreamlitSurvey()
-        engage_categories= {'1': 'Support', '2': 'Invest', '10': 'Donate'}
-        engage = create_qualitative('trifurcation',
-                           kwargs={"survey": survey, 
-                                   'label': 'categorical', 
-                                    "name": "we are at a crossing point.",
-                                    "question" : "Support, Invest, or Donate?",
-                                    
-                            })
-        feedback_messages = {
-            '1': "I have chosen to **Support** our initiative. Your backing is essential in helping us move forward.",
-            '2': "I have chosen to **Invest** in our vision. Your investment will help us consolidate and expand our impact.",
-            '10': "I have chosen to **Donate** to our cause. Your generosity makes a significant difference."
+    engage_categories= {'1': 'Support', '2': 'Invest', '10': 'Donate'}
+    engage = create_qualitative('trifurcation',
+                        kwargs={"survey": survey, 
+                                'label': 'categorical', 
+                                "name": "we are at a crossing point.",
+                                "question" : "Support, Invest, or Donate?",
+                                "categories": engage_categories
+                        })
+    
+    feedback_messages = {
+        '1': "## I have chosen to **`Support`** this initiative. \n ### _Thank you,_ your backing is essential in helping us move forward.",
+        '2': "## I have chosen to **`Invest`** in a shared vision. \n ### _Thank you,_ your interest in investment will help us consolidate and expand our activity.",
+        '10': "## I have chosen to **`Donate`** to our cause. \n ### _Thank you,_ your generosity makes a significant difference."
 }
-        if engage is not None:
-            st.write(feedback_messages.get(str(engage), "Thank you for your dedication so far!"))
+    if engage is not None:
+        st.markdown(feedback_messages.get(str(engage), "Thank you for your dedication so far!"))
+    else:
+        st.write("Thank you for your dedication so far.")
+    # if st.button("Reset the choice"):
+    #     survey.data["Qualitative"]["value"] = None
+    #     engage = None
 
-        # st.write(engage)
+def resonance():
+    st.markdown("# <center> Step X: Access key</center>", unsafe_allow_html=True)
+    """
+    Generate access key to proceed with the journey.
+    """
+    if st.session_state['authentication_status'] is None:
+        # authenticator.login('Connect', 'main', fields = fields_connect)
+        # st.warning('Please use your access key')
+        try:
+            match = True
+            success, access_key, response = authenticator.register_user(data = match, captcha=True, pre_authorization=False, fields = fields_forge)
+            if success:
+                st.success('Registered successfully')
+                st.toast(f'Access key: {access_key}')
+                st.write(response)
+        except Exception as e:
+            st.error(e)
+
+def values():
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        st.markdown(
+        """
+We are populating the table of our shared elementary values. This is more than just a GAME. It is a collective discovery process.
+Would you like to play? grey is uncertain, Black yes, white no 
+"""
+        )
         create_dichotomy(key = "executive", id= "executive",
                                             kwargs={'survey': survey,
                                                 'label': 'resonance', 
-                                                'question': 'Click to express your viewpoint: the gray area represents uncertainty, the extremes: clarity.',
+                                                'question': 'Click to express your viewpoint: the gray area represents uncertainty, the two extremes: clarity.',
                                                 'gradientWidth': 20,
                                                 'height': 250,
                                                 'title': '',
@@ -378,6 +523,75 @@ This structured journey is designed to engage participants on multiple levels—
                                                 'messages': ["Yes, it's a good idea", "No, it's not a good idea", "I'm not sure"],
                                                 # 'inverse_choice': inverse_choice,
                                                 'callback': lambda x: ''})
+
+
+def profiles():
+
+    st.markdown("# <center> Step 3: Data Collection</center>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        st.markdown(
+        """
+As we proceed, your decisions and actions will be stored in two different databases—one trusted and one untrusted. This distinction allows us to explore the dynamics of trust and value in a digital environment.
+
+Two aspects are key for us:
+"""
+        )
+        """
+        1. **Transparency:** Regularly update donors, contributors, and investors on how their resources are being used.
+
+2. **Acknowledgements:** Recognising and thanking donors for their support, detailing the outcomes and benefits of the donations.
+        """
+        
+        """
+        **Remark:** Data will be stored in two databases. One trusted and one is not trusted why is the Banking ledger the information we want to retrieve will be encoded in a transaction?
+        """
+    st.toast(
+        """Side Note:
+Why is the banking ledger trusted? The information we seek will be encoded in a transaction, ensuring transparency and integrity."""
+    )
+    
+    st.markdown("# <center> Step 4: Personal Story / profile</center>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        st.markdown(
+        """
+We’re curious to learn more about the individuals behind these decisions. Your story matters and contributes to the richness of this journey, as a collective.
+What is your story?
+"""
+        )
+    show_pathways(philanthropic_profiles, cols=1)
+    col1, col2, col3 = st.columns([2, 6, 1], vertical_alignment="center")
+    
+    with col2:
+    
+        if st.toggle("Custom profile", key="custom_profile"):
+            """(Feel free to share as much or as little as you like.)"""
+            
+            survey.text_area("Enter your custom profile:", key="custom_profile_text")
+            st.session_state["profile"] = None         
+
+    if st.session_state["profile"] is not None:
+        # st.write(f"Your profile is {st.session_state['profile']}")
+        with col2:
+            st.write(list(philanthropic_profiles.items())[st.session_state['profile']-1][1]["description"])    
+        
+        with col3:
+            st.markdown('# ' + f'{list(philanthropic_profiles.items())[st.session_state['profile']-1][1]["icon"]}') 
+
+        st.markdown('### #' + f'{list(philanthropic_profiles.items())[st.session_state['profile']-1][0]}') 
+            
+    st.markdown("# <center> Step 5: Participation / expression</center>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        st.markdown(
+        """
+
+If philanthropy is your choice to connect and engage, we invite you to join us at our next event, the European Discourse Conference. It’s the perfect opportunity to further your engagement and see how your actions translate into real-world impact.
+"""
+        )
+
+        # st.write(engage)
         equaliser_data = [
             ("Decision Making", ""),
             ("Science", ""),
@@ -403,55 +617,57 @@ This structured journey is designed to engage participants on multiple levels—
             'A Coffee': {'amount': '17', 'icon': ':material/coffee:'},
             'Partial Dinner': {'amount': '100', 'icon': ':material/restaurant:'},
             'Partial Accommodation': {'amount': '1000', 'icon': ':material/hotel:'},
-            'Partial Travel': {'amount': '0', 'icon': ':material/flight_takeoff:'}
+            'Partial Travel': {'amount': '0', 'icon': ':material/jump_to_element:'}
         }
 
         # Create three columns
-        col1, col2, col3, col4 = st.columns(4)
 
-        # Add buttons in each column
-        with col1:
-            if st.button(f"{options['A Coffee']['icon']} •"):
-                st.write("Thank you for supporting us with a coffee!")
-                
-        with col2:
-            if st.button(f"{options['Partial Dinner']['icon']} •"):
-                st.write("Thank you for covering part of the dinner!")
+        # if st.button("Custom Donation", type="primary", help="Click to enter a custom donation amount", 
+        #              use_container_width=True, on_click=lambda: st.session_state.update(custom_donation=True)):
+        custom_donation = st.toggle("Custom Donation", key="custom_donation",)
+        if not custom_donation:
+                    #  on_change=lambda: st.session_state.update(custom_donation=True)):
+            col1, col2, col3, col4 = st.columns(4)
 
-        with col3:
-            if st.button(f"{options['Partial Accommodation']['icon']} •"):
-                st.write("Thank you for supporting our accommodation!")
-        with col4:
-            if st.button(f"{options['Partial Travel']['icon']} •"):
-                st.write("Thank you for supporting our accommodation!")
-        
-        if st.button("Custom Donation",type="primary", help="Click to enter a custom donation amount", use_container_width=True):
-            st.write("Thank you for your generous donation!")
-        
-        # Define the range of values for the exponential slider
-        
-        min_exp_value = 0
-        max_exp_value = 5
-        min_actual_value = 1
-        max_actual_value = 100000
+            # Add buttons in each column
+            with col1:
+                if survey.button(label = f"{options['A Coffee']['icon']} •", id="coffee"):
+                    st.write("Thank you for supporting us with a coffee!")
+                    
+            with col2:
+                if survey.button(label = f"{options['Partial Dinner']['icon']} •", id="dinner"):
+                    st.write("Thank you for covering part of the dinner!")
 
-        # Convert exponential value to actual value
-        def exp_to_actual(value):
-            return 10**value
-            return min_actual_value * (max_actual_value / min_actual_value) ** ((value - min_exp_value) / (max_exp_value - min_exp_value))
+            with col3:
+                if survey.button(label = f"{options['Partial Accommodation']['icon']} •", id="accommodation"):
+                    st.write("Thank you for supporting our accommodation!")
+            with col4:
+                if survey.button(label = f"{options['Partial Travel']['icon']} •", id="travel"):
+                    st.write("Thank you for supporting our travels!")
+            
 
-        # Exponential slider
-        exp_value = survey.slider("Exponential Slider", min_value=float(min_exp_value), max_value=float(max_exp_value), value=float(min_exp_value),
-                                  step = 0.01,
-                                  format="%d")
+            st.write("Thank you for your generous intention!")
+            
+            # Exponential slider
+        if st.session_state.custom_donation:
+            min_exp_value = 0
+            max_exp_value = 5
+            min_actual_value = 1
+            max_actual_value = 100000
 
-        # Convert exponential value to actual value
-        actual_value = exp_to_actual(exp_value)
+            exp_value = survey.slider(label = "Sensitive Slider",
+                                      id = "custom_donation_slider", 
+                                      min_value=float(min_exp_value), max_value=float(max_exp_value), value=float(min_exp_value),
+                                    step = 0.01,
+                                    format="%d")
 
-        # Display the actual type: exp_value if actual value < 3000, otherwise -1
-        _display = lambda x, t: int(x)+10 if t < 3000 else -1
-        st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {int(exp_value)}")
-        st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {_display(exp_value, actual_value)}")
+            # Convert exponential value to actual value
+            actual_value = exp_to_actual(exp_value)+0.1
+
+            # Display the actual type: exp_value if actual value < 3000, otherwise -1
+            donation_type = lambda x, t: int(x)+10 if t < 3000 else -1
+            # st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {int(exp_value)}")
+            st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {donation_type(exp_value, actual_value)}")
 
     
     st.markdown("# <center> Step X: Access / IF INVESTMENT</center>", unsafe_allow_html=True)
@@ -465,50 +681,15 @@ This structured journey is designed to engage participants on multiple levels—
         risk_tolerance = survey.radio("Risk Appetite:", options=["Low", "Medium", "High"], horizontal=True, key="risk_appetite", captions=["Play it safe through the maze", "Play like adventure", "Play like a pro"])
     investment(survey)
 
-    st.markdown("# <center> Step X: Example reading / xxx</center>", unsafe_allow_html=True)
-    st.json(survey.data)
+    st.markdown("# <center> Step X:  / IF CONTRIBUTION</center>", unsafe_allow_html=True)
 
-    philanthropic_profiles = {
-    'Communitarian': {
-        'description': '### **Doing good** makes sense for the community. Your contributions create ripple effects that strengthen social bonds and uplift those around you.',
-        'icon': ':material/group:'
-    },
-    'Devout': {
-        'description': '### **Doing good** is the will of a higher power. Your philanthropy is a sacred duty, a way to serve and fulfill your spiritual obligations.',
-        'icon': ':material/auto_awesome:'
-    },
-    'Investor': {
-        'description': '### **Doing good** is good business. You see philanthropy as an investment, generating returns not just for society, but for the world at large.',
-        'icon': ':material/monetization_on:'
-    },
-    'Socialite': {
-        'description': '### **Doing good** is sexy. Your generosity is a symbol of status and influence, making waves in social circles while benefiting the greater good.',
-        'icon': ':material/party_mode:'
-    },
-    'Repayer': {
-        'description': '### **Time to give back**. You have received much from society, and now it’s your turn to return the favor and support the next generation.',
-        'icon': ':material/replay:'
-    },
-    'Dynast': {
-        'description': '### **Following family tradition**. Philanthropy is in your blood, a legacy passed down through generations, and you proudly carry the torch.',
-        'icon': ':material/family_restroom:'
-    },
-    'Altruist': {
-        'description': '### **Giving from the heart**. Your generosity knows no bounds; you give selflessly and with deep compassion, driven by a love for humanity.',
-        'icon': ':material/favorite:'
-    },
-    'Indifferent': {
-        'description': '### **I don\'t give a shit about** philanthropy or social causes. You believe that everyone should fend for themselves, and you see no reason to contribute.',
-        'icon': ':material/block:'
-    },
-    'Deflector': {
-        'description': '### **It\'s somebody else\'s problem**. You believe that social issues and philanthropy are for others to worry about, not your concern or responsibility.',
-        'icon': ':material/warning:'
-    }
-}
-    show_pathways(philanthropic_profiles, cols=3)
-
+    # col1, col2, col3 = st.columns([1, 9, 1])
+    
+    # with col2:
     st.markdown("# <center> Step X: Example reading / xxx</center>", unsafe_allow_html=True)
+    st.write(dataset_to_text(survey.data))
+
+
     if st.session_state['profile'] is not None and not st.session_state.toast:
         id = st.session_state['profile']
         st.toast("#"+ list(philanthropic_profiles.keys())[id-1])
@@ -522,16 +703,11 @@ This structured journey is designed to engage participants on multiple levels—
 
 
     st.markdown("# <center> Step X: Finalise / commit</center>", unsafe_allow_html=True)
+    st.json(survey.data, expanded=False)
     st.markdown(
 """
 To cover expenses and manage potential surplus funds, follow these steps:
 
-1. **Clearly Communicate Goals:** Outline the primary objective of covering expenses for travel, accommodation, and meals. Specify that any extra funds will support projects in decision-making, scientific research, and artistic endeavors.
-
-
-3. **Transparency:** Regularly update donors on how their contributions are being used.
-
-4. **Acknowledge Contributions:** Recognize and thank donors for their support, detailing the impact of their donations.
 
 5. **Engage Further:** Invite donors to follow the project’s progress and participate in future initiatives."""
     )
@@ -547,8 +723,12 @@ To cover expenses and manage potential surplus funds, follow these steps:
     # generate string based on data
     mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
 
-    st.markdown("## `SCFS10110`" + '<code>' + mask_string("asdasdasdasdasdasda") + "</code>", unsafe_allow_html=True)
-
+    st.markdown("## `SCFS10110`" + '•' + '<code>' + mask_string("asdasdasdasdasdasda") + "</code>", unsafe_allow_html=True)
+    tx_tag, (tier, type_value, donation_type) = extract_info(survey.data, custom_donation)
+    st.markdown(f"## `SCFS{tx_tag}`" + '•' + '<code>' + mask_string('asd') + "</code>", unsafe_allow_html=True)
+    # st.write(st.session_state["username"])
+    st.write(extract_info(survey.data, custom_donation))
+    
 if __name__ == "__main__":
     alert_text = """
 The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance in an era marked by simultaneous and interconnected 'polycrises'. 
@@ -580,4 +760,24 @@ Click twice on the 'Yes' button _twice_ to go forward.
     #     st.stop()
                 
 
-    body()
+    # body()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    engagement()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    authentication()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    resonance()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    values()
+    """
+    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """
+    profiles()
