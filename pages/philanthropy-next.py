@@ -1422,14 +1422,6 @@ Click twice on the 'Yes' button _twice_ to go forward.
             
     #     st.stop()
                 
-    """
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    """
-    
-    
-    
-    
-    
     intro()
 
     st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
