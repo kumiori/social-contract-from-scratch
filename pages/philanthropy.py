@@ -285,7 +285,7 @@ The initiative has the broadest scope because hinges upon the connection of conc
     st.markdown("# <center>Which steps to take?</center>", unsafe_allow_html=True)
 
     st.markdown("""
-This initiative is a step towards shaping visions into participation, insight and cooperation. In a bigger picture, we provide a tangible platform that aligns with Sustainable Development Goals (SDGs) and promotes long-term solutions to structural societal imbalances.   
+This initiative is a step towards shaping visions into participation, insight and cooperation. In a bigger picture, we provide a tangible platform that aligns with Sustainable Development Goals (SDGs) and promotes long-term solutions to structural _societal imbalances_, as some like to call.    
 
 We are navigating a broad range of pressing issues that span social, scientific, economic, and philosophical domains, humane, moral, ethical, and cultural.
 
@@ -294,6 +294,10 @@ After identifying several conceptual pathways - different directions for explora
 Would you like to see how others are playing?
 """)
 
+    st.page_link("pages/philanthropy-next.py", label="Philantropy", icon="1️⃣")
+    st.page_link("pages/philanthropy-next.py", label="Decision Making", icon="2️⃣", disabled=True)
+    st.page_link("pages/philanthropy-next.py", label="Sciences", icon="💫", disabled=True)
+    st.page_link("pages/philanthropy-next.py", label="Arts", icon="✨", disabled=True)
 
 if __name__ == "__main__":
     alert_text = """

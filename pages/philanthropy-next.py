@@ -658,7 +658,7 @@ def engagement():
     #     engage = None
 
 def access():
-    st.markdown("# <center> Step 3: Open access with key</center>", unsafe_allow_html=True)
+    st.markdown("# <center> Step 3: Open your access</center>", unsafe_allow_html=True)
     """
     We've collected some info so far...
     """
@@ -903,7 +903,7 @@ def offer():
     investment(survey)
 
 def contribution():
-    st.markdown("# <center> Step X:  / IF CONTRIBUTION</center>", unsafe_allow_html=True)
+    st.markdown("# <center> Step X:  / IF SUPPORT</center>", unsafe_allow_html=True)
     """
     In Kind or Economic Contribution
     """
@@ -995,7 +995,7 @@ def reading():
     st.markdown("# <center> Step X: Connect / commit</center>", unsafe_allow_html=True)
     st.markdown(
 """
-We aim at _covering expenses_, however - should there be any surplus funds, _we invite_ donors to participate in a future initiative, following the project's progress."""
+We aim at _covering expenses_, however - in case of any surplus funds, _we invite_ donors to participate in a future initiative, following the project's progress."""
     )
     
     
@@ -1011,12 +1011,12 @@ We aim at _covering expenses_, however - should there be any surplus funds, _we 
     # generate string based on data
 
     tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
-    st.markdown(f"# <center>Transaction code:</center> \n # <center>`SCFS{tx_tag}`</center>", unsafe_allow_html=True)
+    st.markdown(f"# <center>Short code:</center> \n # <center>`SCFS{tx_tag}`</center>", unsafe_allow_html=True)
     # " + '•' + '<code>' + str(st.session_state["username"]) + "</code>
     # st.write(st.session_state["username"])
     # st.write(extract_info(survey.data))
     """
-    The transaction code is formatted in this way to encode the key details of the transaction in a compact and meaningful way.
+    The synthetic code is formatted in this way to encode the key details of this session in a compact and meaningful way.
     """
     st.markdown("# <center> SCFS XX YY Z - P</center>", unsafe_allow_html=True)
     """
@@ -1045,7 +1045,7 @@ We aim at _covering expenses_, however - should there be any surplus funds, _we 
     f"""
     ### Why is this computed?
     
-    The encoding of information into a small number (`xx`) and committing it through a transaction of **1.**`xx` EUR if CONTRIBUTION, **10.**`xx` if INVESTMENT, **11**.`xx` if DONATION, **100.**`xx` OTHERWISE. 
+    The encoding of information into a small number (`xx`) and committing it through a transaction of **1.**`xx` EUR if SUPPORT, **10.**`xx` if INVESTMENT, **11**.`xx` if DONATION, **100.**`xx` OTHERWISE. 
     
     This serves to securely link the data _within_ the transaction itself. By embedding this information in the transaction amount, it creates a verifiable record on the ledger, ensuring that the encoded data remains tamper-proof and directly tied to your intention. 
     
@@ -1172,8 +1172,6 @@ def get_checkout_info(checkout_id):
         return None
     
     
-    
-    
 def checkout():
     st.markdown("# <center> Step X: Create digital trace</center>", unsafe_allow_html=True)
     st.markdown(
@@ -1287,7 +1285,6 @@ def checkout():
     
     """
     return reference, _signature
-
 
 def integrate(reference, _signature):
         
