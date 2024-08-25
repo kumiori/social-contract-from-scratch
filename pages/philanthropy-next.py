@@ -38,6 +38,7 @@ from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.row import row
 from streamlit_timeline import timeline
 from yaml import SafeLoader
+from streamlit_player import st_player
 
 db = IODatabase(conn, "discourse-data")
 
@@ -373,7 +374,7 @@ def show_pathways(pathways, cols=3):
     
     # st.write(philanthropic_profiles.keys())
 
-def dataset_to_text(dataset):
+def dataset_to_text(dataset, perspective='first'):
     text = ""
     # Start with the qualitative decision
     qualitative_value = dataset["Qualitative"]["value"]
@@ -388,6 +389,17 @@ def dataset_to_text(dataset):
 
     # Map the resonance
     
+    if perspective == "first":
+        pronoun = "I"
+        possessive = "my"
+        verb = "am"
+    elif perspective == "third":
+        pronoun = "You"
+        possessive = "your"
+        verb = "are"
+    else:
+        raise ValueError("Perspective must be either 'first' or 'third'.")
+
     resonance_value = dataset.get("resonance", {}).get("value", False)
     resonance_text = "has't been considered yet." if bool(resonance_value) is False else "a lot" if float(resonance_value) >= .7 else "very little" if float(resonance_value) <= .3 else "moderately"
     # Determine interest mix
@@ -409,8 +421,8 @@ def dataset_to_text(dataset):
     connector = "and" if interest_level == 'high' else "yet"
     # Create the text output
     text = (
-        f"I decide to start this journey `{qualitative_desc}` as a philanthropist. In this sense, the idea `{'resonates ' if resonance_value is not None else resonance_text}`. "
-        f"My current interest levels are `{interest_level}`, `{connector}` `{interest_mixture}` across `{interest_labels}`. "
+        f"{pronoun.title()} decide to start this journey `{qualitative_desc}` as a philanthropist. In this sense, the idea `{'resonates ' if resonance_value is not None else resonance_text}`. "
+        f"{possessive.title()} current interest levels are `{interest_level}`, `{connector}` `{interest_mixture}` across `{interest_labels}`. "
     )
     # st.write(qualitative_desc)
     # Risk appetite and return rates for investing profile
@@ -420,7 +432,7 @@ def dataset_to_text(dataset):
         expected_return = dataset.get("Enter your expected return rate (%):", {}).get("value", "unknown")
         dream_return = dataset.get("Enter your dream return rate (%):", {}).get("value", "unknown")
 
-        investment_profile = f"My investing profile has a `{risk_appetite}` risk appetite. In terms of revenues, I prefer to express return rates in terms of `{expression_return_rates}`. Quantitatively, my investment bracket spans `{expected_return}`% and `{dream_return}`%."
+        investment_profile = f"{possessive.title()} investing profile has a `{risk_appetite}` risk appetite. In terms of revenues, {pronoun} prefer to express return rates in terms of `{expression_return_rates}`. Quantitatively, {possessive} investment bracket spans `{expected_return}`% and `{dream_return}`%."
 
         # print(expected_return , dream_return)
         # print('or', expected_return or dream_return)
@@ -431,7 +443,7 @@ def dataset_to_text(dataset):
                         """)
 
     else:
-        investment_profile = "I am observing the world from a different perspective."
+        investment_profile = f"{pronoun} {verb} observing the world from a different perspective."
     
     text = text + investment_profile
 
@@ -562,9 +574,9 @@ def body():
         """
     Let's jump on the _action_ side of this philanthropic journey. 
     
-    This is a digital platform which we build to stimulate interaction, committment and actionable decisions, gathering your stories and engaging meaningfully.
+    This is a digital platform which we build to stimulate interaction, committment and actionable decisions, gathering your stories and engaging.
     
-    Designed to engage with you on multiple levels while ensuring that your preferences, perceptions, and contributions, are integrated in a meaningful and impactful way. 
+    Designed to connect with you on multiple levels while ensuring that your preferences, perceptions, and contributions, are integrated in a meaningful and impactful way. 
     
     The combination of reflection, interaction, and emotion-driven engagement sets the stage for new collective experiences.
 
@@ -582,34 +594,35 @@ def body():
     """
 
         """
-    For now, our primary goal is to **gather your commitment to philanthropic intentions** and ensure that our objectives align. This process helps us understand your interests and motivations, setting the stage for meaningful collaboration. 
+    For now, our primary goal is to **gather your commitment to philanthropic intentions** and ensure that our objectives align. This process helps us understand your interests and motivations, setting the stage for collaboration. 
     
-    Once we have established this connection and confirmed that our paths are in sync, we will reach out to discuss the next steps in more detail, ensuring that your contribution is impactful and aligns with our shared goals. 
+    Once we have established this connection and confirmed that our paths are in sync, we will reach out to discuss the next steps in more detail, ensuring that your contribution is aligned with action. 
     
     We look forward to exploring this journey together.
     """
     # We are populating the table of our shared elementary values, would you like to play
 
 def authentication():
-    st.markdown("## <center> Step X: Access key</center>", unsafe_allow_html=True)
+    
+    st.markdown("## <center> Step X: Access is key</center>", unsafe_allow_html=True)
     if st.session_state['authentication_status'] is None:
-        col1, col2, col3 = st.columns([1, 9, 1])
         """### Towards our conference in Athens _Europe in Discourse_"""
+        col1, col2, col3 = st.columns([1, 9, 1])
         with col2:
             """
-            Our primary objective is covering expenses for travel, accommodation, and meals. Any extra funds will support current development projects in decision-making, scientific research, and artistic endeavors.
+            Our primary objective is covering expenses for travel, accommodation, conference fees, and meals. Any extra funds will support current development projects in decision-making, scientific research, and artistic endeavors.
             """
 
     if st.session_state['authentication_status']:
-        st.toast('Initialised authentication model')
+        st.toast(f'Authenticated successfully {mask_string(st.session_state["username"])}')
         col1, col2, col3 = st.columns([1, 1, 1])
-        # with col2:
-            # authenticator.logout()
+        with col2:
+            authenticator.logout()
         st.write(f'`Your signature is {mask_string(st.session_state["username"])}`')
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
     elif st.session_state['authentication_status'] is None:
-        authenticator.login('Connect', 'main', fields = fields_connect)
+        # authenticator.login('Connect', 'main', fields = fields_connect)
         st.warning('Please use your access key')
 
 def engagement():
@@ -729,7 +742,7 @@ We are populating the table of our shared elementary values. This is more than j
 
 def datacollection():
 
-    st.markdown("## <center> Step 3: Data Collection</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 3: Changing perspectives</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -789,7 +802,7 @@ What is your story?
         st.markdown('### #' + f'{list(philanthropic_profiles.items())[st.session_state["profile"]-1][0]}') 
         
 def preferences():
-    st.markdown("## <center> Step 5: Participation / expression</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 5: Participation and Expression</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -933,28 +946,28 @@ def timeflow():
             },
             "text": {
             "headline": "Welcome to<br>Athena's Timeline",
-            "text": "<p>A Timeline component by integrating ... from ...</p>"
+            "text": "<p>Integrating our agendas</p>"
             }
         },
         "events": [
         {
             "media": {
-            "url": "https://vimeo.com/143407878",
-            "caption": "How to Use TimelineJS (<a target=\"_blank\" href='https://timeline.knightlab.com/'>credits</a>)"
+                "url": "https://vimeo.com/1002366658",
+                "caption": "Visit the <a target=\"_blank\" href='https://https://www.europeindiscourse.eu/'>conference's website</a> for details of the venue and schedule.",
             },
             "start_date": {
-            "year": "2024",
-            "month":"9",
-            "day":"26"
+                "year": "2024",
+                "month":"9",
+                "day":"26"
             },
             "end_date": {
-            "year": "2024",
-            "month":"9",
-            "day":"28"
+                "year": "2024",
+                "month":"9",
+                "day":"28"
             },
             "text": {
-            "headline": "Athena's Collective<br> participatory timelines.",
-            "text": "<p>Athena's Collective is ... </p>"
+                "headline": "Europe in Discourse,<br> the conference.",
+                "text": "<p>Athena's Collective is organising the panel discussion \"The Social Congract from Scratch\"</p>"
             }
         },
         {
@@ -969,8 +982,8 @@ def timeflow():
                 "day":"3"
                 },
             "text": {
-                "headline": "Athena's Collective<br> October timelines.",
-                "text": "<p>Athena's Collective is ... </p>"
+                "headline": "Athena's Collective<br> October event.",
+                "text": "<p>Athena's Collective is hosting a dinner</p>"
             }
         }
         ]
@@ -1188,10 +1201,19 @@ def checkout():
 """
     For this, we need your signature
 """)
+    if st.session_state['authentication_status']:
+        st.write(f'Authenticated: {st.session_state['authentication_status']}')
     
-    _signature = st.session_state["username"]
-    signature = mask_string(_signature)
-    
+    if st.session_state["username"] is not None:
+        signature = mask_string(st.session_state["username"])
+    else: 
+        """
+        It looks like you haven't signed in yet.
+        We haven't been able to find your key signature. Please, connect using the form above or  enter your access key below.
+        """
+        _signature = survey.text_input("Enter your access key:", key="signature")
+        signature = mask_string(_signature)
+        
     st.markdown(f"### <center> My signature is `{signature}`</center>", unsafe_allow_html=True)
     
     st.markdown("Confirm with a glance, and proceed to the next step.")
@@ -1229,8 +1251,6 @@ def checkout():
                 redirect_uri=redirect_uri,
             )
 
-            # st.write(sumup)
-            # st.write(sumup.authorization_url())
             st.write('Authorisation #' + sumup.state)
             st.session_state['sumup'] = sumup
         except RequestException as e:
@@ -1431,11 +1451,17 @@ Click twice on the 'Yes' button _twice_ to go forward.
     st.divider()
     st.markdown(f"# <center>Philanthropy Application</center> ", unsafe_allow_html=True)
 
+    if st.session_state['authentication_status']:
+        event = st_player("https://vimeo.com/1002366658", key='vimeo_player')
+    else:
+        st.markdown("### <center>_Log in to preview._</center>", unsafe_allow_html=True)
+        # st.markdown("### _Authentication_ is key to proceed. It will allow us to forge an access key for you to proceed.")
+    
     body()
-
     engagement()
     question()
     access()
+    authentication()
     datacollection()
     story()
     preferences()
@@ -1447,15 +1473,13 @@ Click twice on the 'Yes' button _twice_ to go forward.
     elif survey.data["Qualitative"]["value"] == "1":
         contribution()
     # else:
-        # """
-        # ELSE PARTICIPATE
-        # """
+    #     # """
+    #     # ELSE PARTICIPATE
+    #     # """
 
     reading()
     price()
-    # authentication()
-
-    # timeflow()
+    timeflow()
     reference, _signature = checkout()
     integrate(reference, _signature)
     
