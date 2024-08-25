@@ -1,8 +1,11 @@
-# 🎈 Blank app template
+# 🎈 The Social Contract From Scratch
 
-A simple Streamlit app template for you to modify!
+“The Social Contract from Scratch” is a panel discussion, but in a bigger picture is the inception of a foundational project at the intersection of philosophy, technology, social innovation within a global discourse. Our exploration of the Social Contract means rebuilding the foundational agreements of society at a juncture marked by global challenges. Our main focus is their connectedness.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+This is its digital platform.
+
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://social-contract-from-scratch.streamlit.app/)
 
 ### How to run it on your own machine
 

@@ -972,14 +972,15 @@ def donation():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
 
-        st.markdown("## <center> Step X: Access / IF DONATION</center>", unsafe_allow_html=True)
+        st.markdown("## <center> Step X: Donation</center>", unsafe_allow_html=True)
         """
         ### **Donation Options:**
-        - **Custom Donation:** Allows you to pick your preferred number.
-        - **:material/coffee: :** "Sponsor a Coffee for the collective" – 17 EUR
-        - **:material/restaurant: :** "Cover a Light Lunch or Part of Dinner" – 100 EUR
-        - **:material/hotel::** "Support Our Accommodation" – 1000 EUR
-        - **:material/jump_to_element: :** "Support Our Travels" – 1111 EUR
+        
+        You can choose a Custom Donation, allowing you to select any amount that resonates with your personal commitment. 
+        
+        Alternatively, you may consider the following suggested contributions: Sponsor a Coffee for the collective, Cover a Light Lunch or Part of Dinner, Sponsor Cofenrence Fees, Support Our Accommodation, or our Travels. 
+        
+        Each donation helps us move forward.
 
 
         """
@@ -1002,18 +1003,18 @@ def donation():
 
             # Add buttons in each column
             with col1:
-                if survey.button(label = f"{options['A Coffee']['icon']} •", id="coffee"):
+                if survey.button(use_container_width= True, label = f"{options['A Coffee']['icon']} •", id="coffee"):
                     st.write("Thank you for supporting us with a coffee!")
                     
             with col2:
-                if survey.button(label = f"{options['Partial Dinner']['icon']} •", id="dinner"):
-                    st.write("Thank you for covering part of the dinner!")
+                if survey.button(use_container_width= True, label = f"{options['Partial Dinner']['icon']} •", id="dinner"):
+                    st.write("Thank you for sponsoring part of the dinner!")
 
             with col3:
-                if survey.button(label = f"{options['Partial Accommodation']['icon']} •", id="accommodation"):
+                if survey.button(use_container_width= True, label = f"{options['Partial Accommodation']['icon']} •", id="accommodation"):
                     st.write("Thank you for supporting our accommodation!")
             with col4:
-                if survey.button(label = f"{options['Partial Travel']['icon']} •", id="travel"):
+                if survey.button(use_container_width= True, label = f"{options['Partial Travel']['icon']} •", id="travel"):
                     st.write("Thank you for supporting our travels!")
         
         else:
@@ -1041,6 +1042,17 @@ def donation():
             donation_type = lambda x, t: int(x)+10 if t < 3000 else -1
             # st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {int(exp_value)}")
             st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {donation_type(exp_value, actual_value)}")
+
+        
+        """
+        #### Details:
+                
+        - **Custom Donation:** Allows you to pick your preferred number.
+        - **:material/coffee: :** "Sponsor a Coffee for the collective" – 17 EUR
+        - **:material/restaurant: :** "Cover a Light Lunch or Part of Dinner" – 100 EUR
+        - **:material/hotel::** "Support Our Accommodation" – 1000 EUR
+        - **:material/jump_to_element: :** "Support Our Travels" – 1111 EUR
+        """
 
 def investment(survey):
    
@@ -1237,7 +1249,7 @@ def price():
     
     To this end, we use the smallest possible units of currency to encode the type of commitment you have made, and the decimal digits to capture other relevant information.
     """
-    st.toast(f"When price conceals value, what is money, anyways? ")
+    st.toast(f"Sometimes price conceals _value_, what is _money_, anyways? ")
     
     with st.expander("What does this number mean?", expanded=False):
         f"""

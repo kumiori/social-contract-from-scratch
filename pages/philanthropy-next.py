@@ -195,7 +195,6 @@ def vote_callback(id):
     # st.toast(f"Your profile id {id}")
     # st.toast(f"Your session profile id {st.session_state["profile"]}")
 
-            
 # Convert exponential value to actual value
 def exp_to_actual(value):
     return 10**value
@@ -703,6 +702,7 @@ def access():
             st.error(e)
     else:
         st.markdown(f"### My access key is already forged, its signature is `{mask_string(st.session_state['username'])}`.")
+
 def question():
     st.markdown("## <center> Step 3</center>", unsafe_allow_html=True)
     st.markdown("# <center> How do you _feel_ about the future?</center>", unsafe_allow_html=True)
@@ -1362,7 +1362,6 @@ def integrate(reference, _signature):
     if st.button(f"Clear all and restart", key=f"restart", type='primary', use_container_width=True):
         st.session_state.clear()
         st.rerun()
-
 
 @st.dialog("Join the whitelist")
 def join_waitlist():
