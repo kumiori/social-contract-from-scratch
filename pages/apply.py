@@ -519,17 +519,31 @@ def show_pathways(pathways, cols=3):
     
     st.session_state["current_pathway"] = None
     
+    dico_style = """<style> 
+        div[data-testid='stVerticalBlockBorderWrapper'] div[data-testid='stVerticalBlock'] [data-testid="baseButton-secondary"]:not(:has(div#profiles_outer)) p  {
+            font-size: 4rem;
+            padding: 1rem;
+        };
+        </style>
+        """       
+# #root > div:nth-child(1) > div.withScreencast > div > div > div > section.main.st-emotion-cache-bm2z3a.ea3mdgi8 > div.block-container.st-emotion-cache-13ln4jf.ea3mdgi5 > div > div > div > div.st-emotion-cache-0.e1f1d6gn0 > div > div > div.st-emotion-cache-ocqkz7.e1f1d6gn5 > div:nth-child(2) > div > div > div > div > div > div > div.st-emotion-cache-1cyexbd.ef3psqc1 > button > div > p
+# //*[@id="root"]/div[1]/div[1]/div/div/div/section[2]/div[1]/div/div/div/div[14]/div/div/div[2]/div[2]/div/div/div/div/div/div/div[2]/button/div/p
+
+    script = """<div id = 'profiles_outer'></div>"""
+    st.markdown(script, unsafe_allow_html=True)
+    st.markdown(dico_style, unsafe_allow_html=True) 
+
     for id, (pathway, details) in enumerate(pathways.items(), start=1):
         icon = details['icon']
         description = details['description'] 
 
         button_text = f"{icon}"
         profile_id = links_row.button(button_text, help=description, key=id, 
-                         on_click = vote_callback, args = ((id),))
+                        on_click = vote_callback, args = ((id),))
     
     st.write('''<style>
         [data-testid="stVerticalBlock"] [data-testid="baseButton-secondary"] p {
-            font-size: 4rem;
+            font-size: 1rem;
             padding: 1rem;
         }
         [data-testid="stVerticalBlock"] [data-testid="baseButton-secondary"][aria-pressed="true"] {
@@ -537,6 +551,7 @@ def show_pathways(pathways, cols=3):
             box-shadow: 0px 0px 10px 2px #FF5733;
         }
     </style>''', unsafe_allow_html=True)
+
         
 def body1():
     st.divider()
@@ -583,16 +598,32 @@ def engagement():
         """
         We're offering three different ways to engage with our initiative: **Support**, **Invest**, or **Donate**.
         
-        **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources.
-        
+        """
+    st.divider()
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col1:
+        """
+            **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources.
+            """
+    with col2:
+        """            
         **Invest**, means that you are interested in contributing financially to our initiative, with the expectation of a return. Introduces an element of risk, allowing to get more creative.
+        """
         
+    with col3:
+        """
         **Donate**, means that you are willing to contribute financially to our initiative, without expectation of financial gains. 
+        """
+    st.divider()
         
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        """
         **Remark:** in the long run, these options are not mutually exclusive.
         
         """
         
+    st.markdown("## <center> Your choice</center>", unsafe_allow_html=True)
         
     engage_categories= {'1': 'Support', '2': 'Invest', '10': 'Donate'}
     engage = create_qualitative('trifurcation',
@@ -692,7 +723,7 @@ def access():
 
 def authentication():
     
-    st.markdown("## <center> Step X: Access is key</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Communication is key</center>", unsafe_allow_html=True)
     if st.session_state['authentication_status'] is None:
         """### Towards our conference in Athens _Europe in Discourse_"""
         col1, col2, col3 = st.columns([1, 9, 1])
@@ -703,9 +734,26 @@ def authentication():
 
     if st.session_state['authentication_status']:
         st.toast(f'Authenticated successfully {mask_string(st.session_state["username"])}')
-        col1, col2, col3 = st.columns([1, 1, 1])
+        col1, col2, col3 = st.columns([1, 9, 1])
         with col2:
-            authenticator.logout()
+            from email_validator import EmailNotValidError, validate_email
+                    
+            st.markdown("""
+        ### We're excited that you are interested in joining our initiative. 
+        
+        As we consolidate a focused and passionate community, sharing your email facilitates communication and collaboration.
+                    """)
+            email = survey.text_input("Your email address", id="Email")
+            if email:
+                try:
+                    valid = validate_email(email)
+                    email = valid.email
+                except EmailNotValidError as e:
+                    st.error(str(e))
+                name = survey.text_input("Your name", id="given-name")
+                if name:
+                    st.write(f"Thank you `{name}` for your interest. We will get back to you shortly.")
+
         st.write(f'`Your signature is {mask_string(st.session_state["username"])}`')
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
@@ -1144,7 +1192,7 @@ def checkout():
         st.warning("We are integrating _money_ into the game. This requires your authorisation.")
 
     if st.session_state['authentication_status']:
-        st.write(f'Authenticated: {st.session_state['authentication_status']}')
+        st.write(f'Authenticated: {st.session_state["authentication_status"]}')
     
     if st.session_state["username"] is not None:
         signature = mask_string(st.session_state["username"])
@@ -1216,7 +1264,7 @@ def checkout2():
     """
     The button below will create a record to be verified on the ledger. This entry will be a trace of your commitment, a digital footprint of your intention and action.
     """
-    if st.button("Create record", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True):
+    if st.button("Create record", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True, disabled=not bool(st.session_state['sumup'])):
         with st.spinner("Creating record..."):
             st.write(reference)
             reference = reference+f"-{int(now.strftime('%S'))}"
