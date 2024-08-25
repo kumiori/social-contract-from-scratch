@@ -1148,17 +1148,22 @@ def offer():
     investment(survey)
 
 def contribution():
-    st.markdown("## <center> Step X:  / IF SUPPORT</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Your support</center>", unsafe_allow_html=True)
     """
-    In Kind or Economic Contribution
+
+    Support comes in many forms, and not all of it involves financial contributions. Sometimes, the most impactful support is the kind that feeds the mind and spirit. 
+    
+    For instance, Fabio and Andrea, who own a restaurant, generously offered, 
+    
+    ### _“Come eat at our venue; we're happy to feed your ideas.”_ 
+    
+    This type of support is invaluable, as it provides not just sustenance but also a space for creative exchange and collaboration. 
+    
+    ### _“I have a venue to propose for your events.”_ 
+    
+    Your feedback, expertise, or your presence at our events can be equally powerful. Whether it's offering a venue, hospitality, sharing your skills, or providing thoughtful feedback, your support is valuable.
+    
     """
-    
-    """For example, I have a restaurant, come eat at my venue
-    I'm happy to feed your ideas
-    
-    I'm happy to offer a room in my hotel
-    
-    a disposizione asset e non solo denaro"""
     # col1, col2, col3 = st.columns([1, 9, 1])
     
 def reading():
