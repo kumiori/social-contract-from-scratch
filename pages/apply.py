@@ -598,7 +598,11 @@ def engagement():
 
     with col2:
         """
-        We are seeking support for our 17-member team, the Athena Collective, hosting a panel discussion entitled 'the Social Contract from Scratch’ at the upcoming 'Europe in Discourse' conference (26-28 September 2024).
+        ### We are seeking support for our 17-member team, 
+        
+        # the _Athena Collective_, 
+         
+        #### hosting a panel discussion entitled 'the Social Contract from Scratch' at the upcoming 'Europe in Discourse' conference (26-28 September 2024), in Athens.
         """
 
         """
