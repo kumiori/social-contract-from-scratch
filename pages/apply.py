@@ -338,11 +338,11 @@ def dataset_to_intro(dataset):
 
     formatted_text += f"I decide to start this journey `{qualitative_desc}` as a philanthropist"
 
-    if dataset.get("resonance", {}).get("value") is not None:
-        resonance = float(dataset.get("resonance", {}).get("value", False))
+    if dataset.get("future_outlook", {}).get("value") is not None:
+        future_outlook = float(dataset.get("future_outlook", {}).get("value", False))
         
-        outlook = "bright horizon" if resonance >= 1 else "dark storm" if resonance < 0.5 else "grey mist"
-        leaning = ", leaning `to the bright`." if resonance > 0.5 and resonance < 1. else ", leaning `to the dark`." if resonance < .5 and resonance > 0. else "."
+        outlook = "bright horizon" if future_outlook >= 1 else "dark storm" if future_outlook < 0.5 else "grey mist"
+        leaning = ", leaning `to the bright`." if future_outlook > 0.5 and future_outlook < 1. else ", leaning `to the dark`." if future_outlook < .5 and future_outlook > 0. else "."
 
         formatted_text += f", my outlook for the future is a `{outlook}`{leaning}."
     return formatted_text
@@ -360,7 +360,7 @@ def dataset_to_text(dataset, perspective='first'):
     else:
         qualitative_desc = "participating"
 
-    # Map the resonance
+    # Map the future_outlook
     
     if perspective == "first":
         pronoun = "I"
@@ -373,8 +373,8 @@ def dataset_to_text(dataset, perspective='first'):
     else:
         raise ValueError("Perspective must be either 'first' or 'third'.")
 
-    resonance_value = dataset.get("resonance", {}).get("value", False)
-    resonance_text = "has't been considered yet." if bool(resonance_value) is False else "a lot" if float(resonance_value) >= .7 else "very little" if float(resonance_value) <= .3 else "moderately"
+    future_outlook_value = dataset.get("future_outlook", {}).get("value", False)
+    future_outlook_text = "has't been considered yet." if bool(future_outlook_value) is False else "a lot" if float(future_outlook_value) >= .7 else "very little" if float(future_outlook_value) <= .3 else "moderately"
     # Determine interest mix
     if "equaliser_0" not in dataset:
         interests = [0, 0, 0, 0]
@@ -394,7 +394,7 @@ def dataset_to_text(dataset, perspective='first'):
     connector = "and" if interest_level == 'high' else "yet"
     # Create the text output
     text = (
-        f"{pronoun.title()} decide to start this journey `{qualitative_desc}` as a philanthropist. In this sense, the idea `{'resonates ' if resonance_value is not None else resonance_text}`. "
+        f"{pronoun.title()} decide to start this journey `{qualitative_desc}` as a philanthropist. In this sense, the idea `{'resonates ' if future_outlook_value is not None else future_outlook_text}`. "
         f"{possessive.title()} current interest levels are `{interest_level}`, `{connector}` `{interest_mixture}` across `{interest_labels}`. "
     )
     # st.write(qualitative_desc)
@@ -519,8 +519,6 @@ def show_pathways(pathways, cols=3):
     
     st.session_state["current_pathway"] = None
     
-    # st.write(f"current_pathway {st.session_state["current_pathway"]}")
-
     for id, (pathway, details) in enumerate(pathways.items(), start=1):
         icon = details['icon']
         description = details['description'] 
@@ -540,11 +538,6 @@ def show_pathways(pathways, cols=3):
         }
     </style>''', unsafe_allow_html=True)
         
-    # write current profile
-    # __import__('pdb').set_trace()
-    
-    # st.write(philanthropic_profiles.keys())
-
 def body1():
     st.divider()
     st.markdown("## <center> Step 0:  / Awareness</center>", unsafe_allow_html=True)
@@ -642,7 +635,7 @@ def question():
         """
     my_create_dichotomy(key = "executive", id= "executive",
                         kwargs={'survey': survey,
-                            'label': 'resonance', 
+                            'label': 'future_outlook', 
                             'question': 'Click to express your viewpoint.',
                             'gradientWidth': 30,
                             'height': 250,
@@ -717,7 +710,7 @@ def authentication():
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
     elif st.session_state['authentication_status'] is None:
-        # authenticator.login('Connect', 'main', fields = fields_connect)
+        authenticator.login('Connect', 'main', fields = fields_connect)
         st.warning('Please use your access key')
 
 def datacollection():
@@ -1162,7 +1155,7 @@ def checkout():
         """
         # if st.button("Connect", type='primary', key="connect", help="Connect to the platform", use_container_width=True):
             # pages.current = "Connect"
-        _signature = survey.text_input("Enter your access key:", key="signature")
+        _signature = st.text_input("Enter your access key:", key="signature")
         signature = mask_string(_signature)
         
     st.markdown(f"### <center> My signature is `{signature}`</center>", unsafe_allow_html=True)
@@ -1263,8 +1256,10 @@ def checkout2():
     """
     return
 
-def integrate(reference, _signature):
-        
+def integrate():
+    reference = st.session_state["tx_tag"]
+    _signature = st.session_state["username"]
+    
     st.markdown("## <center> Step X: Integrate the data</center>", unsafe_allow_html=True)
     
     csv_filename = f"my_philanthropic_question_map_1_{reference}.data"
@@ -1311,7 +1306,7 @@ def integrate(reference, _signature):
         st.rerun()
 
 def application_pages():
-    pages_total = 14
+    pages_total = 16
     pages = survey.pages(pages_total, 
             on_submit=lambda: _submit(),
             )
@@ -1366,7 +1361,7 @@ def application_pages():
             checkout2()
 
         if pages.current == 14:
-            integrate(reference, _signature)
+            integrate()
                 
 
 if __name__ == "__main__":
