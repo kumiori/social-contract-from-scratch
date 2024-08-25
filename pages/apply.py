@@ -36,6 +36,7 @@ from philoui.authentication_v2 import AuthenticateWithKey
 from philoui.io import QuestionnaireDatabase as IODatabase
 from philoui.io import conn, create_dichotomy, create_equaliser, create_qualitative
 from philoui.survey import CustomStreamlitSurvey
+from philoui.texts import hash_text, stream_text
 from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.row import row
 from streamlit_timeline import timeline
@@ -82,7 +83,7 @@ if 'tx_tag' not in st.session_state:
        
 if 'price' not in st.session_state:
     st.session_state.price = 100.01
-    
+
 authenticator = AuthenticateWithKey(
     config['credentials'],
     config['cookie']['name'],
@@ -139,6 +140,27 @@ philanthropic_profiles = {
 API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
+
+@st.dialog("Join the whitelist")
+def join_waitlist():
+    from email_validator import EmailNotValidError, validate_email
+    st.markdown("**Welcome aboard**")
+    st.markdown("""
+We're excited that you are interested in joining our initiative. As we consolidate a focused and passionate community, your interest is a great step, and we'd love to learn more about you and your views. 
+
+Joining the whitelist is our way of creating a supportive environment where individuals can collaborate and contribute meaningfully.
+             """)
+    email = st.text_input("Your email address")
+    if email:
+        try:
+            valid = validate_email(email)
+            email = valid.email
+        except EmailNotValidError as e:
+            st.error(str(e))
+        name = st.text_input("Your name")
+        if name:
+            st.write(f"Thank you `{name}` for your interest. We will get back to you shortly.")
+    # st.write("We are working on the whitelist feature. Please check back later.") 
 
 def get_checkout_info(checkout_id):
     url = f'{API_BASE_URL}/checkouts/{checkout_id}'
@@ -203,6 +225,48 @@ def _submit(serialised_data, signature):
             st.error("🫥 Sorry! Failed to update data.")
             st.write(e)
 
+@st.dialog('Cast your preferences')
+def _form_submit():
+    # st.write('Thanks, expand below to see your data')    
+    # signature = st.session_state["username"]
+    with st.spinner("Checking your signature..."):
+        signature = st.session_state["username"]
+        serialised_data = st.session_state['serialised_data']
+                
+        time.sleep(2)
+        if not serialised_data:
+            st.error("No data available. Please ensure data is correctly entered before proceeding.")
+        else:
+            # Proceed with processing serialised_data
+            # st.write(serialised_data)
+            preferences_exists = db.check_existence(signature)
+            # st.write(f"Integrating signature preferences `{mask_string(signature)}`")
+            st.write(f"Integrating preferences `{mask_string(signature)}`")
+            _response = "Yes!" if preferences_exists else "Not yet"
+            st.info(f"Some of your preferences exist...{_response}")
+
+            try:
+                data = {
+                    'signature': signature,
+                    'philanthropy_01': json.dumps(serialised_data)
+                }
+                # throw an error if signature is null
+                if not signature:
+                    raise ValueError("Signature cannot be null or empty.")
+                
+                query = conn.table('discourse-data')                \
+                       .upsert(data, on_conflict=['signature'])     \
+                       .execute()
+                
+                if query:
+                    st.success("🎊 Preferences integrated successfully!")
+
+            except ValueError as ve:
+                st.error(f"Data error: {ve}")                
+            except Exception as e:
+                st.error("🫥 Sorry! Failed to update data.")
+                st.write(e)
+
 def my_create_dichotomy(key, id = None, kwargs = {}):
     dico_style = """<style>
     div[data-testid='stVerticalBlock']:has(div#dicho_inner):not(:has(div#dicho_outer)) {background-color: #F5F5DC};
@@ -242,6 +306,15 @@ def my_create_dichotomy(key, id = None, kwargs = {}):
             st.markdown(_response)
     return response
 
+
+def stream_once_then_write(text):
+    text_hash = hash_text(text)
+    if text_hash not in st.session_state["read_texts"]:
+        stream_text(text)
+        st.session_state["read_texts"].add(text_hash)
+    else:
+        st.markdown(text)
+        
 def create_commit_checkout(reference, amount, description):
     # Define the SumUp checkout endpoint URL
     checkout_url = f'{API_BASE_URL}/checkouts'
@@ -315,7 +388,6 @@ def sumup_widget(checkout_id):
                             onResponse: function (type, body) {{
                             console.log('Type', type);
                             console.log('Body', body);
-                            SumUpCard.unmount();
                             }},
                         }});
                     </script>
@@ -1279,7 +1351,7 @@ def checkout2():
         if len(st.session_state['checkouts']) == 0:              
             checkout = create_commit_checkout(reference, st.session_state["price"], description + signature)
 
-            st.stession_state['checkouts'] = checkout
+            st.session_state['checkouts'] = checkout
         else:
             st.error("There already is a record of theis session. You can list it below.")
                 
@@ -1325,6 +1397,7 @@ def integrate():
     with st.expander("Show the data", expanded=False):
         st.json(survey.data)
 
+    st.session_state['serialised_data'] = survey.data
 
     if st.download_button(label=f"Download datafile", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='primary'):
         st.success(f"Saved {csv_filename}")
@@ -1338,9 +1411,10 @@ def integrate():
     # )
     st.title("Save the session!")
     """
-    Each of the buttons below (if any) correspond to a specific commitment. Clicking on a button will integrate yours into our lightweight database.
+    The button corresponds to your specific commitment. Clicking on it, will integrate it into our records.
     """
     if st.button(f":material/sunny:", key=f"commit", help=f"Commit", use_container_width=True):
+        st.session_state['serialised_data'] = survey.data
         _submit(survey.data, _signature)
         
     """
@@ -1353,23 +1427,115 @@ def integrate():
     # st.markdown("# :material/barefoot:, :material/rainy_snow:, :material/online_prediction:, :material/alarm_off:, :material/award_star:, :material/draw:,  :material/step_out:")
     st.markdown(dataset_to_outro(survey.data))
     """
-    Each of the buttons below (if any) correspond to a specific commitment. Clicking on a button will integrate yours, writing into the ledger's _records_.
+    The button corresponds to your specific commitment. Click on it, to write into the ledger's _records_.
     """
     for checkout in st.session_state['checkouts']:
         if st.button(f":material/rainy_snow:", key=f"pay-{checkout}", help=f"{checkout}", use_container_width=True):
             sumup_widget(checkout)
             
-    # st.write(survey.data)
+    st.markdown(
+        """
+        Due to the nature of the transaction, processing might take a moment.
+        Please remain on this page while writing is completed. If the process takes longer than expected, feel free to take a few breaths. 
+        
+        We shall be able to retrieve the verification at a later stage.
+        """
+    )
     
     if st.button(f"Clear all and restart", key=f"restart", type='primary', use_container_width=True):
         st.session_state.clear()
         st.rerun()
 
+def outro():
+    st.markdown("## <center> Step X: _Chapter One_</center>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        Congrats! It was cool to navigate through the process of engaging in our philanthropic initiative.
+        
+We look forward to seeing how this commitment will unfold.
+    
+**You should receive a confirmation email shortly.**
+        """
+"""
+_In the meantime_:"""
+"""
+Here is a snapshot of current activities and developments. This includes updates on ongoing projects, conceptual ideas in the pipeline, and longer-term ventures that are now yielding positive results. 
+"""
+"""
+	1. Health Systems: Addressing the pervasive collapse of health systems, exacerbated by the pandemic and sectarian influences.
+	2. Monetisation: Pressing cyanotypes from experimental human campaigns, economic photography and scientific reflection.
+	3. Scientific Projects: Energy jumps and the stability of the cryosphere, contributing to our understanding of the impact of ice fracture on climate dynamics.
+	4. Philosophical Dinners: Hosting gastronomic events where ideas are served through meals, connecting intellectual and cultural exchange within experience.
+    5. Artistic Endeavours: Exploring the arts, with a focus on music, the natural world, ceramics, and illustration.
+    6. Literature: Communication within the Urban Jungle: the vertical scenario. 
+""")
+    with st.spinner("Thinking..."):
+        time.sleep(1)
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        text = """
+            Any preference? To your taste of insights and ideas - a question - we submit to your attention:
+        _“how to share?”_
+
+        Your insight could provide the next key piece in this collaborative puzzle. 
+
+        Reach out by email, _submit_ your thoughts — each is a step closer to transforming ideas into actionable reality.
+
+
+
+        social.from.scratch@protonmail.com
+
+            """
+            
+        # stream_once_then_write(text)
+        st.markdown(text)
+        if st.session_state['authentication_status']:
+            st.toast(f'Authenticated successfully {mask_string(st.session_state["username"])}')
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col2:
+                authenticator.logout()
+        st.markdown("""
+        `Click "Submit" to save your dashboard.`
+        """)
+        # st.write(survey)
+        # st.write(st.session_state['username'])
+        
+# Each of these projects vectors collective wisdom and input from our communities, and
+# How your perspective can shape and influence the direction we take?
+    
+def intro():
+    cols = st.columns(4, vertical_alignment="center")
+    today = datetime.now()
+    target_date = datetime(today.year, 9, 26)
+
+    # Calculate the time delta
+    time_delta = target_date - today
+        
+    with cols[0]:
+        ui.metric_card(title=".", content='Nan', description="Expenses, so far.", key="card1")
+    with cols[1]:
+        st.button('Dashboard', key='connect', disabled=True, use_container_width=True)
+
+    #     ui.metric_card(title="Total GAME", content="0.1 €", description="Since  _____ we start", key="card2")
+    with cols[2]:
+        ui.metric_card(title="Days to go", content=f"{time_delta.days}", description="Before start of the conference", key="card3")
+    with cols[3]:
+        st.markdown("#### Questions")
+        ui.badges(badge_list=[("experimental", "secondary")], class_name="flex gap-2", key="viz_badges2")
+        # ui.badges(badge_list=[("production", "outline")], class_name="flex gap-2", key="viz_badges3")
+        # switch_value = ui.switch(default_checked=True, label="Enable economic", key="switch1")
+        whitelist = ui.button(text="Join the whitelist", url="", key="link_btn")
+        if whitelist:
+            # st.toast("Whitelist")
+            join_waitlist()
+
+
 def application_pages():
     pages_total = 16
     pages = survey.pages(pages_total, 
-            on_submit=lambda: _submit(),
+            on_submit=lambda: _form_submit(),
             )
+    
     st.progress(float((pages.current + 1) / pages_total))
     
     with pages:
@@ -1423,9 +1589,14 @@ def application_pages():
         if pages.current == 14:
             integrate()
                 
-
+        if pages.current == 15:
+            outro()
+            
 if __name__ == "__main__":
     
+    if st.session_state['authentication_status']:
+        intro()    
+
     st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
     st.markdown("## <center>The intersection of Human and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
     # st.markdown('<center>`wait a minute`</center>', unsafe_allow_html=True)
