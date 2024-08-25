@@ -568,13 +568,13 @@ def body1():
     The combination of reflection, interaction, and emotion-driven engagement sets the stage for new collective experiences.
 
     """
-
+NSTEPS = 15
 def body2():
     st.markdown("## <center> Step 1:  / Reflection</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
-        """ 
-    This is a process in several steps which interactively depend on your choices. 
+        f""" 
+    This is a process in {NSTEPS} steps which interactively depend on your choices. 
     After you make a decision, take a moment to consider _why_ you made this choice and  _how_ does it align with your personal goals and values.
 
     This process will take approximately _the time of a good tea_. If you brew one, pause for a minute to think about why you're here.
@@ -583,7 +583,9 @@ def body2():
         """
     For now, our primary goal is to **gather your commitment to philanthropic intentions** and ensure that our objectives align. This process helps us understand your interests and motivations, setting the stage for collaboration. 
     
-    Once we have established this connection and confirmed that our paths are in sync, we will reach out to discuss the next steps in more detail, ensuring that your contribution is aligned with action. 
+    Once we have established this connection, we will reach out to discuss the next steps in more detail, ensuring that your contribution is aligned with action. 
+    
+    Is it OK for us to reach out by email?
     
     We look forward to exploring this journey together.
     """
@@ -596,14 +598,18 @@ def engagement():
 
     with col2:
         """
-        We're offering three different ways to engage with our initiative: **Support**, **Invest**, or **Donate**.
+        We are seeking support for our 17-member team, the Athena Collective, hosting a panel discussion entitled ‘the Social Contract from Scratch’ at the upcoming ‘Europe in Discourse’ conference (26-28 September 2024).
+        """
+
+        """
+        We offer three different ways to engage with our initiative: **Support**, **Invest**, or **Donate**.
         
         """
     st.divider()
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         """
-            **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources.
+            **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources. Example: xxx, XXX, or contributing your skills.
             """
     with col2:
         """            
@@ -612,7 +618,7 @@ def engagement():
         
     with col3:
         """
-        **Donate**, means that you are willing to contribute financially to our initiative, without expectation of financial gains. 
+        **Donate**, means that you are willing to contribute financially to our initiative, without expectation of financial gains. cover expenses
         """
     st.divider()
         
@@ -754,7 +760,7 @@ def authentication():
                 if name:
                     st.write(f"Thank you `{name}` for your interest. We will get back to you shortly.")
 
-        st.write(f'`Your signature is {mask_string(st.session_state["username"])}`')
+        st.write(f'`My signature is {mask_string(st.session_state["username"])}`')
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
     elif st.session_state['authentication_status'] is None:
