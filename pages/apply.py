@@ -347,6 +347,29 @@ def dataset_to_intro(dataset):
         formatted_text += f", my outlook for the future is a `{outlook}`{leaning}."
     return formatted_text
 
+def dataset_to_outro(dataset):
+    formatted_text = "#### "
+    qualitative_value = dataset["Qualitative"]["value"]
+    if qualitative_value == "1":
+        qualitative_desc = "supporting"
+    elif qualitative_value == "2":
+        qualitative_desc = "investing"
+    elif qualitative_value == "10":
+        qualitative_desc = "donating"
+    else:
+        qualitative_desc = "participating"
+
+    formatted_text += f"I commit to start this journey `{qualitative_desc}` as a philanthropist"
+
+    if dataset.get("future_outlook", {}).get("value") is not None:
+        future_outlook = float(dataset.get("future_outlook", {}).get("value", False))
+        
+        outlook = "bright horizon" if future_outlook >= 1 else "dark storm" if future_outlook < 0.5 else "grey mist"
+        leaning = ", leaning `to the bright`." if future_outlook > 0.5 and future_outlook < 1. else ", leaning `to the dark`." if future_outlook < .5 and future_outlook > 0. else "."
+
+        formatted_text += f", my outlook for the future is a `{outlook}`{leaning}."
+    return formatted_text
+
 def dataset_to_text(dataset, perspective='first'):
     text = ""
     # Start with the qualitative decision
@@ -613,7 +636,7 @@ def engagement():
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         """
-            **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources. Example: xxx, XXX, or contributing your skills.
+            **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources. Even _just_ feedback is a valuable form of support.
             """
     with col2:
         """            
@@ -622,9 +645,17 @@ def engagement():
         
     with col3:
         """
-        **Donate**, means that you are willing to contribute financially to our initiative, without expectation of financial gains. cover expenses
+        **Donate**, means that you are willing to contribute financially to our initiative, without expectation of financial gains. You help is key to enable and save our first step, at this early stage.
         """
     st.divider()
+
+        # This is a good way to help us in this first stage.
+        # immediate necessities, 
+        # safe step
+        # You help is key to enable and save our first step, at this early stage. 
+        # 
+        # In this first stage, you help is key us step our first step together. 
+        # this can be key to 
         
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
@@ -633,13 +664,13 @@ def engagement():
         
         """
         
-    st.markdown("## <center> Your choice</center>", unsafe_allow_html=True)
+    st.markdown("## <center>Feel the choice</center>", unsafe_allow_html=True)
         
     engage_categories= {'1': 'Support', '2': 'Invest', '10': 'Donate'}
     engage = create_qualitative('trifurcation',
                         kwargs={"survey": survey, 
                                 'label': 'categorical', 
-                                "name": "we are at a crossing point.",
+                                "name": "we are at a crossing point: how would you philanthropically commit?.",
                                 "question" : "Support (1, dark grey), Invest (2, light grey), or Donate (10, black)?",
                                 "categories": engage_categories
                         })
@@ -739,7 +770,7 @@ def authentication():
         col1, col2, col3 = st.columns([1, 9, 1])
         with col2:
             """
-            Our primary objective is covering expenses for travel, accommodation, conference fees, and meals. Any extra funds will support current development projects in decision-making, scientific research, and artistic endeavors.
+            Our aim is covering expenses for travel, accommodation, conference fees, and meals. Any extra funds will support current projects: decision-making, scientific research, and artistic endeavors.
             """
 
     if st.session_state['authentication_status']:
@@ -753,16 +784,16 @@ def authentication():
         
         As we consolidate a focused and passionate community, sharing your email facilitates communication and collaboration.
                     """)
-            email = survey.text_input("Your email address", id="Email")
+            email = survey.text_input("My email address", id="Email")
             if email:
                 try:
                     valid = validate_email(email)
                     email = valid.email
                 except EmailNotValidError as e:
                     st.error(str(e))
-                name = survey.text_input("Your name", id="given-name")
+                name = survey.text_input("My name", id="given-name")
                 if name:
-                    st.write(f"Thank you `{name}` for your interest. We will get back to you shortly.")
+                    st.write(f"Thank you `{name}` for your interest. We shall save the data shortly.")
 
         st.write(f'`My signature is {mask_string(st.session_state["username"])}`')
     elif st.session_state['authentication_status'] is False:
@@ -782,14 +813,14 @@ Two aspects are key for us:
 """
         )
         """
-        1. **Transparency:** Regularly update donors, contributors, and investors on how their resources are being used.
+        1. **Transparency:** Regularly update donors, supporters, and investors on how their resources are being used.
 
 2. **Acknowledgements:** Recognising and thanking donors for their support, detailing the outcomes and benefits of the donations.
         """
         
         """
         **Remark:** 
-As we proceed, we will store your information in two separate databases: a 'trusted' one for verified data and an 'untrusted' one for data that needs further validation. This helps us ensure accuracy and transparency in our actions, while exploring the dynamics of trust and value in a digital environment.
+As we proceed, we will store your information in two separate databases: one  'trusted' for verified data and one 'untrusted', for data that needs further validation. This helps us ensure accuracy and transparency in our actions, while exploring the dynamics of trust and value in a digital environment.
         One of the two databases of choice is a simple **_relational_ database**, the other is a **banking ledger**.
         """
     st.toast(
@@ -804,7 +835,7 @@ def story():
     with col2:
         st.markdown(
         """
-We're curious to learn more about the individuals behind these decisions. Your story matters and contributes to the richness of this journey, as a collective.
+We're curious to learn more about the individuals behind these decisions. Your story matters and contributes to the richness of this journey as a collective.
 What is your story?
 """
         )
@@ -940,13 +971,14 @@ def donation():
             st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {donation_type(exp_value, actual_value)}")
 
 def investment(survey):
-    st.title("Investment Opportunity Overview")
+   
     
-    with st.expander("Investment Opportunity Introduction", expanded=False):
+    with st.expander("Investment overview", expanded=False):
         st.markdown("## Introduction")
-        st.write("Explore a unique investment opportunity designed to redefine your approach to returns. "
-                "Our investment protocol allows you to set both an 'expected' and a 'dream' return rate, "
-                "offering a personalized and attainable financial goal.")
+        st.write("Let's redefine our approach to returns. "
+                "Our protocol allows us to set both an 'expected' and a 'dream' return rates. "
+                "We are interested to know how you would tailor-design your ideal investment scheme."
+                )
 
         st.markdown("## Key Features")
         st.subheader("Expected Return Rate")
@@ -975,16 +1007,26 @@ def investment(survey):
         st.write("- **Transparency:** Clear understanding of the investment process.")
         st.write("- **Expertise:** Backed by a team of financial experts.")
 
-        st.markdown("## Next Steps")
-        st.write("Seize this investment opportunity tailored to your financial aspirations. "
-                "Set your expected and dream return rates today to embark on a journey towards financial success.")
-        st.write("Contact us for more details and personalized assistance.")
-        st.title("Investment Opportunity Overview")
+    st.markdown("## Design from Scratch")
+    st.write("Take the chance to finetune an investment opportunity tailored to your financial aspirations. "
+            "Set your _expected_ and _dream_ return rates.")
+    
 
-    st.markdown("## First Steps")
-    st.write("Seize this investment opportunity tailored to your financial aspirations. "
-            "Set your expected and dream return rates today to embark on a journey towards financial success.")
-    st.write("Contact us for more details and personalized assistance.")
+    st.divider()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        """
+            **Expected return rate**, for us means the bare minimum return that you accept to receive. It is your non-negotiable baseline, the minimum you anticipate to justify your involvement and commitment to the investment. 
+            """
+    with col2:
+        """            
+        **Dream return rate**, for us means that the ideal or aspirational rate of return that you hope to achieve under the best possible circumstances.
+        """
+    st.divider()
+        
+        
+    st.write("Contact us for more details and personalised assistance. \n",
+             "social.from.scratch@proton.me")
 
     option = survey.radio("Select how you want to express return rates:",
                             options = ("Percentage", "Leverage Factor", "Mixed mode"), horizontal=True)
@@ -992,80 +1034,33 @@ def investment(survey):
     col1, _spacer, col2= st.columns([3,1,3], vertical_alignment="center")
     _spacer.markdown("# vs.")
     if option == "Percentage":
-        col1.markdown("## Expected Return Rate (Percentage)")
+        col1.markdown("### Expected Return Rate ")
         expected_return_rate = survey.number_input("Enter your expected return rate (%):", min_value=0.0, step=1.)
-        col2.markdown("## Dream Return Rate (Percentage)")
+        col2.markdown("### Dream Return Rate ")
         dream_return_rate = survey.number_input("Enter your dream return rate (%):", min_value=0.0, step=1.)
     elif option == "Leverage Factor":
-        col1.markdown("## Expected Return Rate (Leverage Factor)")
+        col1.markdown("### Expected Return Rate")
         expected_return_rate = col1.number_input("Enter your expected leverage factor:", min_value=0, step=1)
-        col2.markdown("## Dream Return Rate (Leverage Factor)")
+        col2.markdown("### Dream Return Rate")
         dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
     else:
-        col1.markdown("## Expected Return Rate (Percentage)")
+        col1.markdown("### Expected Return Rate (Percentage)")
         expected_return_rate = col1.number_input("Enter your expected return rate (%):", min_value=0.0, step=1.)
-        col2.markdown("## Dream Return Rate (Leverage Factor)")
+        col2.markdown("### Dream Return Rate (Leverage Factor)")
         dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
     
-    with st.expander("Investment Opportunity Overview", expanded=False):
-
-        st.divider()
-
-        st.markdown("## Introduction")
-        st.write("Explore a unique investment opportunity designed to redefine your approach to returns. "
-                "Our investment protocol allows you to set both an 'expected' and a 'dream' return rate, "
-                "offering a personalized and attainable financial goal.")
-
-        st.markdown("## Key Features")
-        st.subheader("Expected Return Rate")
-        st.write("- **Definition:** Baseline return on investment over a fixed time span.")
-        st.write("- **Purpose:** Conservative estimate of return without active involvement.")
-        st.write("- **Your Role:** State your desired expected return rate.")
-
-        st.subheader("Dream Return Rate")
-        st.write("- **Definition:** Ambitious return rate aligned with personal wishes.")
-        st.write("- **Purpose:** Express your ideal financial outcome.")
-        st.write("- **Your Role:** Share your dream return rate.")
-
-        st.subheader("Intermediate Value")
-        st.write("- **Proposal:** Bridge between expected and dream return rates.")
-        st.write("- **Strategy:** Carefully planned investments for balance.")
-        st.write("- **Risk Management:** Approach includes risk management.")
-
-        st.markdown("## Process")
-        st.write("1. **Set Rates:** Clearly define expected and dream return rates.")
-        st.write("2. **Receive Proposal:** Analysis for an attainable intermediate value.")
-        st.write("3. **Investments:** Benefit from a curated investment plan.")
-        st.write("4. **Review:** Regular reviews for adapting to changes.")
-
-        st.markdown("## Why Us")
-        st.write("- **Innovation:** Tailored and flexible investment experience.")
-        st.write("- **Transparency:** Clear understanding of the investment process.")
-        st.write("- **Expertise:** Backed by a team of financial experts.")
-
-
-        st.markdown("## Summary")
-        if option == "Percentage":
-            st.write("Your expected return rate:", expected_return_rate, "%")
-            st.write("Your dream return rate:", dream_return_rate, "%")
-        elif option == "Leverage Factor":
-            st.write("Your expected leverage factor:", expected_return_rate)
-            st.write("Your dream leverage factor:", dream_return_rate)
-        else:
-            st.markdown("## Expected Return Rate (Percentage)")
-            st.write("Your expected return rate:", expected_return_rate, "%")
-            st.write("Your dream leverage factor:", dream_return_rate)
-
 def offer():
     st.markdown("## <center> Step X: Investment horizon</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
-    with col2:
-        st.markdown(
-        """
 
-"""
+    # with col2:
+    st.markdown(
+        """     
+        We collect important information to quantify yuor risk attitude to properly size your investment extent and its potential returns. 
+        """
         )
-        risk_tolerance = survey.radio("Risk Appetite:", options=["Low", "Medium", "High"], horizontal=True, key="risk_appetite", captions=["Play it safe in maze", "Play like an adventure", "Play like a pro"])
+    risk_tolerance = survey.radio("Risk Appetite:", options=["Low", "Medium", "High"], horizontal=True, key="risk_appetite", captions=["Play it safe in maze", "Play like an adventure", "Play like a pro"])
+
     investment(survey)
 
 def contribution():
@@ -1270,9 +1265,9 @@ def checkout2():
         
     st.markdown(f'# <center> Commit # {st.session_state["price"]}</center>', unsafe_allow_html=True)
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
-    st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
+    # st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
     """
-    The button below will create a record to be verified on the ledger. This entry will be a trace of your commitment, a digital footprint of your intention and action.
+    The button below will create a record to be verified on the ledger. This entry will be a trace of your commitment, a digital footprint of your philantrhopic intention.
     """
     if st.button("Create record", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True, disabled=not bool(st.session_state['sumup'])):
         with st.spinner("Creating record..."):
@@ -1280,10 +1275,14 @@ def checkout2():
             reference = reference+f"-{int(now.strftime('%S'))}"
             time.sleep(1)
             st.write(f"Full reference {reference}. (computed as a function of the current time)")
-        checkout = create_commit_checkout(reference, st.session_state["price"], description + signature)
-        # if checkout:
-            # st.json(checkout)
+        
+        if len(st.session_state['checkouts']) == 0:              
+            checkout = create_commit_checkout(reference, st.session_state["price"], description + signature)
 
+            st.stession_state['checkouts'] = checkout
+        else:
+            st.error("There already is a record of theis session. You can list it below.")
+                
     st.write("Commits:")
     if st.button("List commits", key="list_checkouts", use_container_width=True):
         if len(st.session_state['checkouts']) == 0:
@@ -1293,19 +1292,21 @@ def checkout2():
             st.json(st.session_state['checkouts'])    
 
     for checkout in st.session_state['checkouts']:
-        if st.button(f"Get Commit Info for {mask_string(checkout)}", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
+        if st.button(f"Debrief", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
+        # if st.button(f"Get Commit Info for {mask_string(checkout)}", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
             col1, col2, col3 = st.columns([2, 3, 2])
             with col2:
-                checkout_info = get_checkout_info(checkout)
-                # st.json(checkout_info)
-                st.write(f"**Amount:** {checkout_info['amount']} {checkout_info['currency']}")
-                st.write(f"**Checkout Reference:** {checkout_info['checkout_reference']}")
-                st.write(f"**Date:** {checkout_info['date']}")
-                st.write(f"**Description:** {checkout_info['description']}")
-                st.write(f"**Transaction ID:** {checkout_info['id']}")
-                st.write(f"**Merchant Country:** {checkout_info['merchant_country']}")
-                st.write(f"**Merchant Name:** {checkout_info['merchant_name']}")
-                st.write(f"**Status:** {checkout_info['status']}")
+                with st.container():
+                    checkout_info = get_checkout_info(checkout)
+                    # st.json(checkout_info)
+                    st.write(f"**Amount:** {checkout_info['amount']} {checkout_info['currency']}")
+                    st.write(f"**Checkout Reference:** {checkout_info['checkout_reference']}")
+                    st.write(f"**Date:** {checkout_info['date']}")
+                    st.write(f"**Description:** {checkout_info['description']}")
+                    st.write(f"**Transaction ID:** {checkout_info['id']}")
+                    st.write(f"**Merchant Country:** {checkout_info['merchant_country']}")
+                    st.write(f"**Merchant Name:** {checkout_info['merchant_name']}")
+                    st.write(f"**Status:** {checkout_info['status']}")
 
 
     """
@@ -1327,14 +1328,15 @@ def integrate():
 
     if st.download_button(label=f"Download datafile", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='primary'):
         st.success(f"Saved {csv_filename}")
-    """
-    ### How do we store the data? 
-    """
-    st.markdown(
-    """
-    The data you provide is stored in two databases. These two sources provide a complementary snapshot of your intention and action, like _two halves_ of a digital trace of your session.
-    """
-    )
+    # """
+    # ### How do we store the data? 
+    # """
+    # st.markdown(
+    # """
+    # The data you provide is stored in two databases. These two sources provide a complementary snapshot of your intention and action, like _two halves_ of a digital trace of your session.
+    # """
+    # )
+    st.title("Save the session!")
     """
     Each of the buttons below (if any) correspond to a specific commitment. Clicking on a button will integrate yours into our lightweight database.
     """
@@ -1349,7 +1351,7 @@ def integrate():
     # st.write(f"Full signature: {_signature}")
     # st.write(f"Full username: {st.session_state['username']}")
     # st.markdown("# :material/barefoot:, :material/rainy_snow:, :material/online_prediction:, :material/alarm_off:, :material/award_star:, :material/draw:,  :material/step_out:")
-    st.markdown(dataset_to_intro(survey.data))
+    st.markdown(dataset_to_outro(survey.data))
     """
     Each of the buttons below (if any) correspond to a specific commitment. Clicking on a button will integrate yours, writing into the ledger's _records_.
     """
@@ -1429,7 +1431,7 @@ if __name__ == "__main__":
     # st.markdown('<center>`wait a minute`</center>', unsafe_allow_html=True)
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
     st.divider()
-    st.markdown(f"# <center>Philanthropy Application</center> ", unsafe_allow_html=True)
+    st.markdown(f"# <center>Application to Philanthropy</center> ", unsafe_allow_html=True)
 
     if st.session_state['authentication_status']:
         event = st_player("https://vimeo.com/1002379567", key='vimeo_player')
