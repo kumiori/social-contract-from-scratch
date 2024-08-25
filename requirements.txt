@@ -107,7 +107,7 @@ packaging==23.2
 pandas==2.1.1
 parso==0.8.3
 pexpect==4.9.0
-philoui @ git+https://github.com/kumiori/philoui.git@b1edca896814921cb3148f85b92a6e00bae64de4
+philoui @ git+https://github.com/kumiori/philoui.git#egg=philoui
 Pillow==10.1.0
 pkginfo==1.9.6
 platformdirs==4.0.0
