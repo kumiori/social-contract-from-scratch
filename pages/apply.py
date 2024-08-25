@@ -56,6 +56,9 @@ with open('assets/credentials.yml') as file:
 
 survey = CustomStreamlitSurvey()
 
+if 'donation' not in st.session_state:
+    st.session_state.donation = 0
+
 if 'alerted' not in st.session_state:
     st.session_state.alerted = False
 
@@ -978,7 +981,7 @@ def donation():
         
         You can choose a Custom Donation, allowing you to select any amount that resonates with your personal commitment. 
         
-        Alternatively, you may consider the following suggested contributions: Sponsor a Coffee for the collective, Cover a Light Lunch or Part of Dinner, Sponsor Cofenrence Fees, Support Our Accommodation, or our Travels. 
+        Alternatively, you may consider the following suggestions: _Sponsor a Coffee_ for the collective, _Sponsor a Meal_, _Sponsor Cofenrence Fees_, _Support Our Accommodation_, or _our Travels_. 
         
         Each donation helps us move forward.
 
@@ -1041,11 +1044,13 @@ def donation():
             # Display the actual type: exp_value if actual value < 3000, otherwise -1
             donation_type = lambda x, t: int(x)+10 if t < 3000 else -1
             # st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {int(exp_value)}")
-            st.write(f"Donation Value: {actual_value:.1f} EUR, Donation type: {donation_type(exp_value, actual_value)}")
+            st.markdown(f"### Donation: {actual_value:.1f} EUR")
+            st.session_state["donation"] = actual_value
+            # , Donation type: {donation_type(exp_value, actual_value)}")
 
         
         """
-        #### Details:
+        #### Approximate references:
                 
         - **Custom Donation:** Allows you to pick your preferred number.
         - **:material/coffee: :** "Sponsor a Coffee for the collective" – 17 EUR
@@ -1351,8 +1356,19 @@ def checkout2():
     # if st.button('Show full signature', type='primary', on_click=lambda: _show_sig):
         # st.write(f'Full signature {_signature}')
         
-        
+    donation = st.session_state["donation"]
+    price = st.session_state["price"]    
     st.markdown(f'# <center> Commit # {st.session_state["price"]}</center>', unsafe_allow_html=True)
+    st.markdown(f"""
+    ## <center> $$ \\underbrace{{{donation:.2f} \\text{{~EUR}}}}_{{\\text{{Donation}}}}~+\\underbrace{{{price}}}_{{\\text{{Commit \#}}}}$$ </center>
+    """, unsafe_allow_html=True)
+    st.markdown(f"""# <center> = </center>""", unsafe_allow_html=True)
+   
+    st.markdown(f"""
+                ## <center> {donation+ price:.2f}</center>
+    """, unsafe_allow_html=True)
+    
+    
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     # st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
     """
