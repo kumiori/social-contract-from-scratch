@@ -1485,7 +1485,7 @@ def integrate():
 
     st.session_state['serialised_data'] = survey.data
 
-    if st.download_button(label=f"Download datafile", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='primary'):
+    if st.download_button(label=f"Philanthropy", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='secondary'):
         st.success(f"Saved {csv_filename}")
     # """
     # ### How do we store the data? 
@@ -1499,7 +1499,7 @@ def integrate():
     """
     The button corresponds to your specific commitment. Clicking on it, will integrate it into our records.
     """
-    if st.button(f":material/sunny:", key=f"commit", help=f"Commit", use_container_width=True):
+    if st.button(f":material/sunny:", key=f"commit", help=f"Commit", type='primary', use_container_width=True):
         st.session_state['serialised_data'] = survey.data
         _submit(survey.data, _signature)
         
@@ -1517,7 +1517,7 @@ def integrate():
     """
     # for checkout in st.session_state['checkouts']:
     checkout = st.session_state['checkouts']
-    if st.button(f":material/rainy_snow:", key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
+    if st.button(f":material/rainy_snow:", type='primary', key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
         sumup_widget(checkout['id'])
             
     st.markdown(
@@ -1531,7 +1531,7 @@ def integrate():
         """
     )
     
-    if st.button(f"Clear all and restart", key=f"restart", type='primary', use_container_width=True):
+    if st.button(f"Clear all and restart",type='secondary', key=f"restart", use_container_width=True):
         st.session_state.clear()
         st.rerun()
 
