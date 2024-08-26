@@ -233,8 +233,6 @@ def _submit(serialised_data, signature):
 
 @st.dialog('Cast your preferences')
 def _form_submit():
-    # st.write('Thanks, expand below to see your data')    
-    # signature = st.session_state["username"]
     with st.spinner("Checking your signature..."):
         signature = st.session_state["username"]
         serialised_data = st.session_state['serialised_data']
@@ -1408,7 +1406,7 @@ def checkout2():
     price = st.session_state["price"]    
     st.markdown(f'# <center> Commit # {st.session_state["price"]}</center>', unsafe_allow_html=True)
     st.markdown(f"""
-    ## <center> $$ \\underbrace{{{donation:.2f} \\text{{~EUR}}}}_{{\\text{{Donation}}}}~+ \\underbrace{{{investment_input:.2f} \\text{{~EUR}}}}_{{\\text{{Investment}}}}~+\\underbrace{{{price}}}_{{\\text{{Commit \#}}}}$$ </center>
+    ## <center> $$ \\underbrace{{{donation:.2f} \\text{{~EUR}}}}_{{\\text{{Donation}}}}~+ \\underbrace{{{investment_input:.2f} \\text{{~EUR}}}}_{{\\text{{Investment}}}}~+\\underbrace{{{price}}}_{{\\text{{Commit \\#}}}}$$ </center>
     """, unsafe_allow_html=True)
     st.markdown(f"""# <center> = </center>""", unsafe_allow_html=True)
    
@@ -1525,9 +1523,11 @@ def integrate():
     st.markdown(
         """
         Due to the nature of the transaction, processing might take a moment.
-        Please remain on this page while writing is completed. If the process takes longer than expected, feel free to take a few breaths. 
+        Please remain on this page while writing is completed. If the process takes longer than expected, feel free to take a few breaths.
         
-        We shall be able to retrieve the verification at a later stage.
+        _Our experience is that the transaction is usually completed within a few seconds, but the dialogue window does not provide a visual feedback: the final outcome is only written to the console._ 
+        
+        Don't worry, we shall be able to retrieve the verification at a later stage.
         """
     )
     
@@ -1537,9 +1537,18 @@ def integrate():
 
 def outro():
     st.markdown("## <center> Step X: _Chapter One_</center>", unsafe_allow_html=True)
+    
+    st.write(st.session_state['tx_tag'])
+    st.write(st.session_state['checkouts']['id'])
+    
+    dashboard_data = {**st.session_state['serialised_data'], 'checkout': st.session_state['checkouts'], 'checkout_tag': st.session_state['tx_tag']}
+    
+    
+    st.session_state['serialised_data'] = dashboard_data
+    
     st.markdown(
         """
-        Congrats! It was cool to navigate through the process of engaging in our philanthropic initiative.
+        Congrats! It was cool to navigate through the process of engaging in our philanthropic initiative. Hit the Submit button below to create your dashboard.
         
 We look forward to seeing how this commitment will unfold.
     
@@ -1559,11 +1568,11 @@ Here is a snapshot of current activities and developments. This includes updates
     6. Literature: Communication within the Urban Jungle: the vertical scenario. 
 """)
     with st.spinner("Thinking..."):
-        time.sleep(1)
+        time.sleep(3)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         text = """
-            Any preference? To your taste of insights and ideas - a question - we submit to your attention:
+            Any preference or strong inclination? To your taste of insights and ideas - a question - we submit to your attention:
         _“how to share?”_
 
         Your insight could provide the next key piece in this collaborative puzzle. 
@@ -1576,21 +1585,15 @@ Here is a snapshot of current activities and developments. This includes updates
 
             """
             
-        # stream_once_then_write(text)
         st.markdown(text)
         if st.session_state['authentication_status']:
             st.toast(f'Authenticated successfully {mask_string(st.session_state["username"])}')
             col1, col2, col3 = st.columns([1, 1, 1])
-            with col2:
-                authenticator.logout()
+            # with col2:
+                # authenticator.logout()
         st.markdown("""
         `Click "Submit" to save your dashboard.`
         """)
-        # st.write(survey)
-        # st.write(st.session_state['username'])
-        
-# Each of these projects vectors collective wisdom and input from our communities, and
-# How your perspective can shape and influence the direction we take?
     
 def intro():
     cols = st.columns(4, vertical_alignment="center")
