@@ -1420,20 +1420,20 @@ def checkout2():
     """
     The button below will create a record to be verified on the ledger. This entry will be a trace of your commitment, a digital footprint of your philantrhopic intention.
     """
-    if st.button("Create record", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True, disabled=not bool(st.session_state['sumup'])):
-        with st.spinner("Creating record..."):
-            st.write(reference)
-            reference = reference+f"-{int(now.strftime('%S'))}"
-            time.sleep(1)
-            st.write(f"Full reference {reference}. (computed as a function of the current time)")
-        
-        if len(st.session_state['checkouts']) == 0:              
-            checkout = create_commit_checkout(reference, total_amount, description + signature)
+    # REMOVE STEP
+    # if st.button("Create record", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True, disabled=not bool(st.session_state['sumup'])):
+    with st.spinner("Creating record..."):
+        reference = reference+f"-{int(now.strftime('%S'))}"
+        time.sleep(1)
+        st.write(f"Full reference {reference}. (computed as a function of the current time)")
+    
+    if len(st.session_state['checkouts']) == 0:              
+        checkout = create_commit_checkout(reference, total_amount, description + signature)
 
-            st.session_state['checkouts'] = checkout
-            
-        else:
-            st.error("There already is a record of theis session. You can list it below.")
+        st.session_state['checkouts'] = checkout
+        
+    else:
+        st.error("There already is a record of theis session. You can list it below.")
     
     st.write("Commits:")
     if st.button("List commits", key="list_checkouts", use_container_width=True):
@@ -1444,9 +1444,9 @@ def checkout2():
             st.json(st.session_state['checkouts'])    
     # st.write(st.session_state['checkouts'])
     
-    if st.button("Clear commits", key="clear_checkouts", use_container_width=True):
-        st.session_state['checkouts'] = []
-        st.success("Commits cleared.")
+    # if st.button("Clear commits", key="clear_checkouts", use_container_width=True):
+    #     st.session_state['checkouts'] = []
+    #     st.success("Commits cleared.")
     
     checkout = st.session_state['checkouts']
     if st.session_state['checkouts']:
