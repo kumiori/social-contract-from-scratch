@@ -895,7 +895,7 @@ Two aspects are key for us:
         """
         1. **Transparency:** Regularly update donors, supporters, and investors on how their resources are being used.
 
-2. **Acknowledgements:** Recognising and thanking donors for their support, detailing the outcomes and benefits of the donations.
+2. **Acknowledgement:** Recognising and thanking donors for their support, detailing the outcomes and benefits of the donations.
         """
         
         """
