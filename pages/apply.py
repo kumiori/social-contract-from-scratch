@@ -1445,6 +1445,11 @@ def checkout2():
         else:
             st.json(st.session_state['checkouts'])    
     # st.write(st.session_state['checkouts'])
+    
+    if st.button("Clear commits", key="clear_checkouts", use_container_width=True):
+        st.session_state['checkouts'] = []
+        st.success("Commits cleared.")
+    
     checkout = st.session_state['checkouts']
     if st.session_state['checkouts']:
         if st.button(f"Debrief", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
