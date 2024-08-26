@@ -294,7 +294,7 @@ After identifying several conceptual pathways - different directions for explora
 Would you like to see how others are playing?
 """)
 
-    st.page_link("pages/philanthropy-next.py", label="Philantropy", icon="1️⃣")
+    st.page_link("pages/apply.py", label="Philanthropy: Apply for Support", icon="1️⃣")
     st.page_link("pages/philanthropy-next.py", label="Decision Making", icon="2️⃣", disabled=True)
     st.page_link("pages/philanthropy-next.py", label="Sciences", icon="💫", disabled=True)
     st.page_link("pages/philanthropy-next.py", label="Arts", icon="✨", disabled=True)
