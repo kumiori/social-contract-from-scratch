@@ -698,7 +698,9 @@ def engagement():
     st.markdown("## <center> Step 2: Engagement</center>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 9, 1])
-
+    st.session_state['donation'] = 0
+    st.session_state['investment_input'] = 0
+    
     with col2:
         """
         ### We are seeking support for our 17-member team, 
