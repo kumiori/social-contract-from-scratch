@@ -59,6 +59,9 @@ survey = CustomStreamlitSurvey()
 if 'donation' not in st.session_state:
     st.session_state.donation = 0
 
+if 'investment_input' not in st.session_state:
+    st.session_state.investment_input = 0
+
 if 'alerted' not in st.session_state:
     st.session_state.alerted = False
 
@@ -492,7 +495,7 @@ def dataset_to_text(dataset, perspective='first'):
     connector = "and" if interest_level == 'high' else "yet"
     # Create the text output
     text = (
-        f"{pronoun.title()} decide to start this journey `{qualitative_desc}` as a philanthropist. In this sense, the idea `{'resonates ' if future_outlook_value is not None else future_outlook_text}`. "
+        f"{pronoun.title()} decide to start this journey `{qualitative_desc}` as a philanthropist. In this sense, the future `{'looks ' if future_outlook_value is not None else future_outlook_text}`. "
         f"{possessive.title()} current interest levels are `{interest_level}`, `{connector}` `{interest_mixture}` across `{interest_labels}`. "
     )
     # st.write(qualitative_desc)
@@ -503,14 +506,16 @@ def dataset_to_text(dataset, perspective='first'):
         expected_return = dataset.get("Enter your expected return rate (%):", {}).get("value", "unknown")
         dream_return = dataset.get("Enter your dream return rate (%):", {}).get("value", "unknown")
 
-        investment_profile = f"{possessive.title()} investing profile has a `{risk_appetite}` risk appetite. In terms of revenues, {pronoun} prefer to express return rates in terms of `{expression_return_rates}`. Quantitatively, {possessive} investment bracket spans `{expected_return}`% and `{dream_return}`%."
+        investment_profile = f"{possessive.title()} investing profile has a `{risk_appetite}` risk appetite. Quantitatively, {possessive} investment bracket (_expected_ vs. _dream_) spans `{expected_return}`% and `{dream_return}`%."
+
+        # In terms of revenues, {pronoun} prefer to express return rates in terms of `{expression_return_rates}`. 
 
         # print(expected_return , dream_return)
         # print('or', expected_return or dream_return)
 
         if bool(expected_return and dream_return) is False:
             text = text + ("""
-                        However, something looks wrong in the return rates above. Let's check the data again.
+                        However, something looks wrong in the return rates. Let's check the data again.
                         """)
 
     else:
@@ -1007,17 +1012,21 @@ def donation():
             # Add buttons in each column
             with col1:
                 if survey.button(use_container_width= True, label = f"{options['A Coffee']['icon']} •", id="coffee"):
+                    st.session_state["donation"] = options['A Coffee']['amount']
                     st.write("Thank you for supporting us with a coffee!")
                     
             with col2:
                 if survey.button(use_container_width= True, label = f"{options['Partial Dinner']['icon']} •", id="dinner"):
+                    st.session_state["donation"] = options['Partial Dinner']['amount']
                     st.write("Thank you for sponsoring part of the dinner!")
 
             with col3:
                 if survey.button(use_container_width= True, label = f"{options['Partial Accommodation']['icon']} •", id="accommodation"):
+                    st.session_state["donation"] = options['Partial Accommodation']['amount']
                     st.write("Thank you for supporting our accommodation!")
             with col4:
                 if survey.button(use_container_width= True, label = f"{options['Partial Travel']['icon']} •", id="travel"):
+                    st.session_state["donation"] = options['Partial Travel']['amount']
                     st.write("Thank you for supporting our travels!")
         
         else:
@@ -1060,8 +1069,6 @@ def donation():
         """
 
 def investment(survey):
-   
-    
     with st.expander("Investment overview", expanded=False):
         st.markdown("## Introduction")
         st.write("Let's redefine our approach to returns. "
@@ -1096,8 +1103,8 @@ def investment(survey):
         st.write("- **Transparency:** Clear understanding of the investment process.")
         st.write("- **Expertise:** Backed by a team of financial experts.")
 
-    st.markdown("## Design from Scratch")
-    st.write("Take the chance to finetune an investment opportunity tailored to your financial aspirations. "
+    st.markdown("## Returns, from Scratch")
+    st.write("Let's take the chance to fine-tune an investment opportunity tailored to your financial aspirations. "
             "Set your _expected_ and _dream_ return rates.")
     
 
@@ -1113,9 +1120,6 @@ def investment(survey):
         """
     st.divider()
         
-        
-    st.write("Contact us for more details and personalised assistance. \n",
-             "social.from.scratch@proton.me")
 
     option = survey.radio("Select how you want to express return rates:",
                             options = ("Percentage", "Leverage Factor", "Mixed mode"), horizontal=True)
@@ -1139,16 +1143,56 @@ def investment(survey):
         dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
     
 def offer():
-    st.markdown("## <center> Step X: Investment horizon</center>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 9, 1])
+    st.markdown("## <center> Step X: Investing, from scratch</center>", unsafe_allow_html=True)
 
-    # with col2:
     st.markdown(
-        """     
-        We collect important information to quantify yuor risk attitude to properly size your investment extent and its potential returns. 
+        """
+        In this phase, we are focused on gathering crucial information that will enable us to design and tailor new investment processes that best align with your goals and preferences. 
+        
+        By understanding your time frame, investment size, your expectations, risk attitude, and other key factors, we aim to fine-tune a custom and effective investment strategy that meets your needs while ensuring that each transaction remains realistic and proportionate.
+             
         """
         )
-    risk_tolerance = survey.radio("Risk Appetite:", options=["Low", "Medium", "High"], horizontal=True, key="risk_appetite", captions=["Play it safe in maze", "Play like an adventure", "Play like a pro"])
+    
+    """
+    By starting with a commitment — such as 1% or 1/1000 of the intended investment amount — you create a more realistic and accessible entry point for your investment. 
+    
+    This allows time to gather more information and align intentions before making a significant investment. This phased approach is more practical and encourages you to move forward at a pace that feels comfortable and manageable.
+    
+    This strategy helps build trust and engagement without overwhelming  with a large upfront commitment. 
+    
+    """
+        
+    st.write("Contact us for more details and personalised assistance. \n",
+             "social.from.scratch@proton.me")
+
+    st.subheader("Investment Time Frame")
+    time_frame = survey.selectbox(
+        "Select the time frame for your investment:",
+        options=["3 months", "6 months", "1 year", "3 years", "5 years", "more than 5 years"],
+        id="investment_timeframe"
+    )
+    st.subheader("Investment Size")
+
+    investment_size = survey.number_input(
+        "Enter the potential size of your investment (in EUR):",
+        min_value=0.0,
+        id='Investment size',
+        value=0.0,
+        step=100.0
+    )
+
+    st.subheader("Proportional Transaction")
+    percentage = survey.selectbox("Choose a percentage:", options=[1, 0.1], format_func=lambda x: f"{x}%")
+    proportional_amount = investment_size * percentage / 100
+    st.markdown(f"#### To signal your interest, the commitment amount is: {proportional_amount:.2f} EUR")
+    
+    st.session_state["investment_input"] = proportional_amount
+    
+    col1, col2, col3 = st.columns([1, 9, 1])
+
+    with col2:
+        risk_tolerance = survey.radio("Risk Appetite:", options=["Low", "Medium", "High"], horizontal=True, key="risk_appetite", captions=["Play it safe in maze", "Play like an adventure", "Play like a pro"])
 
     investment(survey)
 
@@ -1194,7 +1238,7 @@ def reading():
     st.markdown("## <center> Connect and Commit</center>", unsafe_allow_html=True)
     st.markdown(
 """
-We aim at _covering expenses_, however - in case of any surplus funds, _we invite_ donors to participate in a future initiative, following the project's progress."""
+We aim at _covering expenses_ for the _Athena_ collective to host a panel discussion at the "Europe in Discourse" conference. In case of any surplus funds, _we invite_ donors to participate in a future initiative, following the project's progress."""
     )
     
 
@@ -1356,18 +1400,20 @@ def checkout2():
     # if st.button('Show full signature', type='primary', on_click=lambda: _show_sig):
         # st.write(f'Full signature {_signature}')
         
-    donation = st.session_state["donation"]
+    donation = float(st.session_state["donation"])
+    investment_input = st.session_state["investment_input"]
+    
     price = st.session_state["price"]    
     st.markdown(f'# <center> Commit # {st.session_state["price"]}</center>', unsafe_allow_html=True)
     st.markdown(f"""
-    ## <center> $$ \\underbrace{{{donation:.2f} \\text{{~EUR}}}}_{{\\text{{Donation}}}}~+\\underbrace{{{price}}}_{{\\text{{Commit \#}}}}$$ </center>
+    ## <center> $$ \\underbrace{{{donation:.2f} \\text{{~EUR}}}}_{{\\text{{Donation}}}}~+ \\underbrace{{{investment_input:.2f} \\text{{~EUR}}}}_{{\\text{{Investment}}}}~+\\underbrace{{{price}}}_{{\\text{{Commit \#}}}}$$ </center>
     """, unsafe_allow_html=True)
     st.markdown(f"""# <center> = </center>""", unsafe_allow_html=True)
    
+    total_amount = donation + price + investment_input
     st.markdown(f"""
-                ## <center> {donation+ price:.2f}</center>
+                ## <center> {total_amount:.2f}</center>
     """, unsafe_allow_html=True)
-    
     
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     # st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
@@ -1382,12 +1428,13 @@ def checkout2():
             st.write(f"Full reference {reference}. (computed as a function of the current time)")
         
         if len(st.session_state['checkouts']) == 0:              
-            checkout = create_commit_checkout(reference, st.session_state["price"], description + signature)
+            checkout = create_commit_checkout(reference, total_amount, description + signature)
 
             st.session_state['checkouts'] = checkout
+            
         else:
             st.error("There already is a record of theis session. You can list it below.")
-                
+    
     st.write("Commits:")
     if st.button("List commits", key="list_checkouts", use_container_width=True):
         if len(st.session_state['checkouts']) == 0:
@@ -1395,14 +1442,15 @@ def checkout2():
             
         else:
             st.json(st.session_state['checkouts'])    
-
-    for checkout in st.session_state['checkouts']:
+    # st.write(st.session_state['checkouts'])
+    checkout = st.session_state['checkouts']
+    if st.session_state['checkouts']:
         if st.button(f"Debrief", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
         # if st.button(f"Get Commit Info for {mask_string(checkout)}", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
             col1, col2, col3 = st.columns([2, 3, 2])
             with col2:
                 with st.container():
-                    checkout_info = get_checkout_info(checkout)
+                    checkout_info = get_checkout_info(checkout['id'])
                     # st.json(checkout_info)
                     st.write(f"**Amount:** {checkout_info['amount']} {checkout_info['currency']}")
                     st.write(f"**Checkout Reference:** {checkout_info['checkout_reference']}")
@@ -1462,9 +1510,10 @@ def integrate():
     """
     The button corresponds to your specific commitment. Click on it, to write into the ledger's _records_.
     """
-    for checkout in st.session_state['checkouts']:
-        if st.button(f":material/rainy_snow:", key=f"pay-{checkout}", help=f"{checkout}", use_container_width=True):
-            sumup_widget(checkout)
+    # for checkout in st.session_state['checkouts']:
+    checkout = st.session_state['checkouts']
+    if st.button(f":material/rainy_snow:", key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
+        sumup_widget(checkout['id'])
             
     st.markdown(
         """
