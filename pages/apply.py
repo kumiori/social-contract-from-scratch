@@ -1445,7 +1445,9 @@ def checkout2():
     st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
     # st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
     """
-    The button below will create a record to be verified on the ledger. This entry will be a trace of your commitment, a digital footprint of your philantrhopic intention.
+    The button below will create a record to be etched on the ledger. This entry will be a trace of your philanthropic commitment, a digital footprint of your philantrhopic intention.
+    
+    
     """
     # REMOVE STEP
     # if st.button("Create record", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True, disabled=not bool(st.session_state['sumup'])):
@@ -1503,7 +1505,7 @@ def integrate():
     reference = st.session_state["tx_tag"]
     _signature = st.session_state["username"]
     
-    st.markdown("## <center> Step X: Integrate the data</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Incorporate the data</center>", unsafe_allow_html=True)
     
     csv_filename = f"my_philanthropic_question_map_1_{reference}.data"
     with st.expander("Show the data", expanded=False):
@@ -1511,7 +1513,7 @@ def integrate():
 
     st.session_state['serialised_data'] = survey.data
 
-    if st.download_button(label=f"Philanthropy", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='secondary'):
+    if st.download_button(label=f"Philanthropic session 01", use_container_width=True, data=json.dumps(survey.data), file_name=csv_filename, mime='text/csv', type='secondary'):
         st.success(f"Saved {csv_filename}")
     # """
     # ### How do we store the data? 
@@ -1523,9 +1525,9 @@ def integrate():
     # )
     st.title("Save the session!")
     """
-    The button corresponds to your specific commitment. Clicking on it, will integrate it into our records.
+    Press this button to save and integrate your your preferences it into our records.
     """
-    if st.button(f":material/sunny:", key=f"commit", help=f"Commit", type='primary', use_container_width=True):
+    if st.button(f":material/sunny:  :material/sunny:", key=f"commit", help=f"Commit", type='primary', use_container_width=True):
         st.session_state['serialised_data'] = survey.data
         _submit(survey.data, _signature)
         
@@ -1539,11 +1541,11 @@ def integrate():
     # st.markdown("# :material/barefoot:, :material/rainy_snow:, :material/online_prediction:, :material/alarm_off:, :material/award_star:, :material/draw:,  :material/step_out:")
     st.markdown(dataset_to_outro(survey.data))
     """
-    The button corresponds to your specific commitment. Click on it, to write into the ledger's _records_.
+    Press this button to etch to your specific commitment, into the ledger's _records_.
     """
     # for checkout in st.session_state['checkouts']:
     checkout = st.session_state['checkouts']
-    if st.button(f":material/rainy_snow:", type='primary', key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
+    if st.button(f":material/rainy_snow: Etch data :material/rainy_snow: ", type='primary', key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
         sumup_widget(checkout['id'])
             
     st.markdown(
