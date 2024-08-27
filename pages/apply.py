@@ -1245,11 +1245,10 @@ def contribution():
     # col1, col2, col3 = st.columns([1, 9, 1])
     
 def my_support():
-    st.markdown("## <center> Step ?: My support</center>", unsafe_allow_html=True)
+    st.markdown("## <center> My support</center>", unsafe_allow_html=True)
     """
 Your support is valuable.
 
-We value the support of individuals like you who believe in our mission. Whether it's your time, expertise, resources, or something unique that you bring to the table, every bit of support helps us move closer to our goals.
 
 Please let us know how you'd like to contribute by filling out the input area below.
 
@@ -1259,10 +1258,12 @@ Please let us know how you'd like to contribute by filling out the input area be
         st.markdown(
         """
         ### _We are looking forward to your support._
+        We value the support of individuals like you who believe in our mission. Whether it's your time, expertise, resources, or something unique that you bring to the table, every bit of support helps us move closer to our goals.
         
-        Your feedback, expertise, or your presence at our events can be equally powerful. Whether it's offering a venue, hospitality, sharing your skills, or providing thoughtful feedback, your support is valuable.
         """
         )
+    
+    support_text = survey.text_area("Describe the kind of support you are offering:")
 
 def reading():
     # with col2:
@@ -1768,7 +1769,8 @@ def application_pages():
             elif survey.data["Qualitative"]["value"] == "2":
                 offer()
             elif survey.data["Qualitative"]["value"] == "1":
-                contribution()       
+                contribution()
+                my_support()
             else:
                 st.write("Think of what type of philanthropic engagement you wish to explore. Then choose with _the big strange button_.")     
                 with st.spinner("Loading..."):
