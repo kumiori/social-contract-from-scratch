@@ -1392,7 +1392,7 @@ def price():
     fig = create_scatter_plot('rgba(255, 99, 71, {})')  # Example with a tomato color
     st.plotly_chart(fig)
     
-    st.markdown(f"# <center> {price:.2f}<center>", 
+    st.markdown(f"# <center>My Etch {price:.2f}<center>", 
                 unsafe_allow_html=True)
     """
     Encoding the data on the bank ledger, in EUR currency, serves as a _relatively_ secure, _almost_ immutable record of your engagement, offering an additional layer of verification and trust.
