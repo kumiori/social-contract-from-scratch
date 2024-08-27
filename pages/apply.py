@@ -1463,7 +1463,7 @@ def checkout2():
         st.error("There already is a record of theis session. You can list it below.")
     
     st.write("Commits:")
-    if st.button("List commits", key="list_checkouts", use_container_width=True):
+    if st.button("Philantrhopic committment", key="list_checkouts", use_container_width=True):
         if len(st.session_state['checkouts']) == 0:
             st.warning("There is nothing to commit, yet.")
             
@@ -1478,7 +1478,6 @@ def checkout2():
     checkout = st.session_state['checkouts']
     if st.session_state['checkouts']:
         if st.button(f"Debrief", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
-        # if st.button(f"Get Commit Info for {mask_string(checkout)}", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
             col1, col2, col3 = st.columns([2, 3, 2])
             with col2:
                 with st.container():
