@@ -1270,10 +1270,12 @@ The _Athena_ collective should host a panel discussion at the "Europe in Discour
     
 
     """
-    To etch your preferences and choices in the journey so far, we use a short code that make it easy for us to reference and to perform computations,
+    From the big amount of data that you generated
+ this short code will represent that dataset. It's like a "social security number" for the questions that you have answered.
+ 
+    This makes it easy for us to reference and to perform computations,
     sophisticated data analysis, accounting, and pattern recognition - in a transparent way.
     
-    This is to encode the key details of this session in a compact and meaningful way.
     """
     tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
     st.markdown(f"# <center>Short code: `SCFS{tx_tag}`</center>", unsafe_allow_html=True)
@@ -1291,8 +1293,8 @@ The _Athena_ collective should host a panel discussion at the "Europe in Discour
             •	SCFS stands for Social Contract From Scratch.
             •	XX represents the engagement type: whether you chose 
                         to Support, Invest, or Donate.
-            •	YY indicates the tier: options include coffee, food, 
-                        accommodation/travel, or custom.
+            •	YY indicates the tier: options include custom, coffee, food, 
+                        accommodation/travel, or otherwise.
             •	Z reflects the interest level: either high or low.
             •	P corresponds to your philanthropic profile.
 
@@ -1332,7 +1334,7 @@ def price():
     """
     st.toast(f"Sometimes price conceals _value_, what is _money_, anyways? ")
     
-    with st.expander("What does this number mean?", expanded=False):
+    with st.expander("How to _decode_ this number?", expanded=False):
         f"""
         We use numbers to encode information about your commitment. This number is then used to create a transaction that reflects your parameters.
         To make a step forward, these simple but key informations are encoded numerically into a two-digits number `xx`, where `xx` in this case equals **{convert_string_to_decimal(tx_tag)}**.
@@ -1362,7 +1364,7 @@ def checkout():
         st.warning("We are integrating _money_ into the game. This requires your authorisation.")
 
     if st.session_state['authentication_status']:
-        st.write(f'Are you Authenticated: {st.session_state["authentication_status"]}')
+        st.write(f'Lightning never strikes the same place twice. {st.session_state["authentication_status"]} or _False_?')
     
     if st.session_state["username"] is not None:
         signature = mask_string(st.session_state["username"])
@@ -1388,8 +1390,12 @@ def checkout():
 
     # st.markdown("## We connect to payment channels")
     # print authorisation status
-
-    st.write("Click the link below to authorise _payments_. Your authorisation is key to proceed. If everything is in order, you will read above a message of success, or a unique ID below.")
+    
+    """
+    Bringing money _into the game_ allows us to convert abstract ideas into concrete actions, facilitating the implementation of our first initiative: **hosting a panel discussion at the _Europe in Discourse_ Conference** in Athens.
+    
+    """
+    st.write("Click the link below to authorise this. Your authorisation is key to proceed. If everything is in order, you will read above a message of success, or a unique ID below.")
     if st.button("It is OK to bring money into the game", type='primary', key="authorise", use_container_width=True, disabled=not bool(st.session_state['authentication_status'])):
         try:
             sumup = OAuth2Session(
@@ -1399,7 +1405,7 @@ def checkout():
                 redirect_uri=redirect_uri,
             )
 
-            st.write('Authorisation #' + sumup.state)
+            st.markdown('Authorisation granted! #' + '`' + mask_string(sumup.state) + '`')
             st.session_state['sumup'] = sumup
         except RequestException as e:
             st.error(f"An error occurred during authorization: {e}")
@@ -1408,8 +1414,12 @@ def checkout():
         except Exception as e:
             st.error(f"An unexpected error occurred: {e}")
 
+    """
+    As soon as our payments channels open, we will be able to share the timeline.
+    
+    """
     # st.markdown("Click the expand button below to know more about the payment mechanics.")
-    with st.expander("Payments and ledger", expanded=False):
+    with st.expander("Payments and ledger, further details", expanded=False):
         st.write("The payment data is stored in your session's _state_ and can be accessed by your end for further processing. On _this_ end, we use the SumUp API (sumup.com) to create checkouts and process payments. Finally, we rely on CCF bank, a French commercial bank founded in 1894 and acquired by HSBC in 2000, as the (_untrusted_) ledger.")
     
     
@@ -1424,8 +1434,6 @@ def checkout2():
     @st.dialog("Full Signature")
     def _show_sig():
         st.write(st.session_state["username"])
-    # if st.button('Show full signature', type='primary', on_click=lambda: _show_sig):
-        # st.write(f'Full signature {_signature}')
         
     donation = float(st.session_state["donation"])
     investment_input = st.session_state["investment_input"]
@@ -1435,14 +1443,14 @@ def checkout2():
     st.markdown(f"""
     ## <center> $$ \\underbrace{{{donation:.2f} \\text{{~EUR}}}}_{{\\text{{Donation}}}}~+ \\underbrace{{{investment_input:.2f} \\text{{~EUR}}}}_{{\\text{{Investment}}}}~+\\underbrace{{{price}}}_{{\\text{{Commit \\#}}}}$$ </center>
     """, unsafe_allow_html=True)
-    st.markdown(f"""# <center> = </center>""", unsafe_allow_html=True)
+    # st.markdown(f"""# <center> = </center>""", unsafe_allow_html=True)
    
     total_amount = donation + price + investment_input
     st.markdown(f"""
-                ## <center> {total_amount:.2f}</center>
+                # <center>========= {total_amount:.2f} =========</center>
     """, unsafe_allow_html=True)
     
-    st.markdown(f"### Commit reference: {reference}", unsafe_allow_html=True)
+    st.markdown(f"### Short code: {reference}", unsafe_allow_html=True)
     # st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
     """
     The button below will create a record to be etched on the ledger. This entry will be a trace of your philanthropic commitment, a digital footprint of your philantrhopic intention.
@@ -1454,7 +1462,7 @@ def checkout2():
     with st.spinner("Creating record..."):
         reference = reference+f"-{int(now.strftime('%S'))}"
         time.sleep(1)
-        st.write(f"Full reference {reference}. (computed as a function of the current time)")
+        st.write(f"The full reference is {reference} (computed as a function of the current time)")
     
     if len(st.session_state['checkouts']) == 0:              
         checkout = create_commit_checkout(reference, total_amount, description + signature)
@@ -1527,33 +1535,33 @@ def integrate():
     """
     Press this button to save and integrate your your preferences it into our records.
     """
-    if st.button(f":material/sunny:  :material/sunny:", key=f"commit", help=f"Commit", type='primary', use_container_width=True):
+    if st.button(f":material/sunny: Create the dashboard :material/sunny:", key=f"commit", help=f"Commit", type='primary', use_container_width=True):
         st.session_state['serialised_data'] = survey.data
         _submit(survey.data, _signature)
         
-    """
-    After successful _ledger_ commitment, we shall update and refine our sources with confirmation details and additional secure information.
-    """
-    st.title("Signal the ledger")
+    # """
+    # After successful _ledger_ commitment, we shall update and refine our sources with confirmation details and additional secure information.
+    # """
+    st.title("Etch the ledger!")
     
     # st.write(f"Full signature: {_signature}")
     # st.write(f"Full username: {st.session_state['username']}")
     # st.markdown("# :material/barefoot:, :material/rainy_snow:, :material/online_prediction:, :material/alarm_off:, :material/award_star:, :material/draw:,  :material/step_out:")
-    st.markdown(dataset_to_outro(survey.data))
+    st.markdown(dataset_to_outro(survey.data) +".")
     """
-    Press this button to etch to your specific commitment, into the ledger's _records_.
+    Press this button to etch to your philanthropic commitment into the ledger's _records_.
     """
     # for checkout in st.session_state['checkouts']:
     checkout = st.session_state['checkouts']
-    if st.button(f":material/rainy_snow: Etch data :material/rainy_snow: ", type='primary', key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
+    if st.button(f":material/rainy_snow: Etch Philantrhopy :material/rainy_snow: ", type='primary', key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
         sumup_widget(checkout['id'])
             
     st.markdown(
         """
-        Due to the nature of the transaction, processing might take a moment.
+        Due to the nature of the transaction, processing might _feel_ it takes _a moment_*.
         Please remain on this page while writing is completed. If the process takes longer than expected, feel free to take a few breaths.
         
-        _Our experience is that the transaction is usually completed within a few seconds, but the dialogue window does not provide a visual feedback: the final outcome is only written to the console._ 
+        *: _Our experience is that the transaction is usually completed within a few seconds, but the dialogue window does not provide a visual feedback: the final outcome is only written to the console._ 
         
         Don't worry, we shall be able to retrieve the verification at a later stage.
         """
