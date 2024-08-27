@@ -510,7 +510,16 @@ def dataset_to_text(dataset, perspective='first'):
         f"{pronoun.title()} decide to start this journey `{qualitative_desc}` as a philanthropist. In this sense, the future `{'looks ' if future_outlook_value is not None else future_outlook_text}`. "
         f"{possessive.title()} current interest levels are `{interest_level}`, `{connector}` `{interest_mixture}` across `{interest_labels}`. "
     )
-    # st.write(qualitative_desc)
+
+
+    # if dataset.get("future_outlook", {}).get("value") is not None:
+    #     future_outlook = float(dataset.get("future_outlook", {}).get("value", False))
+        
+    #     outlook = "bright horizon" if future_outlook >= 1 else "dark storm" if future_outlook < 0.5 else "grey mist"
+    #     leaning = ", leaning `to the bright`." if future_outlook > 0.5 and future_outlook < 1. else ", leaning `to the dark`." if future_outlook < .5 and future_outlook > 0. else "."
+
+    #     formatted_text += f", my outlook for the future is a `{outlook}`{leaning}."
+
     # Risk appetite and return rates for investing profile
     if qualitative_desc == "investing":
         risk_appetite = dataset.get("Risk Appetite:", {}).get("value", "unknown")
@@ -531,7 +540,7 @@ def dataset_to_text(dataset, perspective='first'):
                         """)
 
     else:
-        investment_profile = f"{pronoun} {verb} observing the world from a different perspective."
+        investment_profile = f""
     
     text = text + investment_profile
 
@@ -1295,7 +1304,7 @@ The _Athena_ collective should host a panel discussion at the "Europe in Discour
     
 
     """
-    From the big amount of data that you generated, we shrink it into a short code to represent that dataset. It's like a _"social security number"_ for the questions that you have answered.
+    We shrink the big amount of data that you generated into a short code to represent that dataset. It's like a _"social security number"_ for the questions that you have answered.
  
     This makes it easy for us to integrate and make sense, to reference and to perform computations, sophisticated data analysis, accounting, and pattern recognition - in a transparent way.
     
@@ -1394,8 +1403,10 @@ def price():
     """
     fig = create_scatter_plot('rgba(255, 99, 71, {})')  # Example with a tomato color
     st.plotly_chart(fig)
-    
-    st.markdown(f"# <center>My Etch {price:.2f}<center>", 
+    """
+    # :material/rainy_snow:
+    """
+    st.markdown(f"# <center>My Philanthropic  Etch  is {price:.2f}<center> ", 
                 unsafe_allow_html=True)
     """
     Encoding the data on the bank ledger, in EUR currency, serves as a _relatively_ secure, _almost_ immutable record of your engagement, offering an additional layer of verification and trust.
@@ -1436,7 +1447,7 @@ def checkout():
         st.warning("We are integrating _money_ into the game. This requires your authorisation.")
 
     if st.session_state['authentication_status']:
-        st.write(f'Lightning never strikes the same place twice. {st.session_state["authentication_status"]} or _False_?')
+        st.markdown(f'#### Lightning never strikes the same place twice. {st.session_state["authentication_status"]} or _False_?')
     
     if st.session_state["username"] is not None:
         signature = mask_string(st.session_state["username"])
@@ -1492,7 +1503,7 @@ def checkout():
     """
     # st.markdown("Click the expand button below to know more about the payment mechanics.")
     with st.expander("Payments and ledger, further details", expanded=False):
-        st.write("The payment data is stored in your session's _state_ and can be accessed by your end for further processing. On _this_ end, we use the SumUp API (sumup.com) to create checkouts and process payments. Finally, we rely on CCF bank, a French commercial bank founded in 1894 and acquired by HSBC in 2000, as the (_untrusted_) ledger.")
+        st.write("The payment data is stored in your session's _state_ and can be accessed by your end for further processing. This app uses the SumUp API (sumup.com) to create checkouts and process payments. Finally, we rely on CCF bank, a French commercial bank founded in 1894 and acquired by HSBC in 2000, as the (_untrusted_) ledger.")
     
     
 def checkout2():
@@ -1578,7 +1589,7 @@ def checkout2():
             st.session_state['checkouts'] = []
 
     """
-    Let's save essential data (e.g., preferences, ideas, initial information) before the payment to ensure nothing is lost if the payment fails (some will _indeed_ fail!). 
+    Let's save essential data (e.g., preferences, ideas, initial information) before the payment to ensure nothing is lost if the payment fails (some will _indeed_ fail!) 
     
     """
     return
@@ -1624,7 +1635,7 @@ def integrate():
     st.markdown(dataset_to_outro(survey.data))
     # st.markdown(dataset_to_final(survey.data) +".")
     """
-    Press this button to etch to your philanthropic commitment into the ledger's _records_.
+    Press this button to etch your philanthropic commitment into the bank's _records_.
     """
     # for checkout in st.session_state['checkouts']:
     checkout = st.session_state['checkouts']
