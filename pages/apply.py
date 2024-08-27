@@ -104,7 +104,7 @@ authenticator = AuthenticateWithKey(
 )
 fields_connect = {'Form name':'Have you ever found the key out of the portal?', 'Email':'Email', 'Username':'Username',
             'Password':'Password', 'Repeat password':'Repeat password',
-            'Register':' Here • Now ', 'Captcha':'Captcha'}
+            'Register':' Forge access key ', 'Captcha':'Captcha'}
 fields_forge = {'Form name':'Forge access key', 'Email':'Email', 'Username':'Username',
             'Password':'Password', 'Repeat password':'Repeat password',
             'Register':' Here • Now ', 'Captcha':'Captcha'}
@@ -828,7 +828,7 @@ We are populating the table of our shared elementary values. This is more than j
 def access():
     st.markdown("## <center> Step 3: Open your access</center>", unsafe_allow_html=True)
     """
-    We've collected some insight so far...
+    We've collected some insight so far. Let's check it.
     """
     # st.write(survey.data)
     col1, col2, col3 = st.columns([1, 9, 1])
@@ -843,7 +843,9 @@ def access():
         # authenticator.login('Connect', 'main', fields = fields_connect)
         # st.warning('Please use your access key')
         """
-        If you don't have one already, let's forge an access key for you to proceed.
+        Unless you already have an access key, let's forge one for you to proceed. 
+        
+        Otherwise, click Next.
         """
         try:
             match = True
@@ -1808,5 +1810,9 @@ if __name__ == "__main__":
         event = st_player("https://vimeo.com/1002613928", key='vimeo_player')
     else:
         st.markdown("### <center>_Log in to open a window._</center>", unsafe_allow_html=True)
+        
+    if st.session_state['authentication_status'] is None:
+        authenticator.login('Connect', 'main', fields = fields_connect)
+
     # https://vimeo.com/1002379567
     application_pages()
