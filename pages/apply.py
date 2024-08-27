@@ -56,6 +56,11 @@ with open('assets/credentials.yml') as file:
 
 survey = CustomStreamlitSurvey()
 
+if 'read_texts' not in st.session_state:
+    st.session_state.read_texts = set()
+else:
+    st.session_state.read_texts = set(st.session_state.read_texts)
+    
 if 'donation' not in st.session_state:
     st.session_state.donation = 0
 
@@ -165,8 +170,8 @@ Joining the whitelist is our way of creating a supportive environment where indi
             st.error(str(e))
         name = st.text_input("Your name")
         if name:
-            st.write(f"Thank you `{name}` for your interest. We will get back to you shortly.")
-    # st.write("We are working on the whitelist feature. Please check back later.") 
+            st.write(f"Thank you `{name}` for your interest. We will get back to you by email.")
+    st.write("Please check back here in a few days. We may have crafted your dashboard by then.") 
 
 def get_checkout_info(checkout_id):
     url = f'{API_BASE_URL}/checkouts/{checkout_id}'
@@ -231,7 +236,7 @@ def _submit(serialised_data, signature):
             st.error("🫥 Sorry! Failed to update data.")
             st.write(e)
 
-@st.dialog('Cast your preferences')
+@st.dialog('Spin off your dashboard')
 def _form_submit():
     with st.spinner("Checking your signature..."):
         signature = st.session_state["username"]
@@ -443,7 +448,16 @@ def dataset_to_outro(dataset):
         outlook = "bright horizon" if future_outlook >= 1 else "dark storm" if future_outlook < 0.5 else "grey mist"
         leaning = ", leaning `to the bright`." if future_outlook > 0.5 and future_outlook < 1. else ", leaning `to the dark`." if future_outlook < .5 and future_outlook > 0. else "."
 
-        formatted_text += f", my outlook for the future is a `{outlook}`{leaning}."
+        formatted_text += f", my outlook for the future is a `{outlook}`{leaning}"
+        
+        if qualitative_desc == "supporting":
+            formatted_text += f" My `supporting` is `in kind`, in time, in feedback."
+        elif qualitative_desc == "investing":
+            formatted_text += f" I am `investing` my interest in the cause."
+        elif qualitative_desc == "donating":
+            donation = st.session_state.donation
+            formatted_text += f" I am `donating` {donation} EUR to the cause."
+            
     return formatted_text
 
 def dataset_to_text(dataset, perspective='first'):
@@ -1010,37 +1024,9 @@ def donation():
         # if st.button("Custom Donation", type="primary", help="Click to enter a custom donation amount", 
         #              use_container_width=True, on_click=lambda: st.session_state.update(custom_donation=True)):
         custom_donation = st.toggle("Custom Donation", key="custom_donation",)
-        if not custom_donation:
-                    #  on_change=lambda: st.session_state.update(custom_donation=True)):
-            col1, col2, col3, col4 = st.columns(4)
-
-            # Add buttons in each column
-            with col1:
-                if survey.button(use_container_width= True, label = f"{options['A Coffee']['icon']} •", id="coffee"):
-                    st.session_state["donation"] = options['A Coffee']['amount']
-                    st.write("Thank you for supporting us with a coffee!")
-                    
-            with col2:
-                if survey.button(use_container_width= True, label = f"{options['Partial Dinner']['icon']} •", id="dinner"):
-                    st.session_state["donation"] = options['Partial Dinner']['amount']
-                    st.write("Thank you for sponsoring part of the dinner!")
-
-            with col3:
-                if survey.button(use_container_width= True, label = f"{options['Partial Accommodation']['icon']} •", id="accommodation"):
-                    st.session_state["donation"] = options['Partial Accommodation']['amount']
-                    st.write("Thank you for supporting our accommodation!")
-            with col4:
-                if survey.button(use_container_width= True, label = f"{options['Partial Travel']['icon']} •", id="travel"):
-                    st.session_state["donation"] = options['Partial Travel']['amount']
-                    st.write("Thank you for supporting our travels!")
+        # on_change=lambda: st.session_state.update(custom_donation = not st.session_state["custom_donation"])
         
-        else:
-            st.session_state.custom_donor = True
-
-            st.write("Thank you for your generous intention!")
-            
-            # Exponential slider
-        if st.session_state.custom_donor:
+        if custom_donation:
             min_exp_value = 0
             max_exp_value = 5
             min_actual_value = 1
@@ -1061,6 +1047,41 @@ def donation():
             st.markdown(f"### Donation: {actual_value:.1f} EUR")
             st.session_state["donation"] = actual_value
             # , Donation type: {donation_type(exp_value, actual_value)}")
+
+        # if not custom_donation:
+                    #  ):
+        if custom_donation:
+            st.divider()
+        """
+        ### Suggestions
+        """
+        col1, col2, col3, col4 = st.columns(4)
+        # Add buttons in each column
+        with col1:
+            if survey.button(use_container_width= True, label = f"{options['A Coffee']['icon']} • A Coffee or Tea for all", id="coffee"):
+                st.session_state["donation"] = options['A Coffee']['amount']
+                st.write("Thank you for supporting us with a coffee!")
+                
+        with col2:
+            if survey.button(use_container_width= True, label = f"{options['Partial Dinner']['icon']} • A shared meal", id="dinner"):
+                st.session_state["donation"] = options['Partial Dinner']['amount']
+                st.write("Thank you for sponsoring part of the dinner!")
+
+        with col3:
+            if survey.button(use_container_width= True, label = f"{options['Partial Accommodation']['icon']} • Hospitality", id="accommodation"):
+                st.session_state["donation"] = options['Partial Accommodation']['amount']
+                st.write("Thank you for supporting our accommodation!")
+        with col4:
+            if survey.button(use_container_width= True, label = f"{options['Partial Travel']['icon']} • Travel and Fees", id="travel"):
+                st.session_state["donation"] = options['Partial Travel']['amount']
+                st.write("Thank you for supporting our travels!")
+        
+        # else:
+            # st.session_state.custom_donor = True
+
+            # st.write("Thank you for your generous intention!")
+            
+            # Exponential slider
 
         
         """
@@ -1121,31 +1142,31 @@ def investment(survey):
             """
     with col2:
         """            
-        **Dream return rate**, for us means that the ideal or aspirational rate of return that you hope to achieve under the best possible circumstances.
+        **Dream return rate**, for us means that the ideal or aspirational rate of return that you hope to achieve under the best possible circumstances. Those which occur _only if_ all planets are aligned.
         """
     st.divider()
         
 
-    option = survey.radio("Select how you want to express return rates:",
+    option = survey.radio("This is how I want to express my return rates:",
                             options = ("Percentage", "Leverage Factor", "Mixed mode"), horizontal=True)
 
     col1, _spacer, col2= st.columns([3,1,3], vertical_alignment="center")
     _spacer.markdown("# vs.")
     if option == "Percentage":
-        col1.markdown("### Expected Return Rate ")
-        expected_return_rate = survey.number_input("Enter your expected return rate (%):", min_value=0.0, step=1.)
-        col2.markdown("### Dream Return Rate ")
-        dream_return_rate = survey.number_input("Enter your dream return rate (%):", min_value=0.0, step=1.)
+        col1.markdown("### Expected \n Return Rate ")
+        expected_return_rate = survey.number_input("This is my expected return rate (%):", min_value=0.0, step=1.)
+        col2.markdown("### Dream \n Return Rate ")
+        dream_return_rate = survey.number_input("This is my dream return rate (%):", min_value=0.0, step=1.)
     elif option == "Leverage Factor":
-        col1.markdown("### Expected Return Rate")
-        expected_return_rate = col1.number_input("Enter your expected leverage factor:", min_value=0, step=1)
-        col2.markdown("### Dream Return Rate")
-        dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
+        col1.markdown("### Expected \n Return Rate")
+        expected_return_rate = survey.number_input("This is my expected leverage factor:", min_value=0, step=1)
+        col2.markdown("### Dream \n Return Rate")
+        dream_return_rate = survey.number_input("This is my dream leverage factor:", min_value=1, step=1)
     else:
-        col1.markdown("### Expected Return Rate (Percentage)")
-        expected_return_rate = col1.number_input("Enter your expected return rate (%):", min_value=0.0, step=1.)
-        col2.markdown("### Dream Return Rate (Leverage Factor)")
-        dream_return_rate = col2.number_input("Enter your dream leverage factor:", min_value=1, step=1)
+        col1.markdown("### Expected \n Return Rate (Percentage)")
+        expected_return_rate = survey.number_input("This is my expected return rate (%):", min_value=0.0, step=1.)
+        col2.markdown("### Dream \n Return Rate (Leverage Factor)")
+        dream_return_rate = survey.number_input("This is my dream leverage factor:", min_value=1, step=1)
     
 def offer():
     st.markdown("## <center> Step X: Investing, from scratch</center>", unsafe_allow_html=True)
@@ -1159,9 +1180,7 @@ def offer():
         """
         )
     
-    """
-    By starting with a commitment — such as 1% or 1/1000 of the intended investment amount — you create a more realistic and accessible entry point for your investment. 
-    
+    """    
     This allows time to gather more information and align intentions before making a significant investment. This phased approach is more practical and encourages you to move forward at a pace that feels comfortable and manageable.
     
     This strategy helps build trust and engagement without overwhelming  with a large upfront commitment. 
@@ -1188,6 +1207,9 @@ def offer():
     )
 
     st.subheader("Proportional Transaction")
+    """
+        By starting with a commitment — such as 1% or 1/1000 of the intended investment amount — you create a more realistic and accessible entry point for your investment. 
+"""
     percentage = survey.selectbox("Choose a percentage:", options=[1, 0.1], format_func=lambda x: f"{x}%")
     proportional_amount = investment_size * percentage / 100
     st.markdown(f"#### To signal your interest, the commitment amount is: {proportional_amount:.2f} EUR")
@@ -1265,24 +1287,22 @@ def reading():
 # We aim at _covering expenses_ for the
 # In case of any surplus funds 
 """
-The _Athena_ collective should host a panel discussion at the "Europe in Discourse" conference. Covering the necessary expenses, we shall _invite_ donors to participate in our initiative, following the project's progress."""
+The _Athena_ collective should host a panel discussion at the "Europe in Discourse" conference. Covering the necessary expenses first, we _invite_ donors to participate in our initiative, steering the project's progress."""
     )
     
 
     """
-    From the big amount of data that you generated
- this short code will represent that dataset. It's like a "social security number" for the questions that you have answered.
+    From the big amount of data that you generated, we shrink it into a short code to represent that dataset. It's like a _"social security number"_ for the questions that you have answered.
  
-    This makes it easy for us to reference and to perform computations,
-    sophisticated data analysis, accounting, and pattern recognition - in a transparent way.
+    This makes it easy for us to integrate and make sense, to reference and to perform computations, sophisticated data analysis, accounting, and pattern recognition - in a transparent way.
     
     """
     tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
-    st.markdown(f"# <center>Short code: `SCFS{tx_tag}`</center>", unsafe_allow_html=True)
+    st.markdown(f"# <center>_My_ Short code: `SCFS{tx_tag}`</center>", unsafe_allow_html=True)
     # " + '•' + '<code>' + str(st.session_state["username"]) + "</code>
     # st.write(st.session_state["username"])
     # st.write(extract_info(survey.data))
-    with st.expander("What does this code mean?", expanded=False):
+    with st.expander("How to read this code?", expanded=False):
         """
         We format codes as follows:
         """
@@ -1308,6 +1328,48 @@ The _Athena_ collective should host a panel discussion at the "Europe in Discour
     
     return f"SCFS{tx_tag}"
 
+import pandas as pd
+import numpy as np
+
+import plotly.express as px
+
+def create_scatter_plot(color='rgba(30, 144, 255, {})'):
+    # Generate random data
+    np.random.seed(42)
+    n_points = 100
+    x = np.random.randn(n_points)
+    y = np.random.randn(n_points)
+    transparency = np.random.rand(n_points)
+    marker_size = np.random.randint(10, 100, n_points)
+
+    # Create a DataFrame
+    df = pd.DataFrame({
+        'x': x,
+        'y': y,
+        'transparency': transparency,
+        'size': marker_size
+    })
+
+    # Create the scatter plot
+    fig = px.scatter(df, x='x', y='y', size='size', size_max=20)
+
+    # Update markers with varying transparency and random sizes
+    fig.update_traces(marker=dict(
+        color=[color.format(op) for op in transparency],
+        line=dict(width=1)
+    ))
+
+    # Customize layout to remove grids, ticks, and labels, and make the plot square
+    fig.update_layout(
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        width=600,
+        height=600
+    )
+
+    return fig
+
+
 def price():
     tx_tag, (tier, type_value, donation_type), qualitative_value, _ = extract_info(survey.data)
     
@@ -1319,17 +1381,24 @@ def price():
     st.session_state["price"] = price
     st.markdown(f" # _Price_, commitment, or _value_?") 
     """
-    We not only store your data securely in our database, but we also encode it into numbers that are recorded on a bank ledger. 
+    We not only store your data securely in our database, but we also encode it into _pattern_ (and a number) that is recorded on a bank ledger. 
     
     This dual method ensures both transparency and accountability, while safeguarding your information. 
     
-    This is the number we came up with, for you:
+    #### This is the pattern we came up with, for you
+
+    
     """
+    fig = create_scatter_plot('rgba(255, 99, 71, {})')  # Example with a tomato color
+    st.plotly_chart(fig)
+    
     st.markdown(f"# <center> {price}<center>", 
                 unsafe_allow_html=True)
     """
     Encoding the data on the bank ledger, in EUR currency, serves as a _relatively_ secure, _almost_ immutable record of your engagement, offering an additional layer of verification and trust.
-    
+    """
+
+    """
     To this end, we use the smallest possible units of currency to encode the type of commitment you have made, and the decimal digits to capture other relevant information.
     """
     st.toast(f"Sometimes price conceals _value_, what is _money_, anyways? ")
@@ -1487,7 +1556,7 @@ def checkout2():
     
     checkout = st.session_state['checkouts']
     if st.session_state['checkouts']:
-        if st.button(f"Debrief", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
+        if st.button(f"Debrief (double check)", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
             col1, col2, col3 = st.columns([2, 3, 2])
             with col2:
                 with st.container():
@@ -1502,6 +1571,8 @@ def checkout2():
                     st.write(f"**Merchant Name:** {checkout_info['merchant_name']}")
                     st.write(f"**Status:** {checkout_info['status']}")
 
+        if st.button(f"Remove", key=f"remove_checkout_{checkout['id']}", type='secondary', use_container_width=True):
+            st.session_state['checkouts'] = []
 
     """
     Let's save essential data (e.g., preferences, ideas, initial information) before the payment to ensure nothing is lost if the payment fails (some will _indeed_ fail!). 
@@ -1547,7 +1618,8 @@ def integrate():
     # st.write(f"Full signature: {_signature}")
     # st.write(f"Full username: {st.session_state['username']}")
     # st.markdown("# :material/barefoot:, :material/rainy_snow:, :material/online_prediction:, :material/alarm_off:, :material/award_star:, :material/draw:,  :material/step_out:")
-    st.markdown(dataset_to_outro(survey.data) +".")
+    st.markdown(dataset_to_outro(survey.data))
+    # st.markdown(dataset_to_final(survey.data) +".")
     """
     Press this button to etch to your philanthropic commitment into the ledger's _records_.
     """
@@ -1574,8 +1646,8 @@ def integrate():
 def outro():
     st.markdown("## <center> Step X: _Chapter One_</center>", unsafe_allow_html=True)
     
-    st.write(st.session_state['tx_tag'])
-    st.write(st.session_state['checkouts']['id'])
+    # st.write(st.session_state['tx_tag'])
+    # st.write(st.session_state['checkouts']['id'])
     
     dashboard_data = {**st.session_state['serialised_data'], 'checkout': st.session_state['checkouts'], 'checkout_tag': st.session_state['tx_tag']}
     
@@ -1584,17 +1656,19 @@ def outro():
     
     st.markdown(
         """
-        Congrats! It was cool to navigate through the process of engaging in our philanthropic initiative. Hit the Submit button below to create your dashboard.
+        Congrats! It was cool to navigate through the process of engaging in our philanthropic initiative. Hit the Submit button below to initiate your dashboard.
         
 We look forward to seeing how this commitment will unfold.
     
-**You should receive a confirmation email shortly.**
+        Thank you for your interest. We will get back to you by email.
+    
         """
 """
 _In the meantime_:"""
 """
-Here is a snapshot of current activities and developments. This includes updates on ongoing projects, conceptual ideas in the pipeline, and longer-term ventures that are now yielding positive results. 
+Here is a snapshot of current activities and developments. Any insight to share?
 """
+# This includes updates on ongoing projects, conceptual ideas in the pipeline, and longer-term ventures that are now yielding positive results. 
 """
 	1. Health Systems: Addressing the pervasive collapse of health systems, exacerbated by the pandemic and sectarian influences.
 	2. Monetisation: Pressing cyanotypes from experimental human campaigns, economic photography and scientific reflection.
@@ -1603,8 +1677,8 @@ Here is a snapshot of current activities and developments. This includes updates
     5. Artistic Endeavours: Exploring the arts, with a focus on music, the natural world, ceramics, and illustration.
     6. Literature: Communication within the Urban Jungle: the vertical scenario. 
 """)
-    with st.spinner("Thinking..."):
-        time.sleep(3)
+    with st.spinner("Thinking?"):
+        time.sleep(1)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         text = """
@@ -1613,15 +1687,13 @@ Here is a snapshot of current activities and developments. This includes updates
 
         Your insight could provide the next key piece in this collaborative puzzle. 
 
-        Reach out by email, _submit_ your thoughts — each is a step closer to transforming ideas into actionable reality.
+        Reach out by email, _submit_ your thoughts — each is a step that brings ideas closer to reality.
 
-
-
-        social.from.scratch@protonmail.com
+        <social.from.scratch@proton.me>
 
             """
-            
-        st.markdown(text)
+        stream_once_then_write(text)
+        # st.markdown(text)
         if st.session_state['authentication_status']:
             st.toast(f'Authenticated successfully {mask_string(st.session_state["username"])}')
             col1, col2, col3 = st.columns([1, 1, 1])
@@ -1696,10 +1768,10 @@ def application_pages():
             elif survey.data["Qualitative"]["value"] == "1":
                 contribution()       
             else:
-                st.write("Please select an philanthropy option that suits to you.")     
+                st.write("Think of what type of philanthropic engagement you wish to explore. Then choose with _the big strange button_.")     
                 with st.spinner("Loading..."):
                     import time
-                    time.sleep(3)
+                    time.sleep(5)
                     pages.current = 2
                     st.rerun()
         if pages.current == 10:
