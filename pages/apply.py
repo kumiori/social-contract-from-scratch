@@ -675,7 +675,7 @@ def body2():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         f""" 
-    This is a process in {NSTEPS} steps which interactively depend on your choices. 
+    This is a process in steps which interactively depend on your choices. 
     After you make a decision, take a moment to consider _why_ you made this choice and  _how_ does it align with your personal goals and values.
 
     This process will take approximately _the time of a good tea_. If you brew one, pause for a minute to think about why you're here.
@@ -741,10 +741,13 @@ def engagement():
     with col2:
         """
         **Remark:** in the long run, these options are not mutually exclusive.
-        
-        """
+                """
         
     st.markdown("## <center>Feel the choice</center>", unsafe_allow_html=True)
+    """
+        The visual element below is a clickable interface that allows you to etch your philanthropic committment to **Support** (dark grey), **Invest** (light grey), or **Donate** (black).
+    
+    """
         
     engage_categories= {'1': 'Support', '2': 'Invest', '10': 'Donate'}
     engage = create_qualitative('trifurcation',
@@ -826,7 +829,7 @@ def access():
         # authenticator.login('Connect', 'main', fields = fields_connect)
         # st.warning('Please use your access key')
         """
-        Let us forge an access key for you to proceed.
+        If you don't have one already, let's forge an access key for you to proceed.
         """
         try:
             match = True
@@ -899,10 +902,11 @@ Two aspects are key for us:
         """
         
         """
-        **Remark:** 
-As we proceed, we will store your information in two separate databases: one  'trusted' for verified data and one 'untrusted', for data that needs further validation. This helps us ensure accuracy and transparency in our actions, while exploring the dynamics of trust and value in a digital environment.
-        One of the two databases of choice is a simple **_relational_ database**, the other is a **banking ledger**.
+        **Key remark:** 
+We will store your information in two separate databases. This helps us ensure accuracy and transparency in our actions, while exploring the dynamics of trust and value in a digital environment.
+        One of the two databases of choice is a simple **_relational_ database**, the other is a **bank**.
         """
+        #  one  'trusted' for verified data and one 'untrusted', for data that needs further validation.
     st.toast(
         """Side Note:
 Why should the banking ledger be _trusted_? The information we seek will be encoded in a transaction, ensuring transparency and integrity."""
@@ -944,7 +948,8 @@ What is your story?
         st.markdown('### #' + f'{list(philanthropic_profiles.items())[st.session_state["profile"]-1][0]}') 
         
 def preferences():
-    st.markdown("## <center> Step 5: Participation and Expression</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 5: We are ready for your Participation</center>", unsafe_allow_html=True)
+    #  and Expression
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         st.markdown(
@@ -973,7 +978,7 @@ If philanthropy is your choice to connect and engage, join us at the upcoming _E
 
         create_equaliser(key = "equaliser", id= "equaliser", kwargs={"survey": survey, "data": equaliser_data})
         """
-        Your input helps us better understand which aspects of our initiative resonate with you and ensure that your philanthropic contributions are directed towards areas that are most meaningful to you.
+        Your input helps us better understand which aspects of our initiative resonate with you and ensure that your philanthropy is directed towards areas that are most meaningful to you.
                 """
 
 def donation():
@@ -1215,6 +1220,26 @@ def contribution():
     """
     # col1, col2, col3 = st.columns([1, 9, 1])
     
+def my_support():
+    st.markdown("## <center> Step ?: My support</center>", unsafe_allow_html=True)
+    """
+Your support is valuable.
+
+We value the support of individuals like you who believe in our mission. Whether it's your time, expertise, resources, or something unique that you bring to the table, every bit of support helps us move closer to our goals.
+
+Please let us know how you'd like to contribute by filling out the input area below.
+
+    """
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        st.markdown(
+        """
+        ### _We are looking forward to your support._
+        
+        Your feedback, expertise, or your presence at our events can be equally powerful. Whether it's offering a venue, hospitality, sharing your skills, or providing thoughtful feedback, your support is valuable.
+        """
+        )
+
 def reading():
     # with col2:
     st.markdown("## <center> Step X: Did we get it?</center>", unsafe_allow_html=True)
@@ -1237,14 +1262,16 @@ def reading():
 
     st.markdown("## <center> Connect and Commit</center>", unsafe_allow_html=True)
     st.markdown(
+# We aim at _covering expenses_ for the
+# In case of any surplus funds 
 """
-We aim at _covering expenses_ for the _Athena_ collective to host a panel discussion at the "Europe in Discourse" conference. In case of any surplus funds, _we invite_ donors to participate in a future initiative, following the project's progress."""
+The _Athena_ collective should host a panel discussion at the "Europe in Discourse" conference. Covering the necessary expenses, we shall _invite_ donors to participate in our initiative, following the project's progress."""
     )
     
 
     """
-    To encode meaningful information, we use short code that make it easy for us to perform automated accounting,
-    sophisticated data analysis, and pattern recognition - in a transparent way.
+    To etch your preferences and choices in the journey so far, we use a short code that make it easy for us to reference and to perform computations,
+    sophisticated data analysis, accounting, and pattern recognition - in a transparent way.
     
     This is to encode the key details of this session in a compact and meaningful way.
     """
@@ -1263,7 +1290,7 @@ We aim at _covering expenses_ for the _Athena_ collective to host a panel discus
 
             •	SCFS stands for Social Contract From Scratch.
             •	XX represents the engagement type: whether you chose 
-                        to support, invest, or donate.
+                        to Support, Invest, or Donate.
             •	YY indicates the tier: options include coffee, food, 
                         accommodation/travel, or custom.
             •	Z reflects the interest level: either high or low.
@@ -1323,10 +1350,10 @@ def price():
         """
 
 def checkout():
-    st.markdown("## <center> Step X: Create digital trace</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step X: Etch your trace</center>", unsafe_allow_html=True)
     st.markdown(
 """
-    For this, we need your signature
+    For this, we need your signature:
 """)
     if st.session_state['sumup'] is not None:
         st.info("Authorisation successful!")
@@ -1335,7 +1362,7 @@ def checkout():
         st.warning("We are integrating _money_ into the game. This requires your authorisation.")
 
     if st.session_state['authentication_status']:
-        st.write(f'Authenticated: {st.session_state["authentication_status"]}')
+        st.write(f'Are you Authenticated: {st.session_state["authentication_status"]}')
     
     if st.session_state["username"] is not None:
         signature = mask_string(st.session_state["username"])
