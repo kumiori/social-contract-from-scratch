@@ -1536,7 +1536,7 @@ def checkout2():
     st.markdown(f"### Short code: {reference}", unsafe_allow_html=True)
     # st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
     """
-    The button below will create a record to be etched on the ledger. This entry will be a trace of your philanthropic commitment, a digital footprint of your philantrhopic intention.
+    The button below will create a record to be etched on the ledger. This entry will be a trace of your philanthropic commitment, a digital footprint of your philanthropic intention.
     
     
     """
@@ -1548,7 +1548,7 @@ def checkout2():
         st.write(f"The full reference is {reference} (computed as a function of the current time)")
     
     if len(st.session_state['checkouts']) == 0:              
-        checkout = create_commit_checkout(reference, total_amount, description + signature)
+        checkout = create_commit_checkout(reference, total_amount, description + reference + '•' + mask_string(signature))
 
         st.session_state['checkouts'] = checkout
         
@@ -1556,7 +1556,7 @@ def checkout2():
         st.error("There already is a record of theis session. You can list it below.")
     
     st.write("Commits:")
-    if st.button("Philantrhopic committment", key="list_checkouts", use_container_width=True):
+    if st.button("Philanthropic committment", key="list_checkouts", use_container_width=True):
         if len(st.session_state['checkouts']) == 0:
             st.warning("There is nothing to commit, yet.")
             
