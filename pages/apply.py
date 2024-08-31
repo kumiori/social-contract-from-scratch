@@ -42,7 +42,18 @@ from streamlit_extras.row import row
 from streamlit_timeline import timeline
 from yaml import SafeLoader
 from streamlit_player import st_player
+from streamlit_gtag import st_gtag
 
+st_gtag(
+    key="gtag_app_main",
+    id="G-Q55XHE2GJB",
+    event_name="apply_main_page",
+    params={
+        "event_category": "apply_philantrhopy",
+        "event_label": "test_label_a",
+        "value": 97,
+    },
+)
 db = IODatabase(conn, "discourse-data")
 
 with open("assets/discourse.css", "r") as f:
