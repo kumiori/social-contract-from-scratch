@@ -23,7 +23,18 @@ if st.secrets["runtime"]["STATUS"] == "Production":
     )
 
 from streamlit_extras.row import row
+from streamlit_gtag import st_gtag
 
+st_gtag(
+    key="gtag_app_main",
+    id="G-Q55XHE2GJB",
+    event_name="main_page",
+    params={
+        "event_category": "SCFS",
+        "event_label": "SCFS_a",
+        "value": 97,
+    },
+)
 import yaml
 from yaml import SafeLoader
 import philoui
