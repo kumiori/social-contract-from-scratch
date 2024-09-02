@@ -730,7 +730,7 @@ def body2():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         f""" 
-    This platform moves forward interactively depending on your choices. 
+    This platform moves forward interactively according to your choices. 
     Each choice you make aligns with your personal goals and values.
 
     This process takes about as long as _cup of tea_.
