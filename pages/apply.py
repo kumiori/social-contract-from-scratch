@@ -548,8 +548,9 @@ def dataset_to_text(dataset, perspective='first'):
     if qualitative_desc == "investing":
         risk_appetite = dataset.get("Risk Appetite:", {}).get("value", "unknown")
         expression_return_rates = dataset.get("Select how you want to express return rates:", {}).get("value", "unknown")
-        expected_return = dataset.get("Enter your expected return rate (%):", {}).get("value", "unknown")
-        dream_return = dataset.get("Enter your dream return rate (%):", {}).get("value", "unknown")
+        expected_return = dataset.get("This is my expected return rate (%):", {}).get("value", "unknown")
+        st.write(dataset)
+        dream_return = dataset.get("This is my dream return rate (%):", {}).get("value", "unknown")
 
         investment_profile = f"{possessive.title()} investing profile has a `{risk_appetite}` risk appetite. Quantitatively, {possessive} investment bracket (_expected_ vs. _dream_) spans `{expected_return}`% and `{dream_return}`%."
 
@@ -801,9 +802,9 @@ def engagement():
     #     **Remark:** in the long run, these options are not mutually exclusive.
     #             """
         
-    st.markdown("## <center>Feel the choice</center>", unsafe_allow_html=True)
+    st.markdown("## <center>Embody the choice</center>", unsafe_allow_html=True)
     """
-        At this clickable we arrive at a crossroads where you can choose betewen philantrhropic commitment levels, among  **Support** (dark grey), **Invest** (light grey), or **Donate** (black).
+        At this clickable interface we arrive at a crossroads where you can choose between forms of philanthropic involvment, among  **Support** (dark grey), **Invest** (light grey), or **Donate** (black).
     
     """
         
@@ -952,19 +953,19 @@ def datacollection():
     with col2:
         st.markdown(
         """
-Two aspects are key for us:
+We commit to the following principles:
 """
         )
         """
-        1. **Transparency:** Regularly update donors, supporters, and investors on how their resources are being used.
+        1. **Acting transparently:** to update donors, supporters, and investors on how their resources are being used.
 
-2. **Acknowledgement:** Recognising and thanking philanthropers for their support, detailing the outcomes and benefits of their engagement.
+2. **Acknowledging support networks:** recognising and thanking philanthropers for their support, detailing the outcomes and benefits of their engagement.
         """
         
         """
-        **Key remark:** 
-We will store your information in two separate databases. This helps us ensure accuracy and transparency in our actions, while exploring the dynamics of trust and value in a digital environment.
-        One of the two databases of choice is a simple **_relational_ database**, the other is a **bank**.
+        **Storing your data:** 
+We store your information in two databases to ensure accuracy of analysis and transparency of accounting.
+        One of the two databases of choice is a simple **_relational_ database**, the other is a **bank** ledger.
         """
         #  one  'trusted' for verified data and one 'untrusted', for data that needs further validation.
     st.toast(
@@ -979,8 +980,9 @@ def story():
     with col2:
         st.markdown(
         """
-We're curious to learn more about the individuals behind these decisions. Your story matters and contributes to the richness of this journey as a collective.
-What is your story?
+We're curious  about the individuals behind these decisions. Your story contributes to the richness of this journey as a collective.
+
+Which button most closely reflects your own perspectives?
 """
         )
     col1, col2, col3 = st.columns([2, 6, 1], vertical_alignment="center")
@@ -1015,7 +1017,7 @@ def preferences():
         st.markdown(
         """
 
-If philanthropy is your choice to connect and engage, join us at the upcoming _Europe in Discourse_ conference. It's the perfect opportunity to further our engagement and see how your actions translate into real-world impact.
+Join us at the upcoming _Europe in Discourse_ conference as a philanthropic contributor. It's the perfect opportunity to further our engagement and see how your actions translate into real-world impact.
         """
         )
         """
@@ -1030,10 +1032,10 @@ If philanthropy is your choice to connect and engage, join us at the upcoming _E
         
         # st.write(engage)
         equaliser_data = [
-            ("Decision Making", ""),
-            ("Science", ""),
-            ("Arts", ""),
-            ("Events", ""),
+            ("Decision Making and Social Organisation", ""),
+            ("Science and Technology", ""),
+            ("Arts and Culture", ""),
+            ("Events: dinner parties and /bacchanalia/orgies", ""),
             ]
 
         create_equaliser(key = "equaliser", id= "equaliser", kwargs={"survey": survey, "data": equaliser_data})
