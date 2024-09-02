@@ -75,6 +75,9 @@ else:
 if 'donation' not in st.session_state:
     st.session_state.donation = 0
 
+if 'page' not in st.session_state:
+    st.session_state.page = "Cover"
+
 if 'investment_input' not in st.session_state:
     st.session_state.investment_input = 0
 
@@ -325,7 +328,6 @@ def my_create_dichotomy(key, id = None, kwargs = {}):
             st.markdown(f'#### Take your time:', unsafe_allow_html=True)
             st.markdown(_response)
     return response
-
 
 def stream_once_then_write(text):
     text_hash = hash_text(text)
@@ -698,7 +700,6 @@ def show_pathways(pathways, cols=3):
         }
     </style>''', unsafe_allow_html=True)
 
-        
 def body1():
     st.divider()
     st.markdown("## <center> Step 0:  / Awareness</center>", unsafe_allow_html=True)
@@ -709,9 +710,17 @@ def body1():
     
     This is a digital platform which we build to provoke interaction, commitment and actionable decisions, gathering your stories and engaging.
     
-    Designed to connect with you on multiple levels while integrating your preferences, perceptions, and contributions.
     
     Combining reflexive, interactive, and emotion-driven engagement sets the stage for new collective experiences.
+
+    ------
+    #### Designed to connect with you on multiple levels while integrating your preferences, perceptions, and contributions.
+    
+    ------
+    
+    If a philanthopist is _someone who wants to benefit others by active works of benevolence or beneficence_, then anyone who supprts us in kind or in time or in feedback is a philanthropist.
+    
+    If philanthopy is _love of humankind, especially as shown in deeds of practical beneficence and work for the good of others_, then any who wishes to contribute to our mission through material or immaterial means is a philanthropist.
 
     """
 NSTEPS = 15
@@ -734,7 +743,11 @@ def body2():
     _Can we reach out by email?_
     
     We look forward to embarking on this journey together.
+    
+
     """
+    # 17th century
+    # Quote from 19
     # We are populating the table of our shared elementary values, would you like to play
 
 def engagement():
@@ -945,7 +958,7 @@ Two aspects are key for us:
         """
         1. **Transparency:** Regularly update donors, supporters, and investors on how their resources are being used.
 
-2. **Acknowledgement:** Recognising and thanking donors for their support, detailing the outcomes and benefits of the donations.
+2. **Acknowledgement:** Recognising and thanking philanthropers for their support, detailing the outcomes and benefits of their engagement.
         """
         
         """
@@ -1773,13 +1786,14 @@ def application_pages():
             )
     
     st.progress(float((pages.current + 1) / pages_total))
-    
+    st.write(st.session_state['page'])
     with pages:
         if pages.current == 0:
             body1()
 
         if pages.current == 1:
             body2()
+            st.session_state['page'] = "Application"
 
         if pages.current == 2:
             engagement()
@@ -1834,10 +1848,13 @@ if __name__ == "__main__":
     if st.session_state['authentication_status']:
         intro()    
 
-    st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
-    st.markdown("## <center>A meeting of Social and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
-    # st.markdown('<center>`wait a minute`</center>', unsafe_allow_html=True)
-    st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
+    if st.session_state['page'] == "Cover":
+        st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
+
+        st.markdown("## <center>A meeting of Social and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
+        # st.markdown('<center>`wait a minute`</center>', unsafe_allow_html=True)
+        st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
+
     st.divider()
     st.markdown(f"# <center>Application to Supporters</center> ", unsafe_allow_html=True)
 
