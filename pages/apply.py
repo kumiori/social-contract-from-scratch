@@ -1336,12 +1336,12 @@ def reading():
 # We aim at _covering expenses_ for the
 # In case of any surplus funds 
 """
-The _Athena_ collective should host a panel discussion at the "Europe in Discourse" conference. Covering the necessary expenses first, we _invite_ donors to participate in our initiative, steering the project's progress."""
+The _Athena_ collective is hosting a panel workshop at the _Europe in Discourse_ conference. Covering the essential expenses first, we _invite_ philanthropists to participate in our initiative, steering the project's progress."""
     )
     
 
     """
-    We shrink the big amount of data that you generated into a short code to represent that dataset. It's like a _"social security number"_ for the questions that you have answered.
+    We shrank the into a short code to represent that dataset. It's like a _"social security number"_ for the questions that you have answered.
  
     This makes it easy for us to integrate and make sense, to reference and to perform computations, sophisticated data analysis, accounting, and pattern recognition - in a transparent way.
     
