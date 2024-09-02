@@ -696,11 +696,11 @@ def body1():
         """
     Let's jump on the _action_ side of this philanthropic journey. 
     
-    This is a digital platform which we build to stimulate interaction, committment and actionable decisions, gathering your stories and engaging.
+    This is a digital platform which we build to provoke interaction, commitment and actionable decisions, gathering your stories and engaging.
     
-    Designed to connect with you on multiple levels while ensuring that your preferences, perceptions, and contributions, are integrated in a meaningful and impactful way. 
+    Designed to connect with you on multiple levels while integrating your preferences, perceptions, and contributions.
     
-    The combination of reflection, interaction, and emotion-driven engagement sets the stage for new collective experiences.
+    Combining reflexive, interactive, and emotion-driven engagement sets the stage for new collective experiences.
 
     """
 NSTEPS = 15
@@ -709,20 +709,20 @@ def body2():
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         f""" 
-    This is a process in steps which interactively depend on your choices. 
-    After you make a decision, take a moment to consider _why_ you made this choice and  _how_ does it align with your personal goals and values.
+    This platform moves forward interactively depending on your choices. 
+    Each choice you make aligns with your personal goals and values.
 
-    This process will take approximately _the time of a good tea_. If you brew one, pause for a minute to think about why you're here.
+    This process takes about as long as _cup of tea_.
     """
 
         """
-    For now, our primary goal is to **gather your commitment to philanthropic intentions** and ensure that our objectives align. This process helps us understand your interests and motivations, setting the stage for collaboration. 
+    We wish to learn about your interests and motivations, including your level of commitment to support us. By ensuring that our objectives align, we set the stage for collaboration. 
     
-    Once we have established this connection, we will reach out to discuss the next steps in more detail, ensuring that your contribution is aligned with action. 
+    We will follow up to discuss the next steps in more detail, to back up our mutual commitments with action. 
     
-    Is it OK for us to reach out by email?
+    _Can we reach out by email?_
     
-    We look forward to exploring this journey together.
+    We look forward to embarking on this journey together.
     """
     # We are populating the table of our shared elementary values, would you like to play
 
@@ -743,23 +743,23 @@ def engagement():
         """
 
         """
-        We offer three different ways to engage with our initiative: **Support**, **Invest**, or **Donate**.
+        You can engage with us in: **Support**, **Invest**, or **Donate**.
         
         """
     st.divider()
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         """
-            **Support**, for us means that you are willing to back our initiative, but not necessarily with financial resources. Even _just_ feedback is a valuable form of support.
+            **Support**, you are willing to back our initiative, but not necessarily with financial resources. Feedback alone is a valuable form of support.
             """
     with col2:
         """            
-        **Invest**, means that you are interested in contributing financially to our initiative, with the expectation of a return. Introduces an element of risk, allowing to get more creative.
+        **Invest**, you are interested in contributing financially to our initiative, with the expectation of a return. Introduces an element of risk, allowing to get more creative.
         """
         
     with col3:
         """
-        **Donate**, means that you are willing to contribute financially to our initiative, without expectation of financial gains. You help is key to enable and save our first step, at this early stage.
+        **Donate**, you  wish to contribute financially to our initiative, without expectation of financial gains. Your help is key to enable and save our first step, at this early stage.
         """
     st.divider()
 
@@ -771,15 +771,15 @@ def engagement():
         # In this first stage, you help is key us step our first step together. 
         # this can be key to 
         
-    col1, col2, col3 = st.columns([1, 9, 1])
-    with col2:
-        """
-        **Remark:** in the long run, these options are not mutually exclusive.
-                """
+    # col1, col2, col3 = st.columns([1, 9, 1])
+    # with col2:
+    #     """
+    #     **Remark:** in the long run, these options are not mutually exclusive.
+    #             """
         
     st.markdown("## <center>Feel the choice</center>", unsafe_allow_html=True)
     """
-        The visual element below is a clickable interface that allows you to etch your philanthropic committment to **Support** (dark grey), **Invest** (light grey), or **Donate** (black).
+        At this clickable we arrive at a crossroads where you can choose betewen philantrhropic commitment levels, among  **Support** (dark grey), **Invest** (light grey), or **Donate** (black).
     
     """
         
@@ -787,8 +787,8 @@ def engagement():
     engage = create_qualitative('trifurcation',
                         kwargs={"survey": survey, 
                                 'label': 'categorical', 
-                                "name": "we are at a crossing point: how would you philanthropically commit?.",
-                                "question" : "Support (1, dark grey), Invest (2, light grey), or Donate (10, black)?",
+                                "name": "",
+                                "question" : "",
                                 "categories": engage_categories
                         })
     
@@ -1824,11 +1824,11 @@ if __name__ == "__main__":
         intro()    
 
     st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
-    st.markdown("## <center>The intersection of Human and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
+    st.markdown("## <center>A meeting of Social and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
     # st.markdown('<center>`wait a minute`</center>', unsafe_allow_html=True)
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
     st.divider()
-    st.markdown(f"# <center>Application to Philanthropy</center> ", unsafe_allow_html=True)
+    st.markdown(f"# <center>Application to Supporters</center> ", unsafe_allow_html=True)
 
     if st.session_state['authentication_status']:
         event = st_player("https://vimeo.com/1002613928", key='vimeo_player')
