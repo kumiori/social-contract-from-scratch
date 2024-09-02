@@ -1676,7 +1676,7 @@ def integrate():
     """
     # for checkout in st.session_state['checkouts']:
     checkout = st.session_state['checkouts']
-    if st.button(f":material/rainy_snow: Etch Philantrhopy :material/rainy_snow: ", type='primary', key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
+    if st.button(f":material/rainy_snow: Etch Philanthropy :material/rainy_snow: ", type='primary', key=f"pay-{checkout['id']}", help=f"Click to open a dialogue, {mask_string(checkout['id'])} / {mask_string(_signature)}", use_container_width=True):
         sumup_widget(checkout['id'])
             
     st.markdown(
