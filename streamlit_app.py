@@ -340,15 +340,14 @@ if __name__ == "__main__":
     alert_text = """
 The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance in an era marked by simultaneous and interconnected 'polycrises'. 
 
-Are you happy to proceed?
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-Click twice on the 'Yes' button to go forward.
+Click twice on the button.
 
 """
     disclaimed = ui.alert_dialog(show=not st.session_state["alerted"], 
                     title="Alert Dialog", 
                     description=alert_text, 
-                    confirm_label="Yes", 
+                    confirm_label="I am happy to proceed", 
                     cancel_label="Whatever...", 
                     key="alert_dialog_1")
 
