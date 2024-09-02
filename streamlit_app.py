@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 
 if st.secrets["runtime"]["STATUS"] == "Production":
     st.set_page_config(
@@ -61,6 +62,38 @@ data = db.fetch_data()
 df = pd.DataFrame(data)
 item_count = len(df)
 
+blacklist = IODatabase(conn, "blacklist")
+import json
+
+def _whitelist_submit(email, name):
+    with st.spinner("Checking your signature..."):
+        # signature = st.session_state["username"]
+        # serialised_data = st.session_state['serialised_data']
+                
+        time.sleep(2)
+
+        st.write(f"Updating `whitelist`")
+        try:
+            if not email:
+                raise ValueError("Email cannot be null or empty.")
+        
+            data = {
+                'email': email,
+                'full_name': name,
+                'webapp': 'SCFS',
+            }
+
+            query = conn.table('blacklist')                \
+                    .upsert(data, on_conflict=['email'])     \
+                    .execute()
+            
+            if query:
+                st.success("🎊 Preferences integrated successfully!")
+        except ValueError as ve:
+            st.error(f"Data error: {ve}")                
+        except Exception as e:
+            st.error("🫥 Sorry! We couldn't update the whitelist.")
+            st.write(e)
 
 @st.dialog("Join the whitelist")
 def join_waitlist():
@@ -81,6 +114,8 @@ Joining the whitelist is our way of creating a supportive environment where indi
         name = st.text_input("Your name")
         if name:
             st.write(f"Thank you `{name}` for your interest. We will get back to you shortly.")
+            
+            _whitelist_submit(email, name)
     # st.write("We are working on the whitelist feature. Please check back later.") 
     
     
@@ -216,6 +251,11 @@ def request_booklet():
 
 def body():
     st.divider()
+    
+    """    
+    ### _Committing to action._ Our digital platform is desiged to allow connection and establish a base for sharing understanding. 
+    -----------
+    """
     st.markdown("# <center> Join the initiative</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
@@ -224,39 +264,56 @@ Philanthropy is our choice as a source of initial external support for our activ
     """)
     add_vertical_space(3)
         
-    links_row = row(4, vertical_align="center", gap="small")
+    links_row = row(2, vertical_align="center", gap="small")
     links_row.button(
-        "I am a participant",
+        "Author log in",
         use_container_width=True,
         on_click=request_booklet,
         type="secondary"
     )
     links_row.button(
-        "Download the booklet",
+        "I want the booklet",
         use_container_width=True,
         on_click=request_booklet,
         type="primary"
     )
-    links_row.button(
-        "I want to support",
-        use_container_width=True,
-        on_click=request_booklet,
-    )
-    links_row.link_button(
-        "I want to know more",
-        "#the-social-contract-from-scratch",
-        # "https://www.europeindiscourse.eu/",
-        use_container_width=True,
-        type="primary"
-    )
+    # links_row.page_link("pages/apply.py", label="Application for Support", icon="1️⃣")
+    # links_row.button(
+    # # link_button(
+    #     "I want to apply for support",
+    #     # "/pages/apply",
+    #     use_container_width=True,
+    #     type="secondary"
+    # )
     st.divider()
+  
+    """
+    We have made significant steps in organising the panel, gathering a diverse group of friends, scholars, and practitioners who are eager to contribute. Our digital tools are being developed to facilitate interactive participation and real-time feedback during the event. 
     
+    We are now seeking support for our 17-member team,  the Athena Collective, to cover the costs of attending the event, and curating the edition of the _Social Contract_ booklet.
+    
+    To this end, we are inviting you to join our initiative _as a philanthroper_, and support our work.
+    """
 
+    st.page_link("pages/apply.py", label="✨🎊🌈🍒🔮🌞 Application for Philanthropic Support  📣💫🍱💭🔥🧡📯🎓", icon="📣", use_container_width=True)
+
+    """
+    -----------
+    """
+    """
+### Social inequalities, environmental degradation, and political polarisation. Pressing global issues? 
+-----
+    """  
+    """**What are we going to deliver?**
+   We aim to start a groundwork activity to experience new ways of engaging in cooperation, governance, and societal agreements. Among the outcomes: a _Social Contract_, actionable insights, a collaborative framework for future initiatives, and a real-time digital app that will be shared with all participants and stakeholders.
+   
+   Your participation will directly support the creation of these deliverables and help us _etch a scratch_.
+    """
 def discourse():
 
     st.divider()
     st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
-    st.markdown("### <center>The intersection of Human and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
+    st.markdown("## <center>A meeting of Social and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
     # st.markdown('<center>`wait a minute`</center>', unsafe_allow_html=True)
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
     st.divider()
