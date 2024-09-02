@@ -338,7 +338,7 @@ def tabs():
 
 if __name__ == "__main__":
     alert_text = """
-The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance in an era marked by simultaneous and interconnected 'polycrises'. 
+The 'Social Contract from Scratch' is a panel discussion at the Europe in Discourse 2024 conference in Athens (26-28 September), seeking to explore and redefine the fundamental principles of societal cooperation and governance, in an epoch marked by simultaneous and _interconnected_ 'polycrises'. 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 Click twice on the button.
