@@ -416,7 +416,18 @@ def sumup_widget(checkout_id):
         with st.container():
             components.html(js_code, height=600)
 
-def dataset_to_intro(dataset):
+def dataset_to_intro(dataset, perspective='first'):
+    if perspective == "first":
+        pronoun = "I"
+        possessive = "my"
+        verb = "am"
+    elif perspective == "third":
+        pronoun = "You"
+        possessive = "your"
+        verb = "are"
+    else:
+        raise ValueError("Perspective must be either 'first' or 'third'.")
+
     formatted_text = "#### "
     qualitative_value = dataset["Qualitative"]["value"]
     if qualitative_value == "1":
@@ -428,7 +439,7 @@ def dataset_to_intro(dataset):
     else:
         qualitative_desc = "participating"
 
-    formatted_text += f"I decide to start this journey `{qualitative_desc}` as a philanthropist"
+    formatted_text += f"{pronoun} decide to start this journey `{qualitative_desc}` as a philanthropist"
 
     if dataset.get("future_outlook", {}).get("value") is not None:
         future_outlook = float(dataset.get("future_outlook", {}).get("value", False))
@@ -436,7 +447,7 @@ def dataset_to_intro(dataset):
         outlook = "bright horizon" if future_outlook >= 1 else "dark storm" if future_outlook < 0.5 else "grey mist"
         leaning = ", leaning `to the bright`." if future_outlook > 0.5 and future_outlook < 1. else ", leaning `to the dark`." if future_outlook < .5 and future_outlook > 0. else "."
 
-        formatted_text += f", my outlook for the future is a `{outlook}`{leaning}."
+        formatted_text += f", {possessive} outlook for the future is a `{outlook}`{leaning}."
     return formatted_text
 
 def dataset_to_outro(dataset):
@@ -854,7 +865,7 @@ def access():
     col1, col2, col3 = st.columns([1, 9, 1])
 
     with col2:
-        st.write('### You ' + dataset_to_intro(survey.data)[7::] + '!')
+        st.markdown(dataset_to_intro(survey.data, perspective='third') + '!')
     """
     ### _We are looking forward._"""
     
@@ -879,7 +890,7 @@ def access():
         except Exception as e:
             st.error(e)
     else:
-        st.markdown(f"### My access key is already forged, its signature is `{mask_string(st.session_state['username'])}`.")
+        st.markdown(f"#### My access key is already forged, its signature is `{mask_string(st.session_state['username'])}`.")
 
 def authentication():
     
