@@ -1590,7 +1590,7 @@ def checkout2():
         st.session_state['checkouts'] = checkout
         
     else:
-        st.error("There already is a record of theis session. You can list it below.")
+        st.error("There already is a record of this session. You can list it below.")
     
     st.write("Commits:")
     if st.button("Philanthropic committment", key="list_checkouts", use_container_width=True):
