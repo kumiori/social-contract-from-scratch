@@ -339,10 +339,52 @@ Right now, social inequalities, political polarisation, and breaches of trust be
 We wish to articulate this discourse with you, because all voices have a role.
 """)
 def tabs():
-    st.markdown("# <center> The panel discussion</center>", unsafe_allow_html=True)
+    st.markdown("# <center> Overview</center>", unsafe_allow_html=True)
     
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["# Overview", "Contributions", "Minimal Glossary", "Frequency Asked Questions", "Acknowledgements", "Contacts"])
+    # tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["# Overview", "Contributions", "Minimal Glossary", "Frequency Asked Questions", "Acknowledgements", "Contacts"])
+    tab1, tab2, tab3, tab4, tab5, = st.tabs(["How", "What", "Who", "Why", "Where"])
     
+    with tab1:
+        st.write("## How are we doing?")
+        st.markdown("""
+                    We have made significant steps in organising the panel, gathering a diverse group of friends, scholars, and practitioners who are eager to contribute. Our digital tools are being developed to facilitate interactive participation and real-time feedback during the event. However, to fully realise our Panel in Athens, we still need financial support to cover essential costs.
+                    """)
+    
+    with tab2:
+        st.write("## What is the event?")
+        st.markdown("""
+                    The event is the "Europe in Discourse*" conference in Athens, we will host a panel discussion titled "The Social Contract from Scratch." This event addresses "Future Trajectories for Europe" . The goal is to engage in a meaningful dialogue on how to reconstruct the foundational agreements of society in today's challenging context.
+                    """)
+    
+    with tab3:
+        st.write("## Who is going to attend?")
+        st.markdown("""
+                    The event features a diverse lineup of participants, including well-known policy experts, historians, discourse analysts, authors, public intellectuals, and passionate advocates for social change. 
+                    
+                    Philanthropic support will help us bring together many voices and ensure that the discussion reaches a wide and engaged audience.
+                    """)
+    
+    with tab4:
+        st.write("## Why are we doing this?")
+        st.markdown("""
+                    We are undertaking this project because the current social, political, and economic systems are showing signs of strain and imbalance. We understand the necessity of rebuilding a foundation — a social contract from scratch — where diverse perspectives can come together to address the complexity of today's challenges. 
+                    
+                    Traditional structures often lack transparency, participation, and inclusivity, which leads to growing discontent, polarisation, and inequality.
+                    
+                    Decision-making _should be_  transparent and inclusive. Where policies are not top-down but co-created by the many. Where solutions are not imposed but developed collaboratively, addressing the real needs and desires of society.
+                    
+                    Why is it not _already_ so?
+                    """)
+    with tab5:
+        st.write("## Where is this happening?")
+        st.markdown("""
+                    The event will take place at the Hellenic University of Athens, Greece, from 26-28 September 2024. The panel discussion will be part of the "Europe in Discourse" conference, the fourth episode of a conference series.
+                    
+                    All of this is happening at the intersection of global crises and local realities. Where communities are coming together to demand change; and in digital spaces, where people are connecting across borders to collaborate.
+                    
+                    But more than anything, it's happening in the spaces in-between: between the cracks of existing systems, in the gaps where traditional power structures are weak, in the fragments of "free time", and where new models can emerge. It's in these spaces that our initiative is finding fertile soil, aiming to bridge across boundaries, the personal with the collective, and the theoretical with the practical.
+
+                    """)
 
 if __name__ == "__main__":
     alert_text = """
@@ -374,4 +416,4 @@ Click twice on the button.
     
     discourse()
     body()
-    # tabs()
+    tabs()
