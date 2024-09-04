@@ -703,7 +703,7 @@ def show_pathways(pathways, cols=3):
 
 def body1():
     st.divider()
-    st.markdown("## <center> Step 0:  / Awareness</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 0: Awareness</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         """
@@ -726,7 +726,7 @@ def body1():
     """
 NSTEPS = 15
 def body2():
-    st.markdown("## <center> Step 1:  / Reflection</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 1: Reflection</center>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         f""" 
@@ -1861,7 +1861,6 @@ if __name__ == "__main__":
     else:
         st.markdown("### <center>_Log in to open a window._</center>", unsafe_allow_html=True)
     
-    print(st.session_state['authentication_status'])
     if st.session_state['authentication_status'] is None:
         authenticator.login('Connect', 'main', fields = fields_connect)
 
