@@ -300,7 +300,7 @@ Philanthropy is our choice as a source of initial external support for our activ
     
     We are now seeking support for our 17-member team,  the Athena Collective, to cover the costs of attending the event, and curating the edition of the _Social Contract_ booklet.
     
-    Join our initiative _as a philanthroper_, supporting our work.
+    Join our initiative _as a philanthropist_, supporting our work.
     """
 
     st.page_link("pages/apply.py", label="✨🎊🌈🍒🔮🌞 Application for Philanthropic Support  📣💫🍱💭🔥🧡📯🎓", icon="📣", use_container_width=True)
