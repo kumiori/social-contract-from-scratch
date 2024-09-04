@@ -906,9 +906,7 @@ def access():
     else:
         st.markdown(f"#### My access key is already forged, its signature is `{mask_string(st.session_state['username'])}`.")
 
-def authentication():
     
-    st.markdown("## <center> Step X: Communication is key</center>", unsafe_allow_html=True)
     if st.session_state['authentication_status'] is None:
         """### Towards our conference in Athens _Europe in Discourse_"""
         col1, col2, col3 = st.columns([1, 9, 1])
@@ -945,6 +943,10 @@ def authentication():
     elif st.session_state['authentication_status'] is None:
         authenticator.login('Connect', 'main', fields = fields_connect)
         st.warning('Please use your access key')
+
+
+def authentication():
+    pass
 
 def datacollection():
 
@@ -1440,11 +1442,8 @@ def price():
     """
     fig = create_scatter_plot('rgba(255, 99, 71, {})')  # Example with a tomato color
     st.plotly_chart(fig)
-    """
-    # :material/rainy_snow:
-    """
-    st.markdown(f"# <center>My Philanthropic  Etch  is {price:.2f}<center> ", 
-                unsafe_allow_html=True)
+    st.markdown(f"# My Philanthropic  Etch  is {price:.2f} :material/rainy_snow: ", 
+    )
     """
     Encoding the data on the bank ledger, in EUR currency, serves as a _relatively_ secure, _almost_ immutable record of your engagement, offering an additional layer of verification and trust.
     """
@@ -1542,7 +1541,6 @@ def checkout():
     with st.expander("Payments and ledger, further details", expanded=False):
         st.write("The payment data is stored in your session's _state_ and can be accessed by your end for further processing. This app uses the SumUp API (sumup.com) to create checkouts and process payments. Finally, we rely on CCF bank, a French commercial bank founded in 1894 and acquired by HSBC in 2000, as the (_untrusted_) ledger.")
     
-    
 def checkout2():
 
     description = "Social Contract from Scratch•"
@@ -1590,7 +1588,7 @@ def checkout2():
         st.session_state['checkouts'] = checkout
         
     else:
-        st.error("There already is a record of this session. You can list it below.")
+        st.warning("There already is a record of this session. You can list it below.")
     
     st.write("Commits:")
     if st.button("Philanthropic committment", key="list_checkouts", use_container_width=True):
@@ -1780,15 +1778,13 @@ def intro():
             # st.toast("Whitelist")
             join_waitlist()
 
-
 def application_pages():
-    pages_total = 16
+    pages_total = 15
     pages = survey.pages(pages_total, 
             on_submit=lambda: _form_submit(),
             )
-    
+    # 16-10
     st.progress(float((pages.current + 1) / pages_total))
-    st.write(st.session_state['page'])
     with pages:
         if pages.current == 0:
             body1()
@@ -1805,14 +1801,13 @@ def application_pages():
         if pages.current == 4:
             access()
         if pages.current == 5:
-            authentication()
-        if pages.current == 6:
+            # authentication()
             datacollection()
-        if pages.current == 7:
+        if pages.current == 6:
             story()
-        if pages.current == 8:
+        if pages.current == 7:
             preferences()
-        if pages.current == 9:
+        if pages.current == 8:
             if survey.data["Qualitative"]["value"] == "10":
                 donation()
             elif survey.data["Qualitative"]["value"] == "2":
@@ -1827,23 +1822,24 @@ def application_pages():
                     time.sleep(5)
                     pages.current = 2
                     st.rerun()
-        if pages.current == 10:
+        if pages.current == 9:
             reading()
+        if pages.current == 10:
+            price()
 
         if pages.current == 11:
-            price()
+            checkout()
             
         if pages.current == 12:
-            checkout()
-
-        if pages.current == 13:
             checkout2()
 
-        if pages.current == 14:
+        if pages.current == 13:
             integrate()
-                
-        if pages.current == 15:
+
+        if pages.current == 14:
             outro()
+                
+        # if pages.current == 15:
             
 if __name__ == "__main__":
     
@@ -1864,7 +1860,8 @@ if __name__ == "__main__":
         event = st_player("https://vimeo.com/1002613928", key='vimeo_player')
     else:
         st.markdown("### <center>_Log in to open a window._</center>", unsafe_allow_html=True)
-        
+    
+    print(st.session_state['authentication_status'])
     if st.session_state['authentication_status'] is None:
         authenticator.login('Connect', 'main', fields = fields_connect)
 

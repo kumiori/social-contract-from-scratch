@@ -271,12 +271,20 @@ Philanthropy is our choice as a source of initial external support for our activ
         on_click=request_booklet,
         type="secondary"
     )
-    links_row.button(
-        "I want the booklet",
-        use_container_width=True,
-        on_click=request_booklet,
-        type="primary"
-    )
+    # links_row.button(
+    #     "I want the booklet",
+    #     use_container_width=True,
+    #     on_click=request_booklet,
+    #     type="primary"
+    # )
+    with open('assets/SocialContractFromScratch-Panel.pso.pdf', 'rb') as f:
+        links_row.download_button(
+            "I want the booklet",
+            f,
+            use_container_width=True,
+            file_name="Social•Contract•From•Scratch-Athens-Panel.pdf",
+            type="primary"
+        )
     # links_row.page_link("pages/apply.py", label="Application for Support", icon="1️⃣")
     # links_row.button(
     # # link_button(
