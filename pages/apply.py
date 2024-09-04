@@ -824,6 +824,9 @@ def engagement():
     }
     
     if engage is not None:
+        with st.spinner("Thinking..."):
+            time.sleep(3)
+
         st.markdown(feedback_messages.get(str(engage), "Thank you for your dedication so far!"))
     else:
         st.write("Take your time to get used to this strange button, it's new _to us_ as well.")
