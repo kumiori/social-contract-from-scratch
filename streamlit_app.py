@@ -303,7 +303,8 @@ Philanthropy is our choice as a source of initial external support for our activ
     Join our initiative _as a philanthropist_, supporting our work.
     """
 
-    st.page_link("pages/apply.py", label="✨🎊🌈🍒🔮🌞 Application for Philanthropic Support  📣💫🍱💭🔥🧡📯🎓", icon="📣", use_container_width=True)
+    st.page_link("pages/apply.py", label="Philanthropy for Us 📣", icon="📣", use_container_width=True)
+    st.page_link("pages/apply.py", label="Application for Philanthropic Support 💭", icon="🔮", use_container_width=True)
 
     """
     -----------
@@ -382,7 +383,7 @@ def tabs():
                     
                     All of this is happening at the intersection of global crises and local realities. Where communities are coming together to demand change; and in digital spaces, where people are connecting across borders to collaborate.
                     
-                    But more than anything, it's happening in the spaces in-between: between the cracks of existing systems, in the gaps where traditional power structures are weak, in the fragments of "free time", and where new models can emerge. It's in these spaces that our initiative is finding fertile soil, aiming to bridge across boundaries, the personal with the collective, and the theoretical with the practical.
+                    But more than anything, it's happening in the spaces in-between: between the cracks of existing systems, in the gaps where traditional power structures are weak, in the fragments of "free time", and where ideas can emerge. It's in these spaces that our initiative is finding fertile soil, aiming to bridge across boundaries, the personal with the collective, and the theoretical with the practical.
 
                     """)
 
