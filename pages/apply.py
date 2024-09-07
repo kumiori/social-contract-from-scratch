@@ -943,9 +943,9 @@ def access():
         st.write(f'`My signature is {mask_string(st.session_state["username"])}`')
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
-    elif st.session_state['authentication_status'] is None:
-        authenticator.login('Connect', 'main', fields = fields_connect)
-        st.warning('Please use your access key')
+    # elif st.session_state['authentication_status'] is None:
+    #     authenticator.login('Connect', 'main', fields = fields_connect)
+    #     st.warning('Please use your access key')
 
 
 def authentication():
