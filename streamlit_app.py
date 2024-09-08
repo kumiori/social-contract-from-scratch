@@ -44,6 +44,7 @@ from philoui.io import conn, QuestionnaireDatabase as IODatabase
 import streamlit_shadcn_ui as ui
 import pandas as pd
 from streamlit_extras.add_vertical_space import add_vertical_space 
+from streamlit_player import st_player
 
 with open("assets/discourse.css", "r") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -318,6 +319,9 @@ Philanthropy is our choice as a source of initial external support for our activ
    
    Your participation will directly support the creation of these deliverables and help us _etch a scratch_.
     """
+    
+    event = st_player("https://vimeo.com/1007188309", key='vimeo_player')
+    
 def discourse():
 
     st.divider()
