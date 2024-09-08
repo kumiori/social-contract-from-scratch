@@ -286,6 +286,8 @@ Philanthropy is our choice as a source of initial external support for our activ
             file_name="Social•Contract•From•Scratch-Athens-Panel.pdf",
             type="primary"
         )
+    event = st_player("https://vimeo.com/1007188309", key='vimeo_player')
+        
     # links_row.page_link("pages/apply.py", label="Application for Support", icon="1️⃣")
     # links_row.button(
     # # link_button(
@@ -320,7 +322,6 @@ Philanthropy is our choice as a source of initial external support for our activ
    Your participation will directly support the creation of these deliverables and help us _etch a scratch_.
     """
     
-    event = st_player("https://vimeo.com/1007188309", key='vimeo_player')
     
 def discourse():
 
