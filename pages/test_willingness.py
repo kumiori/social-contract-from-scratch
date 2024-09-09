@@ -1154,6 +1154,12 @@ How you feel about the results?"""
     # checkout2()
     
     
+    
+    from streamlit_lottie import st_lottie
+    
+    st_lottie("https://lottie.host/e83269bc-3342-4d2c-a4d9-9b8cabd8d7f9/JKz0q1LqzR.json")
+    
+    
     """
     ## The next stage is _Building_.
     """
@@ -1169,8 +1175,3 @@ How you feel about the results?"""
     
     Together, we draw blueprints for new social bonds. 
     """
-    
-    from streamlit_lottie import st_lottie
-    
-    st_lottie("https://lottie.host/e83269bc-3342-4d2c-a4d9-9b8cabd8d7f9/JKz0q1LqzR.json")
-    
