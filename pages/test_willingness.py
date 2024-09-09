@@ -121,7 +121,7 @@ authenticator = AuthenticateWithKey(
 fields_connect = {'Form name':'Use your access key if you have it', 'Email':'Email', 'Username':'Username',
             'Password':'Password', 'Repeat password':'Repeat password',
             'Register':' Retrieve access key ', 'Captcha':'Captcha'}
-fields_forge = {'Form name':'Forge access key', 'Email':'Email', 'Username':'Username',
+fields_forge = {'Form name':'Where is my access key?', 'Email':'Email', 'Username':'Username',
             'Password':'Password', 'Repeat password':'Repeat password',
             'Register':' Here • Now ', 'Captcha':'Captcha'}
 philanthropic_profiles = {
@@ -1092,7 +1092,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
     with st.expander("Review your data", expanded=False):
         st.json(survey.data)
 
-    tab1, tab2 = st.tabs(["I am returning", "I am new"])
+    tab2, tab1, = st.tabs(["I am returning", "I am new"])
     
     with tab1:
         if st.session_state['authentication_status'] is None:
