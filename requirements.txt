@@ -171,9 +171,11 @@ streamlit-elements==0.1.0
 streamlit-embedcode==0.1.2
 streamlit-extras==0.3.5
 streamlit-faker==0.0.3
+streamlit-gtag @ git+https://github.com/kumiori/streamlit-gtag.git@7a04ab228f8cb7edac23d1534e7ed8a095a53299
 streamlit-image-coordinates==0.1.6
 streamlit-image-select==0.6.0
 streamlit-keyup==0.2.0
+streamlit-lottie==0.0.5
 streamlit-modal==0.1.2
 streamlit-pills==0.3.0
 streamlit-player==0.1.5
@@ -186,7 +188,6 @@ streamlit-toggle-switch==1.0.2
 streamlit-vertical-slider==2.5.5
 StrEnum==0.4.15
 sumup_oauthsession @ git+https://github.com/CedricCook/sumup_oauthsession@d3a2cd550b8de3337c077c2253b6fe1e59a79d29
-streamlit-gtag @ git+https://github.com/kumiori/streamlit-gtag.git@7a04ab228f8cb7edac23d1534e7ed8a095a53299
 supabase==1.2.0
 supafunc==0.2.3
 sympy==1.12
