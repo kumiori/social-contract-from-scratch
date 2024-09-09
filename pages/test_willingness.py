@@ -979,7 +979,8 @@ By interacting, we question basic assumptions and actively engage in shaping con
     Here's a simple question which still allows for a nuanced response. 
     
     
-    #### How willing to give up your freedoms in exchange for protection and stability, without participating in decisions that affect you?
+    #### How willing are you to give up your freedoms in exchange for protection and stability, relinquishing participation in decisions that affect you?
+    ##### _How willing am I to give up my freedoms in exchange for protection and stability, relinquishing my participation in decisions that affect me?_
     
     **Choose between** 0/black (not willing to give up freedom), 1/white (fully willing to give up freedom), 
     and all values in between - greys - (representing conditional, small or large, willingness). We will gather detailed insights!
@@ -1091,7 +1092,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
     with st.expander("Review your data", expanded=False):
         st.json(survey.data)
 
-    tab1, tab2 = st.tabs(["I already have an access key", "Let's forge an access key"])
+    tab1, tab2 = st.tabs(["I am returning", "I am new"])
     
     with tab1:
         if st.session_state['authentication_status'] is None:
@@ -1106,7 +1107,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
 
         if st.session_state['authentication_status'] is None:
             """
-            Here and Now, let's forge one for you to proceed. 
+            Click `Here and Now`, we have a key in store for you to proceed. 
             """
             try:
                 match = True
@@ -1119,7 +1120,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
             except Exception as e:
                 st.error(e)
         else:
-            st.info('It seems that you are already connected')
+            st.info('It seems that I am already connected')
     
 
     if st.session_state['authentication_status']:
