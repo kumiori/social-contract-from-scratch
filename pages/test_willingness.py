@@ -925,16 +925,15 @@ if __name__ == "__main__":
     # But how should a social contract work?
     """
     f"""
-Let’s take a foundational idea from the 17th century—one that still underpins much of Western and European governance—and put it to the test. It often assumes implicit consent, meaning people agree without ever explicitly being asked. 
+Let’s take a foundational idea from the 17th century—one that still underpins much of Western and European governance—and put it to the test in today's world. 
+It often assumes implicit consent, meaning people agree without ever explicitly being asked. 
 Starting today, {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}, _we challenge that assumption._    """
     """
-    #### 
-    
-Here, we _cut through tradition_ and ask directly: **Do you accept this deal?** _In other words_, **Are you willing to relinquish some of your freedoms in exchange for the benefits of living in a society?**
+Here, we _cut through_ and ask directly:  **Are you willing to relinquish some of your freedoms in exchange for the benefits of living in a society?** _In other words_, **Do you accept this deal?** 
 
 This is where _you_ come in, casting a real, meaningful preference—_yours_.
 
-    Our approach is explicit and participatory, aiming for informed, active consent. 
+Our approach is explicit and participatory, aiming for informed, active consent. 
     Here, participants contribute directly to the construction of our bonds, 
     manifesting a real voice in determining their principles. 
     Stakeholders are real and governing structures are transparent.
@@ -979,14 +978,14 @@ By interacting, we question basic assumptions and actively engage in shaping con
     Here's a simple question which still allows for a nuanced response. 
     
     
-    #### How willing are you to give up your freedoms in exchange for protection and stability, relinquishing participation in decisions that affect you?
-    ##### _How willing am I to give up my freedoms in exchange for protection and stability, relinquishing my participation in decisions that affect me?_
     
     **Choose between** 0/black (not willing to give up freedom), 1/white (fully willing to give up freedom), 
     and all values in between - greys - (representing conditional, small or large, willingness). We will gather detailed insights!
     
     At this clickable interface we arrive at a crossroads where you can choose...
     """
+    # https://lottie.host/embed/45438b97-2912-4a45-97b1-7a6e300abc99/xVtk48wj6I.json
+    # https://lottie.host/embed/2785afba-d09a-4268-9c5e-e343d6f6079a/IKh7NP1UTT.json
 
     question()
 

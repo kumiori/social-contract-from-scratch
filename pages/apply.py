@@ -54,6 +54,8 @@ st_gtag(
         "value": 97,
     },
 )
+
+
 db = IODatabase(conn, "discourse-data")
 
 with open("assets/discourse.css", "r") as f:
@@ -811,7 +813,7 @@ def engagement():
     engage_categories= {'1': 'Support', '2': 'Invest', '10': 'Donate'}
     engage = create_qualitative('trifurcation',
                         kwargs={"survey": survey, 
-                                'label': 'categorical', 
+                                'label': 'Qualitative', 
                                 "name": "",
                                 "question" : "",
                                 "categories": engage_categories
@@ -878,9 +880,7 @@ def access():
     """
     We've collected some insight so far. Let's check it.
     """
-    # st.write(survey.data)
     col1, col2, col3 = st.columns([1, 9, 1])
-
     with col2:
         st.markdown(dataset_to_intro(survey.data, perspective='third') + '!')
     """
