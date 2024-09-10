@@ -26,6 +26,7 @@ if st.secrets["runtime"]["STATUS"] == "Production":
 
 import json
 from datetime import datetime
+from streamlit_lottie import st_lottie
 
 import pandas as pd
 import philoui
@@ -281,11 +282,8 @@ def create_commit_checkout(reference, amount, description):
 
 
 def checkout():
-    st.markdown("## <center>Integrate the data</center>", unsafe_allow_html=True)
-    st.markdown(
-"""
-    For this, we need your signature:
-""")
+    st.markdown("## <center>Integrate the the intentions</center>", unsafe_allow_html=True)
+
     st.warning("We are integrating _money_ into the game. This requires your authorisation.")
 
     from requests.exceptions import RequestException
@@ -301,7 +299,7 @@ def checkout():
     Bringing money _into the game_ allows us to convert abstract ideas into concrete actions, facilitating the implementation of our first initiative: **hosting a panel discussion at the _Europe in Discourse_ Conference** in Athens.
     
     """
-    st.write("Click the link below to authorise this. Your authorisation is key to proceed. If everything is in order, you will read above a message of success, or a unique ID below.")
+    st.write("Click the link below to authorise this. Your authorisation is key to proceed. If everything is in order, you will read a message of success and a unique ID, below. Isn't this cool?")
     if st.button("It is OK to bring money into the game", type='primary', key="authorise", use_container_width=True, disabled=False):
         try:
             sumup = OAuth2Session(
@@ -367,7 +365,7 @@ def checkout2():
     st.markdown(f"### Short code: {reference}", unsafe_allow_html=True)
     # st.markdown(f"### Commit signature: {signature}", unsafe_allow_html=True)
     """
-    The button below will create a record to be etched on the ledger. This entry will be a trace of your philanthropic commitment, a digital footprint of your philanthropic intention.
+    The button below will create a record and initialise your dashboard. This donation will be a trace of your philanthropic commitment.
     
     
     """
@@ -599,8 +597,12 @@ def intro():
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
 
     st.divider()
-    st.markdown(f"# <center>Your Donation is Just the Start</center> ", unsafe_allow_html=True)
+    st.markdown(f"# <center>Start With a Donation</center> ", unsafe_allow_html=True)
     
+    st_lottie("https://lottie.host/91efca67-fa13-43db-8302-f5c182af8152/ufDyVWvWdR.json")
+    # st_lottie("https://lottie.host/d8addf11-2974-4c28-80be-df3d9d7273c5/9FuMagA41S.json")
+    # st_lottie("https://lottie.host/ec578eca-0d54-4173-b4a4-9bd5eadf577c/bIR9lUB6Sk.json")
+    # st_lottie("https://lottie.host/8d0158ec-6eaf-4867-a96c-4774fd2890e2/wFLLXK2Tmj.json")
 
 def exp_to_actual(value):
     return 10**value
@@ -637,8 +639,12 @@ We are the **Athena Collective**, a diverse group of 17 thinkers, scientists, an
 
 Our goal? To build a **Social Contract from Scratch**: an _understanding_ or an agreement that underscores the urgent challenges of our time 
 — ranging from environmental crises to social inequality— and encourages participatory governance and collective decision-making.
+
+
+The  **Athena Collective** is Ariane Ahmadi, Nils Andersen, Bianca Apollonio, Alessandra Carosi, Gabrielle Dyson, flcalb, Giorgio Funaro, Hugues Genevois, Laurence White-Bouckaert, Claire Glanois, Amir Issaa, Andrés León Baldelli, Graziano Mazza, Roger Niyigena Karera, Francesco Raneri, Antonia Taddei, and Sophie Wahnich.
 """
     st.markdown("## <center>Our Initiative</center>", unsafe_allow_html=True)
+    # st_lottie("https://lottie.host/fc486c68-4574-4593-b9fb-d504f1f9c980/Nvrgg8KGLA.json")
 
     """
 Through interactive exchange, games, and digital tools to gather preferences, we aim to:
@@ -660,6 +666,10 @@ We appreciate every contribution, big or small. You can choose to:
 - **Or contribute a custom amount** based on your preference.
 
 """
+    # st_lottie("https://lottie.host/45438b97-2912-4a45-97b1-7a6e300abc99/xVtk48wj6I.json")
+    # st_lottie("https://lottie.host/2785afba-d09a-4268-9c5e-e343d6f6079a/IKh7NP1UTT.json")
+    # st_lottie("https://lottie.host/e83269bc-3342-4d2c-a4d9-9b8cabd8d7f9/JKz0q1LqzR.json")
+
     st.markdown(f"# <center>Donating Supports</center> ", unsafe_allow_html=True)
 
     """
@@ -673,15 +683,14 @@ Join us on this journey toward creating a solid foundation for inclusivity.
     
 
     donation()
-    st.write(st.session_state["price"])
     
     checkout()
     donation_amount = checkout2()
 
     _checkout = st.session_state['checkouts']
     if _checkout:
-        if st.button(f":material/rainy_snow: Etch Philanthropy :material/rainy_snow: ", type='primary', key=f"pay-{_checkout['id']}", help=f"Click to open a dialogue, {mask_string(_checkout['id'])} / {mask_string('')}", use_container_width=True):
-            sumup_widget(checkout['id'])
+        if st.button(f":material/rainy_snow: Am I Truly Happy to  Donate? :material/rainy_snow: ", type='primary', key=f"pay-{_checkout['id']}", help=f"Click to open a dialogue, {mask_string(_checkout['id'])} / {mask_string('')}", use_container_width=True):
+            sumup_widget(_checkout['id'])
             
     st.markdown(
         """
@@ -697,3 +706,5 @@ Join us on this journey toward creating a solid foundation for inclusivity.
     if st.button(f"Clear all and restart",type='secondary', key=f"restart", use_container_width=True):
         st.session_state.clear()
         st.rerun()
+
+    st_lottie("https://lottie.host/e83269bc-3342-4d2c-a4d9-9b8cabd8d7f9/JKz0q1LqzR.json")
