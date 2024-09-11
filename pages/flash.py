@@ -440,7 +440,7 @@ def sumup_widget(checkout_id):
                     """
         # st.write(js_code)
         with st.container():
-            components.html(js_code, height=600)
+            components.html(js_code, height=700)
 
 def donation():
     
