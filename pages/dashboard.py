@@ -3,6 +3,13 @@ import requests
 import time
 from numpy import around
 
+if st.secrets["runtime"]["STATUS"] == "Production":
+    st.set_page_config(
+        page_title="The Social Contract from Scratch",
+        page_icon="✨",
+        layout="wide",
+        initial_sidebar_state="collapsed"
+    )
 
 st.markdown(
         """
@@ -16,14 +23,6 @@ st.markdown(
     </style>
     """,
         unsafe_allow_html=True,
-    )
-
-if st.secrets["runtime"]["STATUS"] == "Production":
-    st.set_page_config(
-        page_title="The Social Contract from Scratch",
-        page_icon="✨",
-        layout="wide",
-        initial_sidebar_state="collapsed"
     )
 
 import json
