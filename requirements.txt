@@ -176,6 +176,7 @@ streamlit-image-coordinates==0.1.6
 streamlit-image-select==0.6.0
 streamlit-keyup==0.2.0
 streamlit-lottie==0.0.5
+streamlit-mermaid==0.2.0
 streamlit-modal==0.1.2
 streamlit-pills==0.3.0
 streamlit-player==0.1.5
