@@ -1065,8 +1065,6 @@ By interacting, we question basic assumptions and actively engage in shaping con
             st.markdown(f"#### My access key is already forged, its signature is `{mask_string(st.session_state['username'])}`.")
 
     with tab1:
-
-
         if st.session_state['authentication_status'] is None:
             """
             We have a key in store, for you to proceed.
@@ -1096,7 +1094,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
     """
     
     if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
-            #   disabled=not bool(st.session_state['authentication_status']), 
+              disabled=not bool(st.session_state['authentication_status']), 
               type='primary',
               use_container_width=True,
               on_click=lambda: _form_submit()):
