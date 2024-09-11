@@ -540,7 +540,7 @@ def dataset_to_outro(dataset):
     else:
         qualitative_desc = "willing, depending upon conditions,"
     ext = '' if qualitative_value > .9 else ' do not '
-    formatted_text += f"I commit to start this journey `{qualitative_desc}` to give up freedom in exchange for protection and stability from an authority or central entity."
+    formatted_text += f"I commit to start this journey `{qualitative_desc}` to give up my freedom in exchange for protection and stability from an authority or central entity."
     name = dataset["name"]["value"] if dataset["name"]["value"] else 'Anonymous'
     
     # if dataset.get("future_outlook", {}).get("value") is not None:
