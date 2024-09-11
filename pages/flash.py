@@ -384,14 +384,6 @@ def checkout2(name=''):
         else:
             st.warning("There already is a record of this session. You can list it below.")
     
-    # st.write("Donation:")
-    if st.button("Philanthropic details", key="list_checkouts", use_container_width=True):
-        if len(st.session_state['checkouts']) == 0:
-            st.warning("There is nothing to donate, yet.")
-            
-        else:
-            st.json(st.session_state['checkouts'])    
-
     checkout = st.session_state['checkouts']
     if st.session_state['checkouts']:
         if st.button(f"Debrief (double check)", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
