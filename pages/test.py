@@ -430,7 +430,7 @@ def sumup_widget(checkout_id):
                             id: 'sumup-card',
                             checkoutId: '{checkout_id}',
                             donateSubmitButton: false,
-                            showInstallments: true,
+                            showInstallments: false,
                             onResponse: function (type, body) {{
                             console.log('Type', type);
                             console.log('Body', body);
