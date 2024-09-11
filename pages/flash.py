@@ -419,7 +419,7 @@ def checkout2(name=''):
     return total_amount
 
 
-@st.dialog("This is the development of a dialogue")
+@st.dialog("This is a dialogue")
 def sumup_widget(checkout_id):
                             # showInstallments: true,
 
