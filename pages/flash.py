@@ -280,7 +280,6 @@ def create_commit_checkout(reference, amount, description):
         st.warning(f'Error: {response.text}')
         return None
 
-
 def checkout():
     st.markdown("## <center>Integrate your contribution</center>", unsafe_allow_html=True)
 
@@ -325,7 +324,6 @@ def checkout():
     # st.markdown("Click the expand button below to know more about the payment mechanics.")
     with st.expander("Payments and ledger, further details", expanded=False):
         st.write("This app uses the SumUp API (sumup.com) to create checkouts and process payments. We rely on CCF bank, a French commercial bank founded in 1894 and acquired by HSBC in 2000, as a piggy-bank.")
-    
     
 def checkout2(name=''):
 
@@ -444,7 +442,6 @@ def sumup_widget(checkout_id):
         with st.container():
             components.html(js_code, height=600)
 
-
 def donation():
     
     st.markdown("## <center> Donation</center>", unsafe_allow_html=True)
@@ -499,7 +496,6 @@ def donation():
     - **:material/hotel::** "Support Our Accommodation" – 1000 EUR
     - **:material/jump_to_element: :** "Support Our Travels" – 1111 EUR
     """
-
 
 def outro():
     st.markdown("## <center> Step X: _Chapter One_</center>", unsafe_allow_html=True)
@@ -602,7 +598,6 @@ def intro():
 
 def exp_to_actual(value):
     return 10**value
-
 
 def question():
             

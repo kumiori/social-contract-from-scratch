@@ -607,7 +607,6 @@ def intro():
 def exp_to_actual(value):
     return 10**value
 
-
 def question():
             
     role = my_create_dichotomy(key = "executive", id= "executive",
