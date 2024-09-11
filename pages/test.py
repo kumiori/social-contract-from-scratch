@@ -420,7 +420,7 @@ def checkout2(name=''):
 
 
 @st.dialog("This is the development of a dialogue")
-def sumup_widget(checkout_id):
+def sumup_widget(checkout_id, installments='false'):
 
         js_code = f"""
                     <div id="sumup-card"></div>
@@ -430,7 +430,7 @@ def sumup_widget(checkout_id):
                             id: 'sumup-card',
                             checkoutId: '{checkout_id}',
                             donateSubmitButton: false,
-                            showInstallments: false,
+                            showInstallments: '{installments}',
                             onResponse: function (type, body) {{
                             console.log('Type', type);
                             console.log('Body', body);
