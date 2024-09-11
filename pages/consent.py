@@ -1077,7 +1077,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
     f"""
     Based on the partial data from the survey, we can make a few key observations and offer some initial reflections:
 
-    ### Preliminary Analysis:
+    ### Preliminary Analysis (last updated, a while ago):
 
     1. **Strong preference for preserving freedom**: 
     The most striking takeaway is that **19 out of the 29 participants** (roughly **65%**) have shown **zero willingness** to give up any personal freedoms. This indicates a significant collective inclination towards the preservation of individual liberties. It suggests that participants place high value on personal autonomy and may have deep concerns about relinquishing their freedoms, even in exchange for protection or stability.
