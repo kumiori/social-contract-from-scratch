@@ -43,6 +43,7 @@ from streamlit_timeline import timeline
 from yaml import SafeLoader
 from streamlit_player import st_player
 from streamlit_gtag import st_gtag
+from datetime import datetime
 
 st_gtag(
     key="gtag_consent",
@@ -782,7 +783,27 @@ Here is a snapshot of current activities and developments. Any insight to share?
         st.markdown("""
         `No need to "Submit", your dashboard is saved.`
         """)
-    
+
+
+@st.cache_data    
+def fetch_data():
+    response = db.fetch_data(kwargs={'verbose': True})
+    return response
+
+# Function to extract willingness and updated_at
+def extract_willingness_and_updated_at(data):
+    results = []
+    for entry in data:
+        if entry.get("consent_00"):
+            consent_data = json.loads(entry["consent_00"])
+            willingness = consent_data.get("willingness", {}).get("value")
+            updated_at = entry.get("updated_at")
+            if willingness and updated_at:
+                # Convert the updated_at to a more readable format
+                updated_at = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
+                results.append({"willingness": willingness, "updated_at": updated_at})
+    return results
+
 def intro():
     cols = st.columns(4, vertical_alignment="center")
     today = datetime.now()
@@ -817,7 +838,10 @@ def intro():
 
     st.divider()
     st.markdown(f"# <center>Testing Basic Assumptions</center> ", unsafe_allow_html=True)
+    
 
+    # philoui.io
+    
 def question():
     
     st.markdown("""
@@ -955,8 +979,44 @@ By interacting, we question basic assumptions and actively engage in shaping con
 
  
     from streamlit_elements import elements, mui, nivo
+    
+    response = fetch_data()
+    response = extract_willingness_and_updated_at(response)
+    # df = pd.DataFrame(response)
+    # st.table(df)
 
-    DATA = [
+
+    def sum_data(A, B):
+        summed_data = []
+        for A_item in A:
+            # Find corresponding item in result based on 'id'
+            for B_item in B:
+                if A_item['id'] == B_item['id']:
+                    # Sum the 'value' fields
+                    new_value = A_item['value'] + B_item['value']
+                    summed_data.append({
+                        "id": A_item["id"],
+                        "label": A_item["label"],
+                        "value": new_value
+                    })
+                    break
+        return summed_data
+
+    def map_willingness(data):
+        full_willingness = len([i for i in data if i["willingness"] == "1"])
+        zero_willingness = len([i for i in data if i["willingness"] == "0"])
+        conditional_willingness = len([i for i in data if 0 < float(i["willingness"]) < 1])
+
+        return [
+            {"id": "Full Willingness", "label": "Full Willingness", "value": full_willingness},
+            {"id": "Zero Willingness", "label": "Zero Willingness", "value": zero_willingness},
+            {"id": "Conditional", "label": "Conditional", "value": conditional_willingness}
+        ]
+
+    # Apply the function to the data
+    state = map_willingness(response)
+
+    INITIAL_CONDITION = [
   {
     "id": "Full Willingness",
     "label": "Full Willingness",
@@ -973,6 +1033,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
     "value": 10
   }
 ]
+    DATA = sum_data(state, INITIAL_CONDITION)
     
     """
     ## The results
