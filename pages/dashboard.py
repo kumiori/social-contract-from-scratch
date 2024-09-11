@@ -2,15 +2,9 @@ import streamlit as st
 import requests
 import time
 from numpy import around
-if st.secrets["runtime"]["STATUS"] == "Production":
-    st.set_page_config(
-        page_title="The Social Contract from Scratch",
-        page_icon="✨",
-        # layout="wide",
-        initial_sidebar_state="collapsed"
-    )
 
-    st.markdown(
+
+st.markdown(
         """
     <style>
         [data-testid="collapsedControl"] {
@@ -26,7 +20,7 @@ if st.secrets["runtime"]["STATUS"] == "Production":
 
 if st.secrets["runtime"]["STATUS"] == "Production":
     st.set_page_config(
-        # page_title="The Social Contract from Scratch",
+        page_title="The Social Contract from Scratch",
         page_icon="✨",
         layout="wide",
         initial_sidebar_state="collapsed"
