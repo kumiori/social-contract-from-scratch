@@ -147,15 +147,16 @@ API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 
-# @st.dialog("Join the whitelist")
-def join_waitlist():
+@st.dialog("Join the whitelist")
+def join_waitlist(container):
     from email_validator import EmailNotValidError, validate_email
     st.markdown("**Welcome aboard**")
     st.markdown("""
-We're excited that you are interested in joining our initiative. As we consolidate a focused and passionate community, your interest is a great step, and we'd love to learn more about you and your views. 
+We're excited that you are interested in joining our initiative. 
+As we consolidate a focused and passionate community, your interest is a great step, and we'd love to learn more about you and your views. 
 
 Joining the whitelist is our way of creating a supportive environment where individuals can collaborate and contribute meaningfully.
-             """)
+            """)
     email = st.text_input("Your email address")
     if email:
         try:
@@ -166,7 +167,7 @@ Joining the whitelist is our way of creating a supportive environment where indi
         name = st.text_input("Your name")
         if name:
             st.write(f"Thank you `{name}` for your interest. We will get back to you by email.")
-    st.write("Please check back here in a few days. We may have crafted your dashboard by then.") 
+    st.write("Please check back here in a few days. We may have crafted your dashboard by then.")
 
 def get_checkout_info(checkout_id):
     url = f'{API_BASE_URL}/checkouts/{checkout_id}'
@@ -565,7 +566,7 @@ def intro():
 
     # Calculate the time delta
     time_delta = target_date - today
-        
+    container = st.container()
     with cols[0]:
         ui.metric_card(title=".", content='0', description="Consents, so far.", key="card1")
     with cols[1]:
@@ -579,10 +580,10 @@ def intro():
         ui.badges(badge_list=[("experimental", "secondary")], class_name="flex gap-2", key="viz_badges2")
         # ui.badges(badge_list=[("production", "outline")], class_name="flex gap-2", key="viz_badges3")
         # switch_value = ui.switch(default_checked=True, label="Enable economic", key="switch1")
-        whitelist = ui.button(text="Join the whitelist", url="", key="link_btn")
-        if whitelist:
-            # st.toast("Whitelist")
-            join_waitlist()
+        # whitelist = ui.button(text="Join the whitelist", url="", key="link_btn")
+        # if whitelist:
+        #     # st.toast("Whitelist")
+        #     join_waitlist(container)
 
     st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
 
