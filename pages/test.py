@@ -147,7 +147,7 @@ API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 
-@st.dialog("Join the whitelist")
+# @st.dialog("Join the whitelist")
 def join_waitlist():
     from email_validator import EmailNotValidError, validate_email
     st.markdown("**Welcome aboard**")
