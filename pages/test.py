@@ -642,7 +642,7 @@ We are the **Athena Collective**, organising a key panel discussion at the **Eur
 """
     st.markdown("## <center>Our Initiative at a Glance</center>", unsafe_allow_html=True)
 
-    event_2 = st_player("https://vimeo.com/1007606689", key='vimeo_player_2')
+    event_2 = st_player("https://vimeo.com/1007188309", key='vimeo_player_2')
     """
     ### Ready to test?
     """
