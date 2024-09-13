@@ -192,6 +192,173 @@ def return_SCFS_details(num_transactions, transaction_rows):
 
     return filtered_transactions
 
+@st.cache_data    
+def fetch_data():
+    response = db.fetch_data(kwargs={'verbose': True})
+    return response
+
+def retrieve_user_by_signature(df, signature):
+    # Filter the DataFrame based on the 'signature' column
+    matched_row = df.loc[df['signature'] == signature]
+    if not matched_row.empty:
+        return matched_row
+    else:
+        return None
+    
+def create_discourse_personal(personal_data):
+    name = personal_data.get("name", {}).get("value", "No name provided")
+    email = personal_data.get("email", {}).get("value", "No email provided")
+    signature = personal_data.get("signature", {}).get("value", "No signature provided")
+    phone = personal_data.get("phone", {}).get("value", "No phone number provided")
+    
+    # Athena range dates
+    athena_range = personal_data.get("athena-range-dates", [])
+    if athena_range:
+        start_date = athena_range[0]
+        end_date = athena_range[1]
+        travel_dates = f"from {start_date['day']}/{start_date['month']}/{start_date['year']} to {end_date['day']}/{end_date['month']}/{end_date['year']}"
+    else:
+        travel_dates = "No travel dates provided"
+    
+    # Extra comments
+    extra = personal_data.get("extra", {}).get("value", "No additional comments provided")
+    
+    # Travel expenses
+    travel_expenses = personal_data.get("Travel expenses", {}).get("value", "No travel expenses provided")
+    
+    # Travel preferences
+    travel_preferences = personal_data.get("travel_preferences", {}).get("value", [])
+    if travel_preferences:
+        travel_preferences_str = ", ".join(travel_preferences)
+    else:
+        travel_preferences_str = "No travel preferences provided"
+    
+    # Food preferences
+    food_preferences = personal_data.get("food_preferences", {}).get("value", [])
+    if food_preferences:
+        food_preferences_str = ", ".join(food_preferences)
+    else:
+        food_preferences_str = "No food preferences provided"
+    
+    # Build the improved discourse
+    discourse = (f"Greetings! My name is `{name}`, and I am excited to share that I will be participating in the upcoming event in Athens. "
+                 f"You can reach me at `{email}`, and my signature for official purposes is `{signature}`. "
+                 f"Though I typically prefer to communicate via email, my phone number is also available for immediate contact if needed: `{phone}`. "
+                 f"\n\nI am eagerly anticipating my trip to Athens, where I’ll be staying `{travel_dates}`. "
+                 f"This journey holds significant value to me, and I have a few preferences that I believe will ensure a seamless experience. "
+                 f"For instance, it would be greatly appreciated if a quiet room could be arranged during my stay. "
+                 f"\n\nIn terms of travel, my expenses amount to `{travel_expenses}`. I plan to travel via `{travel_preferences_str}`. "
+                 f"Finally, I would like to note that my food preferences are `{food_preferences_str}`.")
+    
+    return discourse
+
+
+def create_practical_discourse(practical_questions):
+    # Personal information
+    
+    # Go forward status
+    go_forward = practical_questions.get("go_forward", {}).get("value", "No decision provided")
+    
+    # Travel modes and departure location
+    travel_modes = practical_questions.get("Travel modes:", {}).get("value", [])
+    travel_modes_str = ", ".join(travel_modes) if travel_modes else "No travel modes provided"
+    
+    departure_location = practical_questions.get("departure_location", {}).get("value", "No departure location provided")
+    departure_coordinates = practical_questions.get("departure_location_coordinates", {}).get("value", "No coordinates provided")
+    
+    # Accommodation feedback
+    accommodation_feedback = practical_questions.get("accommodation_feedback", {}).get("value", "No feedback provided")
+    
+    # Financial support
+    financial_support = practical_questions.get("Financial support", {}).get("value", "No financial support requested")
+    financial_details = practical_questions.get("Financial details", {}).get("value", [])
+    financial_details_str = ", ".join(financial_details) if financial_details else "No specific details provided"
+    
+    # Building the compelling discourse
+    discourse = (f"I am thrilled to take the next step in addressing critical issues surrounding the social contract. "
+                 f"As part of this initiative, I will be departing from `{departure_location}` (coordinates: `{departure_coordinates}`) "
+                 f"and have arranged travel via `{travel_modes_str}` to ensure seamless participation."
+                 f"\n\nMy accommodation feedback, rated `{accommodation_feedback}` out of 5, reflects my commitment to optimizing the experience "
+                 f"and creating a comfortable environment for all. In line with this, I am requesting financial support for key areas such as `{financial_details_str}`, "
+                 f"which will enable me to fully focus on contributing to this essential dialogue."
+                 f"\n\nMoreover, I believe there is immense value in connecting with a plenary speaker, and I am eager to explore synergies "
+                 f"that could elevate the conversation to new heights.")
+
+    return discourse
+
+def create_discourse_with_scratches_and_questions(exercise_data):
+    # Scratches (reflections)
+    exercise_data = json.loads(exercise_data.to_json())
+    try:
+        # Extract user ID dynamically and parse the JSON string
+        user_id = next(iter(exercise_data))
+        inner_data = json.loads(exercise_data[user_id])
+    except (json.JSONDecodeError, TypeError, StopIteration) as e:
+        return f"Error decoding JSON or invalid input: {e}"
+    
+    # Scratches (reflections)
+    scratches = inner_data.get("scratches", {})
+    scratches_list = ", ".join(scratches.values()) if scratches else "No scratches provided"
+    
+    # Questions
+    questions = inner_data.get("questions", {})
+    questions_list = ", ".join(questions.values()) if questions else "No questions provided"
+    
+    # Problems and Solutions
+    problems = inner_data.get("problems", {}).get("value", "No problems provided")
+    solutions = inner_data.get("solutions", {}).get("value", "No solutions provided")
+    
+    # Plans
+    plan_b = inner_data.get("plan_b", {}).get("value", "No Plan B provided")
+    plan_omega = inner_data.get("plan_omega", {}).get("value", "No worst case scenario provided")
+    plan_a = inner_data.get("plan_a", {}).get("value", "No main plan provided")
+    
+    # Equalisers (potential outcomes)
+    equaliser_0 = inner_data.get("equaliser_0", {}).get("value", "No value provided")
+    equaliser_1 = inner_data.get("equaliser_1", {}).get("value", "No value provided")
+    equaliser_2 = inner_data.get("equaliser_2", {}).get("value", "No value provided")
+    equaliser_3 = inner_data.get("equaliser_3", {}).get("value", "No value provided")
+    equaliser_4 = inner_data.get("equaliser_4", {}).get("value", "No value provided")
+    equaliser_5 = inner_data.get("equaliser_5", {}).get("value", "No value provided")
+    
+    # Building the more compelling and structured discourse
+    discourse = (f"I am deeply committed to reimagining the social contract from the ground up. "
+                 f"My reflections—what I refer to as **scratches**—focus on key areas such as `{scratches_list}`. "
+                 f"These reflections serve as the foundation for exploring how we, as a collective, can build a more resilient and adaptive societal framework."
+                 f"\n\nTo foster meaningful interaction, I’ve posed several critical questions for reflection: `{questions_list}`. "
+                 f"These questions invite us to challenge the status quo and actively participate in shaping a future that embraces complexity and diversity."
+                 f"\n\nLooking ahead, some challenges that I foresee include: `{problems}`. "
+                 f"However, I firmly believe that solutions lie in `{solutions}`. "
+                 f"\n\nIn case of unforeseen setbacks, I have considered a Plan B: `{plan_b}`. "
+                 f"And for the worst-case scenario, Plan Ω would involve: `{plan_omega}`. "
+                 f"\n\nOur main strategy, Plan A, is: `{plan_a}`. "
+                 f"\n\nIn thinking about potential outcomes and our vision for the future, it’s crucial to consider several key areas: "
+                 f"first, `{equaliser_0}` for New Future Events, `{equaliser_1}` for New Grassroots & Participatory Policies, "
+                 f"`{equaliser_2}` for Pilot Projects, `{equaliser_3}` for Remote Collaborative Working Groups, "
+                 f"`{equaliser_4}` for the Observatory of Perceptions, and `{equaliser_5}` for Executive Actions.")
+    
+    return discourse
+
+def create_discourse_consent(consent_data):
+    consent_data = json.loads(consent_data.to_json())
+    try:
+        # Extract user ID dynamically and parse the JSON string
+        user_id = next(iter(consent_data))
+        inner_data = json.loads(consent_data[user_id])
+    except (json.JSONDecodeError, TypeError, StopIteration) as e:
+        return f"Error decoding JSON or invalid input: {e}"
+
+    name = consent_data.get("name", {}).get("value", "Anonymous")
+    willingness_value = float(consent_data.get("willingness", {}).get("value", 0))
+
+    # Create discourse based on willingness
+    discourse = (f"My willingness is `{willingness_value}` to relinquish some degree of personal freedom and participation in decision-making. "
+                 f"On the other hand, my willingness is `{1 - willingness_value}` to actively engage, develop, and contribute to living in a harmonious, integrated society."
+                 f"\n\nSigned, `{name}`")
+
+    return discourse
+
+    
 if __name__ == "__main__":
     
     intro()
@@ -260,8 +427,71 @@ if __name__ == "__main__":
     
     if st.session_state['authentication_status']:
         st.toast('Initialised authentication model')
-        authenticator.logout()
         st.write(f'`Your signature is {st.session_state["username"][0:4]}***{st.session_state["username"][-4:]}`')
+        
+        """
+        asd asd
+        """
+        st.button('fetch')
+        data = pd.DataFrame(fetch_data())
+        # st.write(data)
+        user_data = retrieve_user_by_signature(data, st.session_state["username"])
+        # If data is found, display it
+        """### Personal data"""
+        if user_data is not None:
+            st.write(f"--- User ID: {user_data['id'].values[0]} ---")
+            st.write(f"Updated at: {user_data['updated_at'].values[0]}")
+            
+            # Personal Details Section
+            personal_data = json.loads(user_data['personal_data'].values[0])
+            st.write("# Personal Details:")
+            if personal_data is not None:
+                st.markdown(create_discourse_personal(personal_data))
+            else:
+                st.write("No personal available. [Link to Personal Questionnaire]")
+            
+            # Practical Questions Section
+            st.write("# Practical Questions:")
+            practical_questions = user_data['practical_questions_01']
+            if practical_questions is not None:
+                st.markdown(create_practical_discourse(practical_questions))
+            else:
+                st.write("No practical questions available. [Link to Practical Questionnaire]")
+
+            # Philanthropy Section
+            st.write("# Philanthropy:")
+            philanthropy = user_data['philanthropy_01']
+            if philanthropy is not None:
+                st.json(philanthropy.to_json())
+            else:
+                st.write("No philanthropy data available. [Link to Philanthropy Questionnaire]")
+
+            # Exercise Section
+            st.write("# Exercise:")
+            exercise = user_data['exercise_01']
+            if exercise is not None:
+                st.markdown(create_discourse_with_scratches_and_questions(exercise))
+            else:
+                st.write("No exercise data available. [Link to Exercise Questionnaire]")
+
+            # Consent Section
+            st.write("# Consent:")
+            consent = user_data['consent_00']
+            if consent is not None:
+                st.markdown(create_discourse_consent(consent))
+            else:
+                st.write("No consent data available. [Link to Consent Form]")
+                            
+            
+        else:
+            st.write(f"No data found with signature: {st.session_state['username']}")
+            
+        st.divider()
+        """
+        # Aggregated data
+        """
+        st.write(data.columns)
+        authenticator.logout()
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
     elif st.session_state['authentication_status'] is None:

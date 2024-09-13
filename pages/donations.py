@@ -147,7 +147,7 @@ API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 
-@st.dialog("Join the whitelist")
+# @st.dialog("Join the whitelist")
 def join_waitlist():
     from email_validator import EmailNotValidError, validate_email
     st.markdown("**Welcome aboard**")
@@ -424,7 +424,7 @@ def checkout2():
     return total_amount
 
 
-@st.dialog("This is the development of a dialogue")
+# @st.dialog("This is the development of a dialogue")
 def sumup_widget(checkout_id):
 
         js_code = f"""

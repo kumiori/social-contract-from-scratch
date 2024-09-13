@@ -147,7 +147,7 @@ API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 
-@st.dialog("Join the whitelist")
+# @st.dialog("Join the whitelist")
 def join_waitlist():
     from email_validator import EmailNotValidError, validate_email
     st.markdown("**Welcome aboard**")
@@ -318,7 +318,7 @@ def checkout():
             st.error(f"An unexpected error occurred: {e}")
 
     """
-    As soon as our payments channels open, we will be able to share the timeline.
+    As soon as our payments channels open, we will be able to share our timeline.
     
     """
     # st.markdown("Click the expand button below to know more about the payment mechanics.")

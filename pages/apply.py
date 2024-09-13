@@ -168,7 +168,7 @@ API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 
-@st.dialog("Join the whitelist")
+# @st.dialog("Join the whitelist")
 def join_waitlist():
     from email_validator import EmailNotValidError, validate_email
     st.markdown("**Welcome aboard**")
@@ -375,7 +375,7 @@ def create_commit_checkout(reference, amount, description):
         st.warning(f'Error: {response.text}')
         return None
 
-@st.dialog("This is the development of a dialogue")
+# @st.dialog("This is the development of a dialogue")
 def sumup_widget(checkout_id):
         # st.markdown("""
         #     <script src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>

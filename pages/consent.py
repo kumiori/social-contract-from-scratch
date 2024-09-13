@@ -63,10 +63,31 @@ with open("assets/discourse.css", "r") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     st.write(f.read())
     
-with open('assets/credentials.yml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
-    now = datetime.now()
-    # st.markdown(f"`Now is {now.strftime('%s')}-{now.strftime('%f')}~` max is {st.session_state.range if st.session_state.range else ''}")
+# with open('assets/credentials.yml') as file:
+#     config = yaml.load(file, Loader=SafeLoader)
+#     now = datetime.now()
+#     # st.markdown(f"`Now is {now.strftime('%s')}-{now.strftime('%f')}~` max is {st.session_state.range if st.session_state.range else ''}")
+
+# st.write(config)
+
+config = {
+  "credentials": {
+    "webapp": "discourse-players",
+    "usernames": {
+    }
+  },
+  "cookie": {
+    "expiry_days": 30,
+    "expiry_minutes": 30,
+    "key": "discourse_panel_cookie",
+    "name": "discourse_panel_cookie"
+  },
+  "preauthorized": {
+    "emails": ""
+  }
+}
+
+now = datetime.now()
 
 survey = CustomStreamlitSurvey()
 
@@ -81,8 +102,8 @@ if 'donation' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = "Cover"
 
-if 'investment_input' not in st.session_state:
-    st.session_state.investment_input = 0
+if 'consents' not in st.session_state:
+    st.session_state.consents = 0
 
 if 'alerted' not in st.session_state:
     st.session_state.alerted = False
@@ -113,11 +134,11 @@ if 'price' not in st.session_state:
     st.session_state.price = .01
 
 authenticator = AuthenticateWithKey(
-    config['credentials'],
-    config['cookie']['name'],
-    config['cookie']['key'],
-    config['cookie']['expiry_days'],
-    config['preauthorized']
+    credentials=config['credentials'],
+    cookie_name=config['cookie']['name'],
+    cookie_key=config['cookie']['key'],
+    cookie_expiry_days=config['cookie']['expiry_days'],
+    pre_authorized=config['preauthorized'],
 )
 fields_connect = {'Form name':'Open with your access key', 'Email':'Email', 'Username':'Username',
             'Password':'Password', 'Repeat password':'Repeat password',
@@ -169,7 +190,7 @@ API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 
-@st.dialog("Join the whitelist")
+# @st.dialog("Join the whitelist")
 def join_waitlist():
     from email_validator import EmailNotValidError, validate_email
     st.markdown("**Welcome aboard**")
@@ -482,7 +503,7 @@ def checkout2():
     """
     return
 
-@st.dialog("This is the development of a dialogue")
+# @st.dialog("This is the development of a dialogue")
 def sumup_widget(checkout_id):
         # st.markdown("""
         #     <script src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
@@ -811,9 +832,10 @@ def intro():
 
     # Calculate the time delta
     time_delta = target_date - today
-        
+    
     with cols[0]:
-        ui.metric_card(title=".", content='0', description="Consents, so far.", key="card1")
+        plural = 's' if st.session_state["consents"] > 1 else ''
+        ui.metric_card(title=".", content=st.session_state["consents"], description=f"Consent{plural}, so far.", key="card1")
     with cols[1]:
         st.button('Dashboard', key='connect', disabled=True, use_container_width=True)
 
@@ -985,7 +1007,6 @@ By interacting, we question basic assumptions and actively engage in shaping con
     # df = pd.DataFrame(response)
     # st.table(df)
 
-
     def sum_data(A, B):
         summed_data = []
         for A_item in A:
@@ -1006,6 +1027,8 @@ By interacting, we question basic assumptions and actively engage in shaping con
         full_willingness = len([i for i in data if i["willingness"] == "1"])
         zero_willingness = len([i for i in data if i["willingness"] == "0"])
         conditional_willingness = len([i for i in data if 0 < float(i["willingness"]) < 1])
+        
+        st.session_state["consents"] = full_willingness
 
         return [
             {"id": "Full Willingness", "label": "Full Willingness", "value": full_willingness},
@@ -1016,6 +1039,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
     # Apply the function to the data
     state = map_willingness(response)
 
+    
     INITIAL_CONDITION = [
   {
     "id": "Full Willingness",
