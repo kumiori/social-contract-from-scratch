@@ -367,10 +367,9 @@ def checkout2(name=''):
     
     
     """
-    # REMOVE STEP
     if not bool(st.session_state['sumup']):
         st.warning('Authorise money, first.')
-    if st.button(f"{total_amount} _is the right number!_ Let's donate", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True, disabled=not bool(st.session_state['sumup'])):
+    if st.button(f"Validation:  {total_amount} _is the right number!_", type='primary', key="checkout", help="Record a trace on the ledger", use_container_width=True, disabled=not bool(st.session_state['sumup'])):
         with st.spinner("Creating record..."):
             reference = reference+f"-{int(now.strftime('%S'))}"
             time.sleep(1)
@@ -386,7 +385,7 @@ def checkout2(name=''):
     
     checkout = st.session_state['checkouts']
     if st.session_state['checkouts']:
-        if st.button(f"Debrief (double check)", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
+        if st.button(f"Debrief details (double check)", key=f"checkout_info_{checkout}", type='primary', use_container_width=True):
             col1, col2, col3 = st.columns([2, 3, 2])
             with col2:
                 with st.container():
@@ -411,7 +410,7 @@ def checkout2(name=''):
     return total_amount
 
 
-@st.dialog("This is a dialogue")
+# @st.dialog("This is a dialogue")
 def sumup_widget(checkout_id):
                             # showInstallments: true,
 
@@ -639,7 +638,7 @@ The  **Athena Collective** is Ariane Ahmadi, Nils Andersen, Bianca Apollonio, Al
 """
     st.markdown("## <center>Our Initiative at a Glance</center>", unsafe_allow_html=True)
 
-    event_2 = st_player("https://vimeo.com/1007606689", key='vimeo_player_2')
+    event_2 = st_player("https://vimeo.com/1007188309", key='vimeo_player_2')
     """
     ### Ready to support?
     """
@@ -652,7 +651,7 @@ The  **Athena Collective** is Ariane Ahmadi, Nils Andersen, Bianca Apollonio, Al
 
     _checkout = st.session_state['checkouts']
     if _checkout:
-        if st.button(f":material/rainy_snow: Am I Truly Happy to  Donate? :material/rainy_snow: ", type='primary', key=f"pay-{_checkout['id']}", help=f"Click to open a dialogue, {mask_string(_checkout['id'])} / {mask_string('')}", use_container_width=True):
+        if st.button(f":material/rainy_snow: I Am Happy to  Donate :material/rainy_snow: ", type='primary', key=f"pay-{_checkout['id']}", help=f"Click to open a dialogue, {mask_string(_checkout['id'])} / {mask_string('')}", use_container_width=True):
             sumup_widget(_checkout['id'])
             
     st.markdown(
