@@ -460,14 +460,20 @@ def donation():
         min_actual_value = 1
         max_actual_value = 100000-0.1
 
-        exp_value = survey.slider(label = "This is a Sensitive Slider",
-                                    id = "custom_donation_slider", 
-                                    min_value=float(min_exp_value), max_value=float(max_exp_value), value=float(min_exp_value),
-                                step = 0.01,
+        # exp_value = survey.slider(label = "This is a Sensitive Slider",
+        #                             id = "custom_donation_slider", 
+        #                             min_value=float(min_exp_value), max_value=float(max_exp_value), value=float(min_exp_value),
+        #                         step = 0.01,
+        #                         format="%d")
+        # # Convert exponential value to actual value
+        # actual_value = exp_to_actual(exp_value)+0.1
+
+        actual_value = survey.slider(label = "This is a Donation Slider",
+                                    id = "regular_donation_slider", 
+                                    min_value=1.1, max_value=10000, value=1.1,
+                                step = 0.1,
                                 format="%d")
 
-        # Convert exponential value to actual value
-        actual_value = exp_to_actual(exp_value)+0.1
 
         # Display the actual type: exp_value if actual value < 3000, otherwise -1
         donation_type = lambda x, t: int(x)+10 if t < 3000 else -1

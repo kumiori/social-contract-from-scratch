@@ -24,6 +24,7 @@ if st.secrets["runtime"]["STATUS"] == "Production":
 
 import json
 from datetime import datetime
+from streamlit_elements import elements, mui, nivo
 
 import streamlit_shadcn_ui as ui
 import yaml
@@ -414,6 +415,7 @@ def generate_review(results):
 def resumes_statements(results):
     # List to store the statements the user resonates with
     resonated_statements = []
+    dissonated_statements = []
     both_statements = []
     
     # Iterate through each result
@@ -423,9 +425,11 @@ def resumes_statements(results):
         # If the result is "0", the user resonated with the first statement
         if result["result"] == "0":
             resonated_statements.append(element_1[1]["statement"])
+            dissonated_statements.append(element_2[1]["statement"])
         # If the result is "1", the user resonated with the second statement
         elif result["result"] == "1":
             resonated_statements.append(element_2[1]["statement"])
+            dissonated_statements.append(element_1[1]["statement"])
         else:
             both_statements.append([element_1[1]["statement"], element_2[1]["statement"]])
             
@@ -481,7 +485,7 @@ if __name__ == "__main__":
         "self_improvement", "security", "public", "how_to_reg", "nature_people", "trending_up", "explore", 
         "school", "spa", "emoji_people", "thumb_up", "brush", "emoji_nature", "healing", "celebration", 
         "emoji_events", "done", "emoji_objects", "hourglass_top", "group_work", "fitness_center", 
-        "group_add", "psychology", "leaderboard", "equalizer", "how_to_vote", "scale", "self_care", 
+        "group_add", "psychology", "leaderboard", "equaliser", "how_to_vote", "scale", "self_care", 
         "wb_sunny", "volunteer_activism", "mood", "science", "auto_awesome", "track_changes", 
         "star", "security_update", "emoji_flags", "public", "favorite_border", "accessibility_new", 
         "recycling", "engineering", "local_activity", "local_see", "emoji_transportation", "gavel", 
@@ -587,10 +591,10 @@ Each of these worldviews provides unique insights into how humans relate to the 
 
 
 ### 1. **Mechanical**: 
-This view sees the universe and life as a machine, with components working together in predictable, mechanical ways. It emphasizes control, order, and predictability, with humans as parts of a larger "machine" governed by natural laws.
+This view sees the universe and life as a machine, with components working together in predictable, mechanical ways. It emphasises control, order, and predictability, with humans as parts of a larger "machine" governed by natural laws.
 
 ### 2. **Organic**: 
-The organic worldview sees life and the universe as a living, interconnected system, like a biological organism. It emphasizes harmony, interdependence, and growth, where all parts are intimately connected and affect each other.
+The organic worldview sees life and the universe as a living, interconnected system, like a biological organism. It emphasises harmony, interdependence, and growth, where all parts are intimately connected and affect each other.
 
 ### 3. **Dramatic**: 
 The third worldview is **dramatic or playful**. In this view, life is seen as a cosmic drama or play, where existence is an unfolding, dynamic performance rather than something rigid or predetermined. This perspective celebrates spontaneity, creativity, and the notion that life is to be experienced like a game or theatrical performance, rather than something to be controlled or merely survived.
@@ -600,7 +604,7 @@ The third worldview is **dramatic or playful**. In this view, life is seen as a 
 The **Shamanic worldview** is deeply rooted in **animism**, the belief that all living and non-living things—such as animals, plants, rivers, and even rocks—have a spirit or consciousness. This perspective, often found in indigenous Amazonian cultures, views the world as a complex, interconnected web of relationships between humans, nature, and spiritual forces.
 
 ### 5. **Ubuntu Worldview**
-In many African cultures, the **Ubuntu** philosophy represents a worldview that emphasizes **collective humanity**, interdependence, and shared responsibility. The phrase often associated with Ubuntu is: “**I am because we are**,” highlighting the deep connection between individuals and their communities.
+In many African cultures, the **Ubuntu** philosophy represents a worldview that emphasises **collective humanity**, interdependence, and shared responsibility. The phrase often associated with Ubuntu is: “**I am because we are**,” highlighting the deep connection between individuals and their communities.
 
 ### Summary of Five Worldviews:
 1. **Mechanical**: The world as a machine governed by laws, emphasising control and order.
@@ -621,8 +625,8 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
                 "The universe operates like a precise clockwork mechanism, following fixed, predictable laws.",
                 "Human progress is achieved through mastering and controlling nature via technology.",
                 "Success is measured by efficiency and productivity, with everything in its rightful place.",
-                "Order and predictability are essential for a stable society, and disruption is to be minimized.",
-                "The individual's role is to fit into pre-defined systems, optimizing their function within it."
+                "Order and predictability are essential for a stable society, and disruption is to be minimised.",
+                "The individual's role is to fit into pre-defined systems, optimising their function within it."
             ],
             "in_disaccord": [
                 "Life is spontaneous and cannot be reduced to predictable formulas or systems.",
@@ -770,6 +774,60 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     """
     # HERE GOES THE VISUALISATION
     """
+    # Number of statements
+    n_statements = 15
+    import random
+    # Generate random values for y (before normalization)
+    def generate_random_y():
+        return random.randint(-1, 1)
+
+    # List of statement IDs
+    statements = [f"Statement {i+1}" for i in range(n_statements)]
+
+    # Create the data structure
+    data = []
+    for statement_id in statements:
+        statement_data = {
+            "id": statement_id,
+            "data": []
+        }
+        for related_statement in statements:
+            statement_data["data"].append({
+                "x": related_statement,
+                "y": generate_random_y()
+            })
+        data.append(statement_data)
+
+    with elements("nivo_charts"):
+
+        with mui.Box(sx={"height": 600}):
+            nivo.HeatMap(
+                data=data,
+                # colors={'scheme': 'brown_blueGreen'},
+                valueFormat=">-.1s",
+                forceSquare=True,
+                xOuterPadding=1,
+                yOuterPadding=1,
+                # margin=[{ 'top': 10, 'right': 90, 'bottom': 10, 'left': 90 }],
+                colors={
+                    'type': 'diverging',
+                    'scheme': 'red_yellow_blue',
+                    'divergeAt': .5,
+                    'minValue': -1,
+                    'maxValue': 1
+                },
+                axisTop=[{
+                    'tickSize': 5,
+                    'tickPadding': 5,
+                    'tickRotation': -90,
+                    'legend': '',
+                    'legendOffset': 0,
+                    'truncateTickAt': 0
+                }],
+                axisLeft=[{None}],
+            )
+
+        
     with st.expander("Review your data", expanded=False):
         st.json(survey.data)
 
