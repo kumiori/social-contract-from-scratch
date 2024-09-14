@@ -470,7 +470,7 @@ def donation():
 
         actual_value = survey.slider(label = "This is a Donation Slider",
                                     id = "regular_donation_slider", 
-                                    min_value=1.1, max_value=10000, value=1.1,
+                                    min_value=1.1, max_value=10000., value=1.1,
                                 step = 0.1,
                                 format="%d")
 
