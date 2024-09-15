@@ -389,7 +389,7 @@ if __name__ == "__main__":
 
 
     with st.spinner('Good question...'):
-        time.sleep(.1)
+        time.sleep(5)
 
     text = """"""
     
