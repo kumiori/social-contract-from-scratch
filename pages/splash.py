@@ -471,7 +471,7 @@ How do we build one that works, and changes for *everyone*, across time?
 
 
 """]
-    _sleep= .1
+    _sleep= 5
     with frame:
         stream_once_then_write(abstract[0], stream_function=stream_function)
     with st.spinner('Thinking about it...'):
