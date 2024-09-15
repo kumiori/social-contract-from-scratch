@@ -388,7 +388,7 @@ if __name__ == "__main__":
     # name = survey.text_input("We may have already met", id="given-name")
 
 
-    with st.spinner('Good question...'):
+    with st.spinner('Think about it...'):
         time.sleep(5)
 
     text = """"""
