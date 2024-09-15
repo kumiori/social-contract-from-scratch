@@ -640,7 +640,7 @@ Our goal? To build a **Social Contract from Scratch**: an _understanding_ or an 
 — ranging from environmental crises to social inequality— and encourages participatory governance and collective decision-making.
 
 
-The  **Athena Collective** is Ariane Ahmadi, Nils Andersen, Bianca Apollonio, Alessandra Carosi, Gabrielle Dyson, flcalb, Giorgio Funaro, Hugues Genevois, Laurence White-Bouckaert, Claire Glanois, Amir Issaa, Andrés León Baldelli, Graziano Mazza, Roger Niyigena Karera, Francesco Raneri, Antonia Taddei, and Sophie Wahnich.
+The  **Athena Collective** is Ariane Ahmadi, Nils Andersen, Bianca Apollonio, Alessandra Carosi, Gabrielle Dyson, Francesca Lina Craparotta, Giorgio Funaro, Hugues Genevois, Laurence White-Bouckaert, Claire Glanois, Amir Issaa, Andrés León Baldelli, Graziano Mazza, Roger Niyigena Karera, Francesco Raneri, Antonia Taddei, and Sophie Wahnich.
 """
     st.markdown("## <center>Our Initiative at a Glance</center>", unsafe_allow_html=True)
 
