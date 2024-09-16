@@ -25,6 +25,7 @@ if st.secrets["runtime"]["STATUS"] == "Production":
 import json
 from datetime import datetime
 from streamlit_elements import elements, mui, nivo
+from streamlit_pills_multiselect import pills
 
 import streamlit_shadcn_ui as ui
 import yaml
@@ -32,8 +33,15 @@ from philoui.authentication_v2 import AuthenticateWithKey
 from philoui.io import QuestionnaireDatabase as IODatabase
 from philoui.io import conn
 from philoui.survey import CustomStreamlitSurvey
+from philoui.texts import stream_once_then_write
 from yaml import SafeLoader
 from streamlit_gtag import st_gtag
+
+from requests.exceptions import RequestException
+from sumup_oauthsession import OAuth2Session
+
+
+
 @st.dialog('Cast your preferences dashboard')
 def _form_submit():
     with st.spinner("Checking your signature..."):
@@ -167,6 +175,27 @@ ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
 
+def authorise_money():
+    base_url = "https://api.sumup.com/"
+    redirect_uri = "https://individual-choice.streamlit.app/"
+    
+    try:
+        sumup = OAuth2Session(
+            base_url=base_url,
+            client_id=st.secrets["sumup"]["CLIENT_ID"],
+            client_secret=st.secrets["sumup"]["CLIENT_SECRET"],
+            redirect_uri=redirect_uri,
+        )
+
+        st.toast('Authorisation granted! #' + '`' + mask_string(sumup.state) + '`')
+        st.session_state['sumup'] = sumup
+    except RequestException as e:
+        st.error(f"An error occurred during authorization: {e}")
+    except KeyError as e:
+        st.error(f"Missing configuration for {e}. Please check your secrets.")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+
 def my_create_dichotomy(key, id = None, kwargs = {}):
     dico_style = """<style>
     div[data-testid='stVerticalBlock']:has(div#dicho_inner):not(:has(div#dicho_outer)) {background-color: #F5F5DC};
@@ -286,9 +315,10 @@ def intro():
         st.markdown("#### Questions")
         ui.badges(badge_list=[("experimental", "secondary")], class_name="flex gap-2", key="viz_badges2")
         # ui.badges(badge_list=[("production", "outline")], class_name="flex gap-2", key="viz_badges3")
-        switch_value = ui.switch(default_checked=True, label="Economic mode", key="switch1")
-        # if switch_value:
-        st.toast(f"Economic mode is {switch_value}")
+        switch_value = ui.switch(default_checked=True, label="Economic impact", key="switch1")
+        if switch_value:
+            authorise_money()
+        st.toast(f"Economic impact is {'On' if switch_value else 'Off'}")
         whitelist = ui.button(text="Check the results", url="", key="link_btn")
         # if whitelist:
             # st.toast("Whitelist")
@@ -301,39 +331,6 @@ def intro():
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
 
     st.divider()
-
-def authenticate():
-    tab2, tab1, = st.tabs(["I am returning", "I am new"])
-    
-    with tab2:
-        if st.session_state['authentication_status'] is None:
-            authenticator.login('Connect', 'main', fields = fields_connect)
-            st.warning('Please use your access key')
-
-        else:
-            st.markdown(f"#### My access key is already forged, its signature is `{mask_string(st.session_state['username'])}`.")
-
-    with tab1:
-        if st.session_state['authentication_status'] is None:
-            """
-            We have a key in store, for you to proceed.
-            Click `Here • Now` after filling the captcha, to retrieve it. 
-            """
-            try:
-                match = True
-                success, access_key, response = authenticator.register_user(data = match, captcha=True, pre_authorization=False, fields = fields_forge)
-                if success:
-                    st.success('Key successfully forged')
-                    st.toast(f'Access key: {access_key}')
-                    st.session_state['username'] = access_key
-                    st.markdown(f"### Your access key is `{access_key}`. Now connect using the key and keep it safe! it will allow you to access the next steps.")
-            except Exception as e:
-                st.error(e)
-        else:
-            st.info('It seems that I am already connected')
-                # with col2:
-            authenticator.logout()
-
 
 def question():
     
@@ -375,7 +372,6 @@ def question():
         
     return dicho
 
-from streamlit_pills_multiselect import pills
 
 @st.cache_data
 def _reshuffle(values):
