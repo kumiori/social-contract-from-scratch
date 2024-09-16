@@ -116,6 +116,49 @@ if 'survey' not in st.session_state:
 if 'serialised_data' not in st.session_state:
     st.session_state.serialised_data = {}
 
+if 'intro_done' not in st.session_state:
+    st.session_state.intro_done = False
+
+
+@st.dialog('Cast your preferences dashboard')
+def _form_submit():
+    with st.spinner("Checking your signature..."):
+        signature = st.session_state["username"]
+        serialised_data = st.session_state['serialised_data']
+
+        if not serialised_data:
+            st.error("No data available. Please ensure data is correctly entered before proceeding.")
+        else:
+            preferences_exists = db.check_existence(signature)
+            st.write(f"Integrating preferences `{mask_string(signature)}`")
+            _response = "Yes!" if preferences_exists else "Not yet"
+            st.info(f"Some of your preferences exist...{_response}")
+
+            try:
+                data = {
+                    'signature': signature,
+                    'remote_05': json.dumps(serialised_data)
+                }
+                # throw an error if signature is null
+                if not signature:
+                    raise ValueError("Signature cannot be null or empty.")
+                
+                query = conn.table('discourse-data')                \
+                       .upsert(data, on_conflict=['signature'])     \
+                       .execute()
+                
+                if query:
+                    st.success("🎊 Preferences integrated successfully!")
+                    st.balloons()
+
+            except ValueError as ve:
+                st.error(f"Data error: {ve}")                
+            except Exception as e:
+                st.error("🫥 Sorry! Failed to update data.")
+                st.write(e)
+
+
+
 philanthropic_profiles = {
 'Communitarian': {
     'description': '## _**Doing good** makes sense for the community._ My contributions create ripple effects that strengthen social bonds and uplift all those around.',
@@ -389,123 +432,141 @@ if __name__ == "__main__":
     # event_2 = st_player("https://vimeo.com/1007606689", key='vimeo_player_2')
     # name = survey.text_input("We may have already met", id="given-name")
 
+    if st.session_state['intro_done'] is False:
+        with st.spinner('Think about it...'):
+            time.sleep(5)
 
-    with st.spinner('Think about it...'):
-        time.sleep(5)
+        text = """"""
+        
+        # stream_once_then_write(text)
 
-    text = """"""
-    
-    # stream_once_then_write(text)
+        frame = st.empty()
 
-    frame = st.empty()
-
-    abstract = ["""
-# **The Time _may be_ now**, _then_.
-
-
-To be _fair_, the **World Economic Forum** says it clearly$^1$: |
-_“The social contract that shaped the mid-20th century no longer works for the world we live in”_.
-
-### **But why _now_, in our times**? |
-
-**Inequality is rising**, natural resources are vanishing, and yet _we_ cling to outdated rules. Rules that incentivise **short-term gain over long-term sustainability**. Rules that allow the few to prosper, while the many are left to produce and consume.
-
-_But who is we_? |
+        abstract = ["""
+    # **The Time _may be_ now**, _then_.
 
 
-The **UN Secretary-General** warns:  
-_"We are a world in pieces, societies are fragmented, political discourse is polarized, and trust is lost within and among countries$^2$"_. 
+    To be _fair_, the **World Economic Forum** says it clearly$^1$: |
+    _“The social contract that shaped the mid-20th century no longer works for the world we live in”_.
+
+    ### **But why _now_, in our times**? |
+
+    **Inequality is rising**, natural resources are vanishing, and yet _we_ cling to outdated rules. Rules that incentivise **short-term gain over long-term sustainability**. Rules that allow the few to prosper, while the many are left to produce and consume.
+
+    _But who is we_? |
+
+
+    The **UN Secretary-General** warns:  
+    _"We are a world in pieces, societies are fragmented, political discourse is polarized, and trust is lost within and among countries$^2$"_. 
 
 
 
-### _"Inequality defines our time$^3$"_
-""",
-"""
-The **current financial system** is faltering. Experts speak of a new financial world order. **What does that even mean**?
-
-And more importantly—**are you part of it**?
-
-Some say the crises we face today _are connected_, part of a larger **“organic crisis”** rooted in a failing hegemonic order. **Is this true**? | 
-
-Good news? Nobody bathes in the same river twice.
-
-### **Have you been invited to the conversation**?
-
-### Or `are decisions about the future being made behind closed doors`?
-
-
-Your vision can help _all_ see through. **Who are** the architects of a new way forward? Who can reshape how **we govern**, how **we cooperate**, how **we play**, how **we love**, how **we eat**, and how **we trust**? The old systems are crumbling, and in their place, we craft something new. **Something collective.**
-
-""",
+    ### _"Inequality defines our time$^3$"_
+    """,
     """
-### **Is it time to re•think**?
+    The **current financial system** is faltering. Experts speak of a new financial world order. **What does that even mean**?
 
-Discussion is not about _tweaks_ to ```the system```. This is time for action. We are digging a **new social contract**—one that rebalances power, rethinks cooperation, and addresses the **fundamentals** of relationships, touching inequalities, and shared prosperity.
+    And more importantly—**are you part of it**?
 
-If you feel _that urgency_ to do more than *just watch* history unfold—then **join us**.
+    Some say the crises we face today _are connected_, part of a larger **“organic crisis”** rooted in a failing hegemonic order. **Is this true**? | 
 
+    Good news? Nobody bathes in the same river twice.
 
-"""
-    ]
+    ### **Have you been invited to the conversation**?
 
-    extra = ["""$^0$: This is a game, fill the blanks. https://social-contract-from-scratch.streamlit.app/game-1
-
-$^1$: https://www.weforum.org/agenda/2022/01/a-new-social-contract-for-21st-century/
-
-$^2$: From the General Debate, 72nd session, https://www.youtube.com/watch?v=t-oHFzwQAo0
-
-$^3$: https://www.un.org/sites/un2.un.org/files/sg_remarks_on_covid_and_inequality.pdf
+    ### Or `are decisions about the future being made behind closed doors`?
 
 
+    Your vision can help _all_ see through. **Who are** the architects of a new way forward? Who can reshape how **we govern**, how **we cooperate**, how **we play**, how **we love**, how **we eat**, and how **we trust**? The old systems are crumbling, and in their place, we craft something new. **Something collective.**
 
-**What is a social contract, anyway?**  
-How do we build one that works, and changes for *everyone*, across time?
+    """,
+        """
+    ### **Is it time to re•think**?
 
-**Your voice matters.**  
-**Be part of the conversation.**  
-**Help shape the future.**
+    Discussion is not about _tweaks_ to ```the system```. This is time for action. We are digging a **new social contract**—one that rebalances power, rethinks cooperation, and addresses the **fundamentals** of relationships, touching inequalities, and shared prosperity.
 
-- Are we truly ready for a **renewed relationship** among people?
-- Will **leaders’ summits** ensure a positive shift in human dynamics, or are they just more of the same?
-- How do we **close the loopholes** that fuel economic dependence and political decay?
-- Is the **international financial system** serving the welfare of the many—or the few?
-- Who shapes the **narratives and strategies** to handle the increasing complexity of our time?
+    If you feel _that urgency_ to do more than *just watch* history unfold—then **join us**.
 
 
-"""]
-    _sleep= 5
-    with frame:
-        stream_once_then_write(abstract[0], stream_function=stream_function)
-    with st.spinner('Thinking about it...'):
-        time.sleep(_sleep)
+    """
+        ]
 
+        extra = ["""$^0$: This is a game, fill the blanks. https://social-contract-from-scratch.streamlit.app/game-1
+
+    $^1$: https://www.weforum.org/agenda/2022/01/a-new-social-contract-for-21st-century/
+
+    $^2$: From the General Debate, 72nd session, https://www.youtube.com/watch?v=t-oHFzwQAo0
+
+    $^3$: https://www.un.org/sites/un2.un.org/files/sg_remarks_on_covid_and_inequality.pdf
+
+
+
+    **What is a social contract, anyway?**  
+    How do we build one that works, and changes for *everyone*, across time?
+
+    **Your voice matters.**  
+    **Be part of the conversation.**  
+    **Help shape the future.**
+
+    - Are we truly ready for a **renewed relationship** among people?
+    - Will **leaders' summits** ensure a positive shift in human dynamics, or are they just more of the same?
+    - How do we **close the loopholes** that fuel economic dependence and political decay?
+    - Is the **international financial system** serving the welfare of the many—or the few?
+    - Who shapes the **narratives and strategies** to handle the increasing complexity of our time?
+
+
+    """]
+        _sleep= 5
+        with frame:
+            stream_once_then_write(abstract[0], stream_function=stream_function)
+        with st.spinner('Thinking about it...'):
+            time.sleep(_sleep)
+
+        
+        frame.empty()
+
+        with frame:
+            stream_once_then_write(abstract[1], stream_function=stream_function)
+            # st.markdown(abstract[1])
+        with st.spinner('Think about it...'):
+            time.sleep(_sleep)
+
+        frame.empty()
+
+        with frame:
+            stream_once_then_write(abstract[2], stream_function=stream_function)        
+        with st.spinner('Do you feel it?'):
+            time.sleep(_sleep)
+        
+        frame.empty()
     
-    frame.empty()
-
-    with frame:
-        stream_once_then_write(abstract[1], stream_function=stream_function)
-        # st.markdown(abstract[1])
-    with st.spinner('Think about it...'):
-        time.sleep(_sleep)
-
-    frame.empty()
-
-    with frame:
-        stream_once_then_write(abstract[2], stream_function=stream_function)        
-    with st.spinner('Do you feel it?'):
-        time.sleep(_sleep)
+        st.session_state['intro_done'] = True
     
-    frame.empty()
+    
+    from philoui.texts import corrupt_string
     survey = CustomStreamlitSurvey()
-    survey.text_input("Ask us a question:", id="question")
-
-    st_lottie("https://lottie.host/91efca67-fa13-43db-8302-f5c182af8152/ufDyVWvWdR.json")
+    question = survey.text_input("Time to Question:", id="question")
+    if st.button("Submit this task", key="submit_question", type='primary', use_container_width=True):
+        st_lottie("https://lottie.host/91efca67-fa13-43db-8302-f5c182af8152/ufDyVWvWdR.json")
+        # time.sleep(1)
+        # st.write(corrupt_string(question, damage_parameter=0.1)[0])
+        st.write_stream(stream_function('Did we understand well?'))
+        st.write_stream(stream_function(corrupt_string(question, damage_parameter=0.1)[0]))
+        st.info("We are trying to gather insight from your question. Thank you for sharing.")
 
 
 ### **We will be in Athens** |
 
-    """Join us for a session where **you** are part of the conversation, shaping and reflecting, sharing and rethinking what governs our society. This is **new** collective building. |
+    """Join us for a session where **you** are part of the conversation, shaping and reflecting, sharing and rethinking what governs our society. 
+    This is **new** collective building experience is taking place during the **Europe in Discourse Conference IV** in Athens.
+
+### Will you be in town or you prefer  remote access?
+
+Whether you're in town or prefer to participate remotely, we've designed a seamless digital experience to ensure everyone can join the conversation. 
+
+From wherever you are, your voice matters.
 """
+# , and we invite you to contribute to this conversation, rethinking social structures and exploring radically new ideas./
     import random
     # """
     # # HERE GOES THE REVIEW
@@ -519,9 +580,9 @@ How do we build one that works, and changes for *everyone*, across time?
     # # HERE GOES THE VISUALISATION
     # """
     
-    stream_once_then_write("### Would you like remote access?", stream_function=stream_function)        
+    # stream_once_then_write("### Would you like remote access?", stream_function=stream_function)        
     
-    survey.text_input("Where are you connecting from?", id="location")
+    location = survey.text_input("Where are you connecting from?", id="location")
 
     cities = [
     {"name": "New York", "lat": 40.7128, "lng": -74.0060, "size": random.random()},
@@ -650,4 +711,29 @@ How do we build one that works, and changes for *everyone*, across time?
     if st.button(f"Clear all and restart",type='secondary', key=f"restart", use_container_width=True):
         st.session_state.clear()
         st.session_state['read_texts'] = set()
+        st.session_state['intro_done'] = False
         st.rerun()
+
+
+    authentifier()
+    
+    st.session_state['serialised_data'] = survey.data
+    """
+    The button below integrates the data into our database.
+    
+    """
+    
+    if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
+              disabled=not bool(st.session_state['authentication_status']), 
+              type='primary',
+              use_container_width=True,
+              on_click=lambda: _form_submit()):
+        """
+        Congratulations!
+
+Check back in a few days or reach out to us by email. 
+
+social.from.scratch@proton.me
+
+How you feel about the results?"""
+        
