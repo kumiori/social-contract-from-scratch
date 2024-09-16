@@ -392,6 +392,7 @@ if __name__ == "__main__":
         transaction_rows.append(row)
 
     df = pd.DataFrame(transaction_rows)
+    print(df)
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])
     df_successful = df[df['Status'] == 'SUCCESSFUL']
     df_failed = df[df['Status'] == 'FAILED']
@@ -491,6 +492,9 @@ if __name__ == "__main__":
         # Aggregated data
         """
         st.write(data.columns)
+        
+        st.write(data["updated_at"].to_json())
+        
         authenticator.logout()
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
