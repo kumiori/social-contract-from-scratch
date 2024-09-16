@@ -231,7 +231,7 @@ def stream_function(text):
         if last_char and last_char in sleep_lengths:
             time.sleep(sleep_lengths[last_char])
         else:
-            time.sleep(0.3)
+            time.sleep(0.4)
 
 
 
