@@ -434,7 +434,7 @@ Good news? Nobody bathes in the same river twice.
 ### Or `are decisions about the future being made behind closed doors`?
 
 
-Your vision can help _all_ see through. **Who are** the architects of a new way forward? Who can reshape how **we govern**, how **we cooperate**, how **we play**, how **we love**, how **we cook**, and how **we trust**? The old systems are crumbling, and in their place, we craft something new. **Something collective.**
+Your vision can help _all_ see through. **Who are** the architects of a new way forward? Who can reshape how **we govern**, how **we cooperate**, how **we play**, how **we love**, how **we eat**, and how **we trust**? The old systems are crumbling, and in their place, we craft something new. **Something collective.**
 
 """,
     """
