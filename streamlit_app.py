@@ -405,6 +405,133 @@ def authentifier():
                 # with col2:
             authenticator.logout()
 
+def next_step():
+
+    location = survey.text_input("Where are you connecting from?", id="location")
+
+    cities = [
+    {"name": "New York", "lat": 40.7128, "lng": -74.0060, "size": random.random()},
+    {"name": "London", "lat": 51.5099, "lng": -0.1180, "size": random.random()},
+    {"name": "Paris", "lat": 48.8566, "lng": 2.3522, "size": random.random()},
+]    
+    cities = [
+    {"name": "New York", "lat": 40.7128, "lng": -74.0060,
+        "maxR": random.random()*20+3,
+        "propagationSpeed": (random.random()-.5)*20+1,
+        "repeatPeriod": random.random() * 2000 + 200,
+        "size": random.random()},
+    {"name": "London",
+        "lat": 51.5099,
+        "lng": -0.1180,
+        "maxR": random.random()*20+3,
+        "propagationSpeed": (random.random()-.5)*20+1,
+        "repeatPeriod": random.random() * 2000 + 200,
+        "size": random.random()},
+    {"name": "Paris",
+        "lat": 48.8566,
+        "lng": 2.3522,
+        "maxR": random.random()*20+3,
+        "propagationSpeed": (random.random()-.5)*20+1,
+        "repeatPeriod": random.random() * 2000 + 200, "size": random.random()},
+]
+    # Generate JavaScript code with city data
+    javascript_code = f"""
+    // Gen city data
+    const cityData = { cities };
+    const N = 10;
+
+    console.log(cityData);
+
+    const map = Globe()
+    (document.getElementById('globeViz'))
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+    .pointsData(cityData)
+    .backgroundColor('rgb(255, 255, 255)')
+    .pointAltitude('size')
+
+    // Add auto-rotation
+    map.controls().autoRotate = true;
+    map.controls().autoRotateSpeed = 1.6;
+    """
+
+    javascript_code = f"""
+    import * as THREE from '//unpkg.com/three/build/three.module.js';
+    const VELOCITY = 2; // minutes per frame
+
+    const sunPosAt = dt => {{
+      const day = new Date(+dt).setUTCHours(0, 0, 0, 0);
+      const t = solar.century(dt);
+      const longitude = (day - dt) / 864e5 * 360 - 180;
+      return [longitude - solar.equationOfTime(t) / 4, solar.declination(t)];
+    }};
+
+    let dt = +new Date();
+    const solarTile = {{ pos: sunPosAt(dt) }};
+    const timeEl = document.getElementById('time');
+
+
+    // Gen city data
+    const cityData = { cities };
+    const N = 10;
+
+    console.log(cityData);
+
+    const map = Globe()
+    (document.getElementById('globeViz'))
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+    .ringsData(cityData)
+    .ringMaxRadius('maxR')
+    .ringPropagationSpeed('propagationSpeed')
+    .ringRepeatPeriod('repeatPeriod')
+    .backgroundColor('rgb(255, 255, 255)')
+      .tilesData([solarTile])
+      .tileLng(d => d.pos[0])
+      .tileLat(d => d.pos[1])
+      .tileAltitude(0.01)
+      .tileWidth(180)
+      .tileHeight(180)
+    .tileMaterial(() => new THREE.MeshLambertMaterial({{ color: '#ffff00', opacity: 0.3, transparent: true }}))
+      .tilesTransitionDuration(0);
+
+    // animate time of day
+    requestAnimationFrame(() =>
+      (function animate() {{
+        dt += VELOCITY * 60 * 1000;
+        solarTile.pos = sunPosAt(dt);
+        map.tilesData([solarTile]);
+        timeEl.textContent = new Date(dt).toLocaleString();
+        requestAnimationFrame(animate);
+      }})()
+    );
+
+    // Add auto-rotation
+    map.controls().autoRotate = true;
+    map.controls().autoRotateSpeed = 4.6;
+    """
+
+    # HTML code with embedded JavaScript
+    html_code = f"""
+    <head>
+    <style> body {{ margin: 0em; }} </style>
+    <script src="//unpkg.com/globe.gl"></script>
+    <script src="//unpkg.com/three"></script>
+    <script src="//unpkg.com/solar-calculator"></script>
+    </head>
+
+    <body>
+    <div id="globeViz"></div>
+    <div id="time"></div>
+    
+    <script type="module">
+        { javascript_code }
+    </script>
+    </body>
+    """
+    col1, col2 = st.columns(2)
+    with col1:
+        st.components.v1.html(html_code, height=700, width=700)
+
+
 def question():
     
     name = 'there'
@@ -582,131 +709,7 @@ From wherever you are, your voice matters.
     
     # stream_once_then_write("### Would you like remote access?", stream_function=stream_function)        
     
-    location = survey.text_input("Where are you connecting from?", id="location")
-
-    cities = [
-    {"name": "New York", "lat": 40.7128, "lng": -74.0060, "size": random.random()},
-    {"name": "London", "lat": 51.5099, "lng": -0.1180, "size": random.random()},
-    {"name": "Paris", "lat": 48.8566, "lng": 2.3522, "size": random.random()},
-]    
-    cities = [
-    {"name": "New York", "lat": 40.7128, "lng": -74.0060,
-        "maxR": random.random()*20+3,
-        "propagationSpeed": (random.random()-.5)*20+1,
-        "repeatPeriod": random.random() * 2000 + 200,
-        "size": random.random()},
-    {"name": "London",
-        "lat": 51.5099,
-        "lng": -0.1180,
-        "maxR": random.random()*20+3,
-        "propagationSpeed": (random.random()-.5)*20+1,
-        "repeatPeriod": random.random() * 2000 + 200,
-        "size": random.random()},
-    {"name": "Paris",
-        "lat": 48.8566,
-        "lng": 2.3522,
-        "maxR": random.random()*20+3,
-        "propagationSpeed": (random.random()-.5)*20+1,
-        "repeatPeriod": random.random() * 2000 + 200, "size": random.random()},
-]
-    # Generate JavaScript code with city data
-    javascript_code = f"""
-    // Gen city data
-    const cityData = { cities };
-    const N = 10;
-
-    console.log(cityData);
-
-    const map = Globe()
-    (document.getElementById('globeViz'))
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-    .pointsData(cityData)
-    .backgroundColor('rgb(255, 255, 255)')
-    .pointAltitude('size')
-
-    // Add auto-rotation
-    map.controls().autoRotate = true;
-    map.controls().autoRotateSpeed = 1.6;
-    """
-
-    javascript_code = f"""
-    import * as THREE from '//unpkg.com/three/build/three.module.js';
-    const VELOCITY = 2; // minutes per frame
-
-    const sunPosAt = dt => {{
-      const day = new Date(+dt).setUTCHours(0, 0, 0, 0);
-      const t = solar.century(dt);
-      const longitude = (day - dt) / 864e5 * 360 - 180;
-      return [longitude - solar.equationOfTime(t) / 4, solar.declination(t)];
-    }};
-
-    let dt = +new Date();
-    const solarTile = {{ pos: sunPosAt(dt) }};
-    const timeEl = document.getElementById('time');
-
-
-    // Gen city data
-    const cityData = { cities };
-    const N = 10;
-
-    console.log(cityData);
-
-    const map = Globe()
-    (document.getElementById('globeViz'))
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-    .ringsData(cityData)
-    .ringMaxRadius('maxR')
-    .ringPropagationSpeed('propagationSpeed')
-    .ringRepeatPeriod('repeatPeriod')
-    .backgroundColor('rgb(255, 255, 255)')
-      .tilesData([solarTile])
-      .tileLng(d => d.pos[0])
-      .tileLat(d => d.pos[1])
-      .tileAltitude(0.01)
-      .tileWidth(180)
-      .tileHeight(180)
-    .tileMaterial(() => new THREE.MeshLambertMaterial({{ color: '#ffff00', opacity: 0.3, transparent: true }}))
-      .tilesTransitionDuration(0);
-
-    // animate time of day
-    requestAnimationFrame(() =>
-      (function animate() {{
-        dt += VELOCITY * 60 * 1000;
-        solarTile.pos = sunPosAt(dt);
-        map.tilesData([solarTile]);
-        timeEl.textContent = new Date(dt).toLocaleString();
-        requestAnimationFrame(animate);
-      }})()
-    );
-
-    // Add auto-rotation
-    map.controls().autoRotate = true;
-    map.controls().autoRotateSpeed = 4.6;
-    """
-
-    # HTML code with embedded JavaScript
-    html_code = f"""
-    <head>
-    <style> body {{ margin: 0em; }} </style>
-    <script src="//unpkg.com/globe.gl"></script>
-    <script src="//unpkg.com/three"></script>
-    <script src="//unpkg.com/solar-calculator"></script>
-    </head>
-
-    <body>
-    <div id="globeViz"></div>
-    <div id="time"></div>
-    
-    <script type="module">
-        { javascript_code }
-    </script>
-    </body>
-    """
-
     # Display the HTML code in Streamlit app
-    col1, col2 = st.columns(2)
-    with col1:
-        st.components.v1.html(html_code, height=700, width=700)
         
     if st.button(f"Clear all and restart",type='secondary', key=f"restart", use_container_width=True):
         st.session_state.clear()
@@ -714,7 +717,10 @@ From wherever you are, your voice matters.
         st.session_state['intro_done'] = False
         st.rerun()
 
-
+    """
+    
+    # SAVE HERE
+    """
     authentifier()
     
     st.session_state['serialised_data'] = survey.data
