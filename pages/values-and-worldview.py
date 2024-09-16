@@ -26,6 +26,7 @@ import json
 from datetime import datetime
 from streamlit_elements import elements, mui, nivo
 from streamlit_pills_multiselect import pills
+import random
 
 import streamlit_shadcn_ui as ui
 import yaml
@@ -560,11 +561,10 @@ if __name__ == "__main__":
     
     # num_values = st.slider("Select the number of neutral values to display", 1, len(values), 5)
 
-    import random
     # Example usage in a Streamlit app:
     
     selected_value = pills("Select values", values, icons, multiselect=True, clearable=True, index=None)
-    
+    print(pills)
     # selected_value = pills("Select values", 
     #                        random.sample(values, num_values), 
     #                        random.sample(icons, num_values), 
@@ -574,7 +574,7 @@ if __name__ == "__main__":
     # st.text_input("Add a new value", key='new_value_input')
     # st.button("Add a new value", on_click=add_new_value)
 
-    # values = st.multiselect("Select values:", ["Equality", "Freedom", "Justice", "Compassion", "Sustainability", "Innovation"])
+    # selected_value = st.multiselect("Select values:", values)
     # st.write(f"Your chosen values: {values}")
 
     """
