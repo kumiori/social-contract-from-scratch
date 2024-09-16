@@ -448,7 +448,7 @@ if __name__ == "__main__":
     
     st.markdown("Our worldview shapes the very core of our beliefs, actions, and how we interact with others. "
                 "By XXX these values, we build the foundation for any social contract.")
-    authenticate()
+    # authenticate()
     st.markdown("### Context")
     st.markdown("From philosophical, social, and economic perspectives, our worldview creates boundaries and possibilities.")
     st.markdown("### Question")
