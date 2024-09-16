@@ -44,6 +44,8 @@ from streamlit_timeline import timeline
 from yaml import SafeLoader
 from streamlit_player import st_player
 from streamlit_gtag import st_gtag
+import gettext
+import locale
 
 from philoui.texts import stream_text
 
@@ -432,7 +434,7 @@ Good news? Nobody bathes in the same river twice.
 ### Or `are decisions about the future being made behind closed doors`?
 
 
-Your vision can help _all_ see through. **Who are** the architects of a new way forward? Who can reshape how **we govern**, how **we cooperate**, and how **we trust**? The old systems are crumbling, and in their place, we craft something new. **Something collective.**
+Your vision can help _all_ see through. **Who are** the architects of a new way forward? Who can reshape how **we govern**, how **we cooperate**, how **we play**, how **we love**, how **we cook**, and how **we trust**? The old systems are crumbling, and in their place, we craft something new. **Something collective.**
 
 """,
     """
