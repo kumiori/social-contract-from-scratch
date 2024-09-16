@@ -743,7 +743,7 @@ def create_scatter_plot(color='rgba(30, 144, 255, {})'):
     return fig
 
 def outro():
-    st.markdown("## <center> Step X: _Chapter One_</center>", unsafe_allow_html=True)
+    st.markdown("## <center> Step 0: _Chapter One_</center>", unsafe_allow_html=True)
     formatted_text, name, ext = dataset_to_outro(survey.data)
     st.markdown(formatted_text)
     
@@ -1098,43 +1098,43 @@ By interacting, we question basic assumptions and actively engage in shaping con
                 ]
             )
 
-    f"""
-    Based on the partial data from the survey, we can make a few key observations and offer some initial reflections:
+    # f"""
+    # Based on the partial data from the survey, we can make a few key observations and offer some initial reflections:
 
-    ### Preliminary Analysis (last updated, a while ago):
+    # ### Preliminary Analysis (last updated, a while ago):
 
-    1. **Strong preference for preserving freedom**: 
-    The most striking takeaway is that **19 out of the 29 participants** (roughly **65%**) have shown **zero willingness** to give up any personal freedoms. This indicates a significant collective inclination towards the preservation of individual liberties. It suggests that participants place high value on personal autonomy and may have deep concerns about relinquishing their freedoms, even in exchange for protection or stability.
+    # 1. **Strong preference for preserving freedom**: 
+    # The most striking takeaway is that **19 out of the 29 participants** (roughly **65%**) have shown **zero willingness** to give up any personal freedoms. This indicates a significant collective inclination towards the preservation of individual liberties. It suggests that participants place high value on personal autonomy and may have deep concerns about relinquishing their freedoms, even in exchange for protection or stability.
 
-    2. **Conditional willingness for compromise**:
-    While the majority prefer not to give up any freedoms, we also see a notable minority — **10 individuals** (about **35%**) — who express **conditional willingness**. This group may be more open to compromise but under specific conditions. It suggests that they might entertain the idea of sacrificing certain freedoms if they perceive the offered stability or protection as sufficiently beneficial or necessary.
+    # 2. **Conditional willingness for compromise**:
+    # While the majority prefer not to give up any freedoms, we also see a notable minority — **10 individuals** (about **35%**) — who express **conditional willingness**. This group may be more open to compromise but under specific conditions. It suggests that they might entertain the idea of sacrificing certain freedoms if they perceive the offered stability or protection as sufficiently beneficial or necessary.
 
-    3. **Complete rejection of full willingness**:
-    **None** of the participants (0%) have shown **full willingness** to give up their freedoms entirely. This unanimous refusal to completely surrender personal liberties could reflect a broader skepticism or distrust in authority or systems that demand total submission in exchange for security.
+    # 3. **Complete rejection of full willingness**:
+    # **None** of the participants (0%) have shown **full willingness** to give up their freedoms entirely. This unanimous refusal to completely surrender personal liberties could reflect a broader skepticism or distrust in authority or systems that demand total submission in exchange for security.
 
-    ### Any insights to share?
+    # ### Any insights to share?
 
-    - **Cautious approach to authority**: 
-    The overwhelming number of participants unwilling to give up any freedom, combined with the lack of full willingness, suggests a collective wariness towards systems or contracts that require giving up personal liberties. This could imply a broader concern about the concentration of power or authority, and an aversion to hierarchical systems where individuals lose agency.
+    # - **Cautious approach to authority**: 
+    # The overwhelming number of participants unwilling to give up any freedom, combined with the lack of full willingness, suggests a collective wariness towards systems or contracts that require giving up personal liberties. This could imply a broader concern about the concentration of power or authority, and an aversion to hierarchical systems where individuals lose agency.
 
-    - **Nuanced willingness to compromise**: 
-    The presence of a group expressing **conditional willingness** hints at a more nuanced view. These individuals may be open to negotiation or compromise if the right conditions are met. It points to a potential avenue for dialogue, where the specific circumstances that would justify relinquishing freedoms can be explored.
+    # - **Nuanced willingness to compromise**: 
+    # The presence of a group expressing **conditional willingness** hints at a more nuanced view. These individuals may be open to negotiation or compromise if the right conditions are met. It points to a potential avenue for dialogue, where the specific circumstances that would justify relinquishing freedoms can be explored.
 
-    - **Challenges ahead for consensus**: 
-    Given that no one is fully willing to give up their freedoms, and a majority are entirely against the idea, reaching consensus on a **social contract** that involves any sacrifice of liberties might prove challenging. However, the conditional willingness group could offer a middle ground, suggesting that dialogue and clear, well-defined terms could sway some participants.
+    # - **Challenges ahead for consensus**: 
+    # Given that no one is fully willing to give up their freedoms, and a majority are entirely against the idea, reaching consensus on a **social contract** that involves any sacrifice of liberties might prove challenging. However, the conditional willingness group could offer a middle ground, suggesting that dialogue and clear, well-defined terms could sway some participants.
 
-    ### Comment
-    "The preliminary results from the survey highlight a strong collective inclination to preserve individual freedoms, with 65% of participants expressing zero willingness to give up any personal liberties. While 35% are conditionally open to compromise, none of the respondents are fully willing to surrender their freedoms. This suggests that while there is some room for negotiation, any proposal to restrict freedoms in exchange for protection or stability would likely face significant resistance, especially without clear guarantees or carefully defined conditions. As we move forward, engaging with the conditional group could help identify the terms under which compromise is possible, while further exploring the concerns of those firmly against giving up freedoms."
+    # ### Comment
+    # "The preliminary results from the survey highlight a strong collective inclination to preserve individual freedoms, with 65% of participants expressing zero willingness to give up any personal liberties. While 35% are conditionally open to compromise, none of the respondents are fully willing to surrender their freedoms. This suggests that while there is some room for negotiation, any proposal to restrict freedoms in exchange for protection or stability would likely face significant resistance, especially without clear guarantees or carefully defined conditions. As we move forward, engaging with the conditional group could help identify the terms under which compromise is possible, while further exploring the concerns of those firmly against giving up freedoms."
 
-    Are these key findings? Highlighting both the resistance and the potential pathways for further discussion...
+    # Are these key findings? Highlighting both the resistance and the potential pathways for further discussion...
 
-    """
-    """
-    # Integrate your preferences and expand our picture
+    # """
+    # """
+    # # Integrate your preferences and expand our picture
     
-    If yes, you can review the data you've contributed before proceeding.
+    # If yes, you can review the data you've contributed before proceeding.
     
-    """
+    # """
     
     with st.expander("Review your data", expanded=False):
         st.json(survey.data)
