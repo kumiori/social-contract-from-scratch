@@ -717,29 +717,33 @@ From wherever you are, your voice matters.
         st.session_state['intro_done'] = False
         st.rerun()
 
-    """
-    
-    # SAVE HERE
-    """
-    authentifier()
-    
-    st.session_state['serialised_data'] = survey.data
-    """
-    The button below integrates the data into our database.
+    text = """
+    ### Save this page in your bookmarks. Check here again the in a few days. We will have more for you.
     
     """
     
-    if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
-              disabled=not bool(st.session_state['authentication_status']), 
-              type='primary',
-              use_container_width=True,
-              on_click=lambda: _form_submit()):
-        """
-        Congratulations!
+    st.write_stream(stream_function(text))
+    
+    
+#     authentifier()
+    
+#     st.session_state['serialised_data'] = survey.data
+#     """
+#     The button below integrates the data into our database.
+    
+#     """
+    
+#     if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
+#               disabled=not bool(st.session_state['authentication_status']), 
+#               type='primary',
+#               use_container_width=True,
+#               on_click=lambda: _form_submit()):
+#         """
+#         Congratulations!
 
-Check back in a few days or reach out to us by email. 
+# Check back in a few days or reach out to us by email. 
 
-social.from.scratch@proton.me
+# social.from.scratch@proton.me
 
-How you feel about the results?"""
+# How you feel about the results?"""
         
