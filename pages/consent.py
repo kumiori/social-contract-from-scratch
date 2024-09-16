@@ -761,29 +761,13 @@ def outro():
             """
             Congrats! 
             
-            Thank you for your interest. We will get back to you by email.
+            Thank you for your interest. Save this page in your bookmarks, and check again in a few days.
         
             """
 """
-_In the meantime_:"""
-"""
-Here is a snapshot of current activities and developments. Any insight to share?
-"""
-# This includes updates on ongoing projects, conceptual ideas in the pipeline, and longer-term ventures that are now yielding positive results. 
-"""
-	1. Health Systems and their pervasive collapse under sectarian influences.
-	2. Monetisation: Pressing cyanotypes from experimental human campaigns, 
-            economic photography and scientific reflection.
-	3. Scientific Projects: Energy transitions, jumps, and the stability of 
-            the cryosphere, did we understand evolution?
-	4. Philosophical Dinners: Gastronomic events where ideas are served as meals, 
-            connecting within experience.
-    5. Artistic Endeavours: all the Arts, with a focus on music, the natural world, 
-            ceramics, and illustration.
-    6. Literature: Communication within the Urban Jungle | the vertical scheme. 
-""")
+_In the meantime_:""")
     with st.spinner("Thinking?"):
-        time.sleep(1)
+        time.sleep(3)
     col1, col2, col3 = st.columns([1, 9, 1])
     with col2:
         text = """
@@ -802,7 +786,7 @@ Here is a snapshot of current activities and developments. Any insight to share?
             # with col2:
                 # authenticator.logout()
         st.markdown("""
-        `No need to "Submit", your dashboard is saved.`
+        `Your dashboard is saved.`
         """)
 
 
@@ -1192,6 +1176,7 @@ social.from.scratch@proton.me
 
 How you feel about the results?"""
         
+    st.markdown(f"#### Sign #`{mask_string(st.session_state['username'])}`.")
     
     st.divider()
     
