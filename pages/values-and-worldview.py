@@ -453,9 +453,13 @@ if __name__ == "__main__":
     st.markdown("### Context")
     st.markdown("From philosophical, social, and economic perspectives, our worldview creates boundaries and possibilities.")
     st.markdown("### Question")
-    st.write("Which core values guide the construction of a new social contract?")
+    st.write("""
+             Which values do you embody?
+Which values do you see reflected in yourself, and which ones guide your everyday actions?
+             
+             These are core values that guide the construction of a new social contract.""")
     
-        
+        # in quali valori ti identifichi e quali valori poni a guida del tuo agire quotidiano
     values = [
         "Equality", "Freedom", "Justice", "Compassion", "Sustainability", "Innovation", "Collaboration", 
         "Responsibility", "Resilience", "Integrity", "Diversity", "Transparency", "Empathy", 
