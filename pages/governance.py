@@ -23,6 +23,8 @@ if st.secrets["runtime"]["STATUS"] == "Production":
     """,
         unsafe_allow_html=True,
     )
+import os
+import gettext
 
 import json
 from datetime import datetime
@@ -165,6 +167,25 @@ ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
 
+
+# Set the path to your custom directory for translations
+localedir = os.path.join(os.path.dirname(__file__), "../locales")
+# st.write(localedir)
+# Initialize translation based on the selected language
+def setup_translation(language):
+    try:
+        t = gettext.translation('scfs-i18n', localedir=localedir, languages=[language], fallback=True)
+    except FileNotFoundError:
+        t = gettext.translation('scfs-i18n', localedir=localedir, fallback=True)
+    t.install()
+    return t.gettext
+
+# Select language
+language = st.selectbox("Select Language", ["en", "fr", "es"])
+
+# Set up translations
+_ = setup_translation(language)
+
 def my_create_dichotomy(key, id = None, kwargs = {}):
     dico_style = """<style>
     div[data-testid='stVerticalBlock']:has(div#dicho_inner):not(:has(div#dicho_outer)) {background-color: #F5F5DC};
@@ -271,7 +292,10 @@ def intro():
 
     # Calculate the time delta
     time_delta = target_date - today
-        
+
+    st.title(_("Collaboration test"))
+    st.button(_("Click here to proceed"))
+
     with cols[0]:
         ui.metric_card(title=".", content='0', description="Consents, so far.", key="card1")
     with cols[1]:
@@ -293,8 +317,7 @@ def intro():
             # join_waitlist()
 
     st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
-
-    st.markdown("## <center>A meeting of Social and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
+    st.markdown(f"## <center>_{_("Welcome to Our App")}_</center>", unsafe_allow_html=True)
 
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
 
