@@ -369,7 +369,7 @@ def question():
         # Pick two new random statements for the next round
         st.session_state.current_element = random.sample(list(statement_dict.items()), 2)
 
-    st.button("Submit", use_container_width=True, on_click=update_state, args=(dicho,))
+    st.button("Submit", use_container_width=True, on_click=update_state, args=(dicho,), type="primary")
         
     return dicho
 

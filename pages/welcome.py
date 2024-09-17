@@ -59,7 +59,11 @@ if 'alerted' not in st.session_state:
     st.session_state.alerted = False
 
 db = IODatabase(conn, "discourse-data")
+
+
 data = db.fetch_data()
+
+
 df = pd.DataFrame(data)
 item_count = len(df)
 
@@ -119,109 +123,6 @@ Joining the whitelist is our way of creating a supportive environment where indi
             _whitelist_submit(email, name)
     # st.write("We are working on the whitelist feature. Please check back later.") 
     
-    
-def blurscape():
-    with open("assets/effects.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
-    # Embed custom HTML, CSS, and JavaScript using st.markdown
-    st.markdown("""
-        <div class="card">
-            <svg 
-                viewBox="0 0 100% 100%"
-                xmlns='http://www.w3.org/2000/svg'
-                class="noise"
-                >
-            <filter id='noiseFilter'>
-                <feTurbulence 
-                            type='fractalNoise' 
-                            baseFrequency='0.85' 
-                            numOctaves='6' 
-                            stitchTiles='stitch' />
-            </filter>
-            <rect
-                    width='100%'
-                    height='100%'
-                    preserveAspectRatio="xMidYMid meet"
-                    filter='url(#noiseFilter)' />
-            </svg>
-            <div class="content">
-            <center><h1>Tr∀*st Game</h1></center>
-            <center><h2>The Gradient</h2></center>
-            <center><h3>to the Steepest Descent</h3></center>
-            <br />
-            <p>Can we play experimental game designed to explore trust dynamics between humans and financial institutions?</p>
-            <p>We explore questions of trust, trustworthiness, and cooperation in social interactions.</p>
-            <h3><a href="">Play to Game</a></h3>
-            <h3><a href="">Pay to Play</a></h3>
-            <h3><a href="">Wait to See</a></h3>
-            </div>
-        </div>
-        <div class="gradient-bg">
-            <svg 
-                viewBox="0 0 100vw 100vw"
-                xmlns='http://www.w3.org/2000/svg'
-                class="noiseBg"
-                >
-            <filter id='noiseFilterBg'>
-                <feTurbulence 
-                            type='fractalNoise'
-                            baseFrequency='0.6'
-                            stitchTiles='stitch' />
-            </filter>
-            <rect
-                    width='100%'
-                    height='100%'
-                    preserveAspectRatio="xMidYMid meet"
-                    filter='url(#noiseFilterBg)' 
-            />
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" class="svgBlur">
-            <defs>
-                <filter id="goo">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-                <feBlend in="SourceGraphic" in2="goo" />
-                </filter>
-            </defs>
-            </svg>
-            <div class="gradients-container">
-            <div class="g1"></div>
-            <div class="g2"></div>
-            <div class="g3"></div>
-            <div class="g4"></div>
-            <div class="g5"></div>
-            </div>
-        </div>
-
-        <script type="text/javascript">
-            console.log('DOM loaded');
-            document.addEventListener('DOMContentLoaded', () => {
-                const interBubble = document.querySelector('.interactive');
-                let curX = 0;
-                let curY = 0;
-                let tgX = 0;
-                let tgY = 0;
-
-                const move = () => {
-                    curX += (tgX - curX) / 20;
-                    curY += (tgY - curY) / 20;
-                    interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
-                    requestAnimationFrame(move);
-                };
-
-            window.addEventListener('mousemove', (event) => {
-                    tgX = event.clientX;
-                    tgY = event.clientY;
-                    console.log(tgX, tgY);
-                });
-
-                move();
-            });
-        </script>
-    """, unsafe_allow_html=True)
-
 def intro():
     cols = st.columns(4, vertical_alignment="center")
     today = datetime.now()
@@ -247,9 +148,6 @@ def intro():
             join_waitlist()
 
 
-def request_booklet():
-    st.toast("To request a booklet, \n please send an email to \n social.from.scratch@proton.me")
-
 def body():
     st.divider()
     
@@ -269,7 +167,6 @@ Philanthropy is our choice as a source of initial external support for our activ
     links_row.button(
         "Author log in",
         use_container_width=True,
-        on_click=request_booklet,
         type="secondary"
     )
     # links_row.button(

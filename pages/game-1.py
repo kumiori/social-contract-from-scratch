@@ -475,7 +475,8 @@ def question():
                         )
             
     # st.markdown(f'## {inverse_choice(float(dicho))}')
-    _display_nuance(inverse_choice(float(dicho)))
+    if dicho is not None:
+        _display_nuance(inverse_choice(float(dicho)))
     
 if __name__ == "__main__":
     
