@@ -57,7 +57,7 @@ st_gtag(
     params={
         "event_category": "apply_splash",
         "event_label": "test_splash",
-        "value": 97,
+        "value": 99,
     },
 )
 
