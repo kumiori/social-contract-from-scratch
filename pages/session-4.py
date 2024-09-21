@@ -4,7 +4,7 @@ import time
 from numpy import around
 if st.secrets["runtime"]["STATUS"] == "Production":
     st.set_page_config(
-        page_title="The Social Contract from Scratch",
+        page_title="The Social Contract from Scratch • Relations, Systems & Healing",
         page_icon="✨",
         # layout="wide",
         initial_sidebar_state="collapsed"
@@ -26,6 +26,7 @@ if st.secrets["runtime"]["STATUS"] == "Production":
 
 import json
 from datetime import datetime
+from streamlit_timeline import timeline
 
 import pandas as pd
 import philoui
@@ -47,10 +48,10 @@ from streamlit_gtag import st_gtag
 st_gtag(
     key="gtag_app_XXX",
     id="G-Q55XHE2GJB",
-    event_name="XXX_main_page",
+    event_name="s&p_main_page",
     params={
-        "event_category": "apply_XXX",
-        "event_label": "test_XXX",
+        "event_category": "apply_s&p",
+        "event_label": "test_s&p",
         "value": 97,
     },
 )
@@ -158,6 +159,55 @@ philanthropic_profiles = {
     'icon': ':material/warning:'
 }
 }  
+
+
+current_year = datetime.now().year
+
+timeline_data = {
+    "title": {
+        "media": {
+          "url": "",
+          "caption": " <a target=\"_blank\" href=''>credits</a>",
+          "credit": ""
+        },
+        "text": {
+          "headline": "Our Timeline",
+          "text": "<p>An integrated collective timeline</p>"
+        }
+    },
+    "events": [
+      {
+        "media": {
+          "url": "https://vimeo.com/1007606689",
+          "caption": "How to (<a target=\"_blank\" href='https://'>credits </a>)"
+        },
+        "start_date": {
+          "year": current_year,
+          "month":"10"
+        },
+        "text": {
+          "headline": "Athena's Collective<br> participatory timelines.",
+          "text": "<p>Athena's Collective is ... </p>"
+        }
+      },
+      {
+        "media": {
+          "url": "https://vimeo.com/1007188309",
+          "caption": "Athena (<a target=\"_blank\" href='https://streamlit.io/'>credits</a>)"
+        },
+        "start_date": {
+          "year": current_year,
+          "month":"7",
+          "day":"13"
+        },
+        "text": {
+          "headline": "Event<br>version 0.1",
+          "text": "Streamlit lets you turn data scripts into sharable web apps in minutes, not weeks. It's all Python, open-source, and free! And once you've created an app you can use our free sharing platform to deploy, manage, and share your app with the world."
+        }
+      },
+    ]
+}
+
 
 # Replace with your SumUp API credentials
 API_BASE_URL = 'https://api.sumup.com/v0.1'
@@ -292,11 +342,10 @@ def intro():
             # st.toast("Whitelist")
             # join_waitlist()
 
-    st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
+    st.markdown("# <center>Consent & Action</center>", unsafe_allow_html=True)
+    st.markdown("## <center>What Are We Consenting To?</center>", unsafe_allow_html=True)
 
-    st.markdown("## <center>A meeting of Social and Natural Sciences, Philosophy, and Arts.</center>", unsafe_allow_html=True)
-
-    st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}")
+    st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')} - Session 4", unsafe_allow_html=True)
 
     st.divider()
 
@@ -335,8 +384,7 @@ def authentifier():
                 # with col2:
             authenticator.logout()
 
-def question():
-    
+def question(): 
     name = 'there'
     dicho = my_create_dichotomy(key = "executive", id= "executive",
                         kwargs={'survey': survey,
@@ -353,12 +401,11 @@ def question():
                             'callback': lambda x: ''
                             }
                         )
-            
 
+    
 if __name__ == "__main__":
     
     intro()
-    st.markdown(f"# <center>Start With XXX</center> ", unsafe_allow_html=True)
 
     # event_2 = st_player("https://vimeo.com/1007606689", key='vimeo_player_2')
     # name = survey.text_input("We may have already met", id="given-name")
@@ -366,43 +413,205 @@ if __name__ == "__main__":
     authentifier()
 
     """
-    # HERE GOES THE FIRST QUESTION
-    """
-# Sample page for "Perceptions: Subjective Points of View"
-    st.markdown("# Perceptions: Subjective Points of View, an Observatory Platform")
-    st.markdown("### Introduction")
-    st.markdown("Perception shapes reality. The observatory platform captures subjective points of view, "
-                "providing a space where different perspectives on social, political, and economic issues are shared.")
-    st.markdown("### Context")
-    st.markdown("This observatory helps build a comprehensive understanding of how individuals from diverse backgrounds "
-                "perceive the same issue differently.")
-    st.markdown("### Question")
+    Our focus shifts to Consent and Action — a critical reflection on the commitments we make through the Social Contract. 
+    
+    Consent isn't just passive agreement; it's an active choice that shapes how we live, govern, and engage with one another.
+    
+    As a first step we will engage in a Consent Game—an interactive exercise designed to explore the classical understanding of the social contract. In the traditional framework, the individual consents to surrender certain personal liberties in exchange for protection and governance by a sovereign entity. 
+    
+    However, crucially, the individual is excluded from participating in the actual decision-making process. This game will allow us to test the implicit assumption that everyone naturally agrees to such a deal.
 
-    st.write("What are your perceptions of current societal challenges?")
-    societal_issues = st.text_area("Share your thoughts:", placeholder="E.g., inequality, climate change, governance...")
-    st.write(f"Your perceptions: {societal_issues}")
 
-    st.write("How do you think different stakeholders (e.g., governments, corporations, individuals) perceive these issues?")
-    stakeholder_perceptions = st.text_area("Describe how different stakeholders view these issues:", placeholder="E.g., governments might...")
-    st.write(f"Stakeholder perceptions: {stakeholder_perceptions}")    
-    """
-    # HERE GOES THE CONTEXT
-    """
+    After reflecting on this classical model, we will expand the scope to consider a larger, more inclusive modern social contract. Here, we pose a fundamental question:
 
+    ### Does consent to live in society simply mean coexisting, or does it imply deeper responsibilities toward others?
+
+    """
     st.divider()
 
     """
-    # HERE GOES THE INTERACTION
+    # HERE GOES THE CONSENT GAME
     """
-
     """
     # HERE GOES THE REVIEW
     """
+    
+    """
+    # SECOND PART
+    
+    ### What commitments are we making to each other and to the broader community?
 
+    This shift invites us to reconsider the nature of consent and action, encouraging us to think critically about the responsibilities and commitments that form the foundation of a truly inclusive and participatory social contract.
+    
+    In common usage, a commitment is a declaration of intent—a promise or obligation for the future, an agreement to act or uphold certain values. In programming, however, a commit refers to a definitive action where changes to a project are finalized and recorded. This dual meaning can guide us in thinking about commitments in the context of the social contract: both as a future-oriented promise and as a recorded action, solidified within a community structure.
+    """    
+    equaliser_data = [
+            ("Curated Publication", ""),
+            ("...", ""),
+            ("Arts", ""),
+            ("Events", ""),
+            ]
+
+    create_equaliser(key = "equaliser", id= "equaliser", kwargs={"survey": survey, "data": equaliser_data})
+
+    
+    responsibility_levels = {
+    0.0: {
+        "title": "Bare Co-Existence",
+        "subtitle": "Minimal responsibility",
+        "description": "Individuals share the same space but have no obligations toward each other beyond avoiding direct harm."
+    },
+    0.1: {
+        "title": "Tolerance",
+        "subtitle": "Accepting differences without interaction",
+        "description": "Individuals peacefully tolerate one another's presence and differences without engaging in deeper social responsibilities."
+    },
+    0.2: {
+        "title": "Non-Interference",
+        "subtitle": "Avoiding harm or disruption",
+        "description": "Individuals avoid actions that could harm or disrupt others’ lives, but without actively engaging or supporting one another."
+    },
+    0.3: {
+        "title": "Basic Respect",
+        "subtitle": "Acknowledging dignity",
+        "description": "Individuals are responsible for recognizing and respecting each other's dignity in social interactions, maintaining basic societal norms."
+    },
+    0.4: {
+        "title": "Civic Engagement",
+        "subtitle": "Active participation in societal duties",
+        "description": "Individuals engage in civic responsibilities beyond mere compliance, including contributing to local governance, community decision-making, and advocating for policies that benefit society as a whole."
+    },
+    0.5: {
+        "title": "Community Support",
+        "subtitle": "Helping in times of need",
+        "description": "Individuals offer support to their community during crises, through volunteering, helping neighbors, or providing mutual aid."
+    },
+    0.6: {
+        "title": "Collaboration",
+        "subtitle": "Working together for a common cause",
+        "description": "Individuals actively collaborate to solve shared challenges, pooling resources and knowledge for the benefit of the group."
+    },
+    0.7: {
+        "title": "Shared Accountability",
+        "subtitle": "Ensuring fairness collectively",
+        "description": "Individuals hold themselves and others accountable for upholding community standards, actively ensuring fairness and justice."
+    },
+    0.8: {
+        "title": "Collective Care",
+        "subtitle": "Responsibility for well-being",
+        "description": "Individuals take responsibility for the well-being of others, contributing to health, education, and overall community welfare."
+    },
+    0.9: {
+        "title": "Deep Interdependence",
+        "subtitle": "Mutual reliance for a better future",
+        "description": "Individuals understand that their own well-being is tied to that of others, and their actions reflect a deep ethical commitment to the collective."
+    },
+    1.0: {
+        "title": "Interdependent Responsibility",
+        "subtitle": "Comprehensive care for the planet and others",
+        "description": "The highest level of responsibility, where every action is taken with consideration for its impact on others, future generations, and the planet."
+    }
+}
+    
+    
+        # Lambda function to retrieve the corresponding nuanced trust description
+    inverse_choice = lambda x: responsibility_levels.get(round(x, 1), {"title": "Invalid", "subtitle": "", "description": "Invalid trust level."})
+
+    # Example usage of the function
+    test_value = 0.5
+    result = inverse_choice(test_value)
+
+    # Output the result
+    # st.write(result)
+    def _display_nuance(trust_level):
+    # Check if trust_level has the necessary keys
+        if "title" in trust_level and "subtitle" in trust_level and "description" in trust_level:
+            # Display the information
+            st.markdown(f"## {trust_level['title']}")
+            st.markdown(f"### *{trust_level['subtitle']}*")
+            st.write(trust_level['description'])
+        else:
+            st.write("Invalid trust level data.")
+
+    dicho = my_create_dichotomy(key = "executive", id= "executive",
+                        kwargs={'survey': survey,
+                            'label': 'future_outlook', 
+                            'question': 'Is this a dichotomy?',
+                            'gradientWidth': 100,
+                            'height': 250,
+                            'title': '',
+                            'name': f'there',
+                            'messages': ["", "", ""],
+                            # 'inverse_choice': inverse_choice,
+                            'callback': lambda x: ''
+                            }
+                        )
+            
+    # st.markdown(f'## {inverse_choice(float(dicho))}')
+    if dicho is not None:
+        _display_nuance(inverse_choice(float(dicho)))
+
+    
+    """
+    # HERE GOES THE THIRD PART
+    
+## New forms of collaboration and systems of transparency.
+
+Do we need transparency?
+_Yes!_, transparency is essential to ensure that 
+// commitments and responsibilities are upheld. 
+
+Without systems of XXX, mutual responsibilities become merely aspirational, lacking the enforcement needed to ensure fairness, justice, and the well-being of all members of society.
+
+1.	Transparent _Peer_ Review Systems: Individuals or groups regularly review each other’s contributions and adherence to community standards or responsibilities, providing feedback and corrective action if necessary.
+2.	Transparent Reporting: A system where actions and decisions are documented and openly shared with all stakeholders, allowing for public scrutiny and ensuring that everyone is held accountable to their commitments.
+3.	Collective Decision-Making: Group decisions are made collectively, with individuals being held accountable for their part in the process and for the results of the collective decision.
+5.	Restorative Models: When XXX is breached, systems focus on healing and restoring relationships, rather than punishment. Individuals are responsible for making amends through actions that benefit the harmed party and the community.
+6.	Automated Tracking & Feedback: Utilising technology, systems can track individual and collective actions against agreed-upon goals, providing real-time feedback on how well individuals or groups are adhering to their responsibilities.
+7.	Public Acknowledgment & Reward Systems: A positive reinforcement model where individuals who consistently meet or exceed their responsibilities are publicly acknowledged or rewarded, creating an incentive for others to follow suit.
+    """
+    
     """
     # HERE GOES THE INTEGRATION
     """
+    
+    options = {"selectable": True, 
+                "multiselect": True, 
+                "zoomable": True, 
+                "verticalScroll": True, 
+                "stack": False,
+                "height": 200, 
+                "margin": {"axis": 5}, 
+                "groupHeightMode": "auto", 
+                "orientation": {"axis": "top", "item": "top"}}
+    timeline(timeline_data, height=800)
+    
+    
+    
+    
+    st.session_state['serialised_data'] = survey.data
+    """
+    The button below integrates the data into our database.
+    
+    """
+    _form_submit = lambda: outro()
+    if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
+              disabled=not bool(st.session_state['authentication_status']), 
+              type='primary',
+              use_container_width=True,
+              on_click=lambda: _form_submit()):
+        """
+        Congratulations!
 
+Check back in a few days or reach out to us by email. 
+
+social.from.scratch@proton.me
+
+How you feel about the results?"""
+        
+    if st.session_state['authentication_status']:
+        st.markdown(f"#### Sign #`{mask_string(st.session_state['username'])}`.")
+    
     """
     # HERE GOES THE VISUALISATION
     """
