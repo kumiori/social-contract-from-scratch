@@ -195,7 +195,7 @@ def resumes_statements(results):
         _statements.append({"element": element[1]['hash'], "resonance": result})
     return _statements
 
-# @st.cache_data
+@st.cache_data
 def _reshuffle(values):
     import random
     random.shuffle(values)
@@ -231,7 +231,7 @@ def intro():
 
     st.markdown("# <center>Values, Patterns & Nuances</center>", unsafe_allow_html=True)
 
-    st.markdown("## <center>XX.</center>", unsafe_allow_html=True)
+    st.markdown("## <center>People bring values into the Social Contract.</center>", unsafe_allow_html=True)
 
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')} - Session 1", unsafe_allow_html=True)
 
@@ -472,7 +472,7 @@ These are core values that guide the construction of a new social contract.""")
     selected_value = pills("Select values", values, icons, multiselect=True, clearable=True, index=None)
     
     new_value_input = survey.text_input("Add a new value", key="new_value_input")
-    st.button("Add a new value", on_click=add_new_value, use_container_width=True)
+    st.button("Add a new value (clears the board)", on_click=add_new_value, use_container_width=True)
     
     """
     # Unerstanding Worldviews
@@ -634,7 +634,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     
     # if st.button("Display Choices"):
     
-    st.write(st.session_state['current_element'])
+    # st.write(st.session_state['current_element'])
     
     if st.session_state['current_element'] == None:
         statement = list(statement_dict.items())[-1]
@@ -651,7 +651,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     _id = len(st.session_state['choices'])
     """
     
-    ## On this scale, how well do you resonate with the statement?
+    #### On this scale, how well do you resonate with the statement?
     
     """
 
