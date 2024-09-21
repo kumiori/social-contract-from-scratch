@@ -104,6 +104,11 @@ if 'read_texts' not in st.session_state:
 else:
     st.session_state.read_texts = set(st.session_state.read_texts)
 
+
+if 'results' not in st.session_state:
+    st.session_state.results = []  # Store the UI interaction results
+
+
 if 'survey' not in st.session_state:
     st.session_state['survey'] = {'data': {}}
 
@@ -122,48 +127,13 @@ if 'custom_values' not in st.session_state:
     
 if 'tx_tag' not in st.session_state:
     st.session_state.tx_tag = None
+      
+if 'choices' not in st.session_state:
+    st.session_state.choices = []
        
 if 'price' not in st.session_state:
     st.session_state.price = .01
 
-philanthropic_profiles = {
-'Communitarian': {
-    'description': '## _**Doing good** makes sense for the community._ My contributions create ripple effects that strengthen social bonds and uplift all those around.',
-    'icon': ':material/group:'
-},
-'Devout': {
-    'description': '## _**Doing good** is the will of a higher power_. My philanthropy is a sacred duty, a way to serve and fulfill my spiritual inspiration.',
-    'icon': ':material/auto_awesome:'
-},
-'Investor': {
-    'description': '## _**Doing good** is good business._ I see philanthropy as an investment, generating returns not just for society, but for the world at large.',
-    'icon': ':material/monetization_on:'
-},
-'Socialite': {
-    'description': '## _**Doing good** is sexy._ My generosity is a symbol of commitment and influence, making waves in social circles while benefiting the greater good.',
-    'icon': ':material/party_mode:'
-},
-'Repayer': {
-    'description': '## _**Time to give back**._ I have received much from society, and now it\'s my turn to return the favor and support the what\'s coming.',
-    'icon': ':material/replay:'
-},
-'Dynast': {
-    'description': '## _**Following family tradition**._ Philanthropy is in my blood, a legacy passed down through generations, and I proudly carry the torch.',
-    'icon': ':material/family_restroom:'
-},
-'Altruist': {
-    'description': '## _**Giving from the heart**._ My generosity expands my boundaries; I give selflessly and with deep compassion, driven by a love for humanity.',
-    'icon': ':material/favorite:'
-},
-'Indifferent': {
-    'description': '## _**I don\'t give a shit about philanthropy**_ or social causes. I believe that everyone should fend for themselves, and I see no reason to contribute.',
-    'icon': ':material/block:'
-},
-'Deflector': {
-    'description': '## _**Social questions are somebody else\'s problem**._ I believe that social issues and philanthropy are for others to worry about, not my concern or responsibility.',
-    'icon': ':material/warning:'
-}
-}  
 
 # Replace with your SumUp API credentials
 API_BASE_URL = 'https://api.sumup.com/v0.1'
@@ -210,67 +180,22 @@ def my_create_dichotomy(key, id = None, kwargs = {}):
             st.markdown(_response)
     return response
 
-def outro():
-    st.markdown("## <center> Step X: _Chapter One_</center>", unsafe_allow_html=True)
-    
-    # st.write(st.session_state['tx_tag'])
-    # st.write(st.session_state['checkouts']['id'])
-    
-    dashboard_data = {**st.session_state['serialised_data'], 'checkout': st.session_state['checkouts'], 'checkout_tag': st.session_state['tx_tag']}
-    
-    
-    st.session_state['serialised_data'] = dashboard_data
-    
-    st.markdown(
-        """
-        Congrats! It was cool to navigate through the process of engaging in our philanthropic initiative. Hit the Submit button below to initiate your dashboard.
-        
-We look forward to seeing how this commitment will unfold.
-    
-        Thank you for your interest. We will get back to you by email.
-    
-        """
-"""
-_In the meantime_:"""
-"""
-Here is a snapshot of current activities and developments. Any insight to share?
-"""
-# This includes updates on ongoing projects, conceptual ideas in the pipeline, and longer-term ventures that are now yielding positive results. 
-"""
-	1. Health Systems: Addressing the pervasive collapse of health systems, exacerbated by the pandemic and sectarian influences.
-	2. Monetisation: Pressing cyanotypes from experimental human campaigns, economic photography and scientific reflection.
-	3. Scientific Projects: Energy jumps and the stability of the cryosphere, contributing to our understanding of the impact of ice fracture on climate dynamics.
-	4. Philosophical Dinners: Hosting gastronomic events where ideas are served through meals, connecting intellectual and cultural exchange within experience.
-    5. Artistic Endeavours: Exploring the arts, with a focus on music, the natural world, ceramics, and illustration.
-    6. Literature: Communication within the Urban Jungle: the vertical scenario. 
-""")
-    with st.spinner("Thinking?"):
-        time.sleep(1)
-    col1, col2, col3 = st.columns([1, 9, 1])
-    with col2:
-        text = """
-            Any preference or strong inclination? To your taste of insights and ideas - a question - we submit to your attention:
-        _“how to share?”_
 
-        Your insight could provide the next key piece in this collaborative puzzle. 
+def resumes_statements(results):
+    # List to store the statements the user resonates with
+    resonated_statements = []
+    dissonated_statements = []
+    _statements = []
+    
+    # Iterate through each result
+    for result in results:
+        element = result["element"]
+        st.write(element)        
+        st.write(result)        
+        _statements.append({"element": element[1]['hash'], "resonance": result})
+    return _statements
 
-        Reach out by email, _submit_ your thoughts — each is a step that brings ideas closer to reality.
-
-        <social.from.scratch@proton.me>
-
-            """
-        stream_once_then_write(text)
-        # st.markdown(text)
-        if st.session_state['authentication_status']:
-            st.toast(f'Authenticated successfully {mask_string(st.session_state["username"])}')
-            col1, col2, col3 = st.columns([1, 1, 1])
-            # with col2:
-                # authenticator.logout()
-        st.markdown("""
-        `Click "Submit" to save your dashboard.`
-        """)
-
-@st.cache_data
+# @st.cache_data
 def _reshuffle(values):
     import random
     random.shuffle(values)
@@ -385,26 +310,26 @@ def generate_review(results):
         element = result["element"]
         
         # Extract statement details
-        st.write(element)
+        st.write(result)
 
-        statement = element[1]["statement"]
-        worldview = element[1]["worldview"]
-        category = element[1]["category"]
+        # statement = element[1]["statement"]
+        # worldview = element[1]["worldview"]
+        # category = element[1]["category"]
         
-        # Interpret result
-        if result["result"] == "1":
-            choice = f"I fully resonated with the 1st statement from the {worldview} worldview."
-        elif result["result"] == "0":
-            # choice = f"I fully resonated with the statement: '{statement_1}' from the {worldview_1} worldview."
-            choice = f"I fully resonated with the 2nd statement from the {worldview} worldview."
-        else:
-            choice = f"Your resonance was divided, showing agreement or disagreement with both statements."
+        # # Interpret result
+        # if result["result"] == "1":
+        #     choice = f"I fully resonated with the 1st statement from the {worldview} worldview."
+        # elif result["result"] == "0":
+        #     # choice = f"I fully resonated with the statement: '{statement_1}' from the {worldview_1} worldview."
+        #     choice = f"I fully resonated with the 2nd statement from the {worldview} worldview."
+        # else:
+        #     choice = f"Your resonance was divided, showing agreement or disagreement with both statements."
 
         # Format the review
         # st.write(f"### Review of Interaction {idx + 1}:")
         # st.write(f"**Statement 1** ({worldview_1} - {category_1}): {statement_1}")
         # st.write(f"**Statement 2** ({worldview_2} - {category_2}): {statement_2}")
-        st.write(f"**Result**: {choice}")
+        # st.write(f"**Result**: {choice}")
     st.write("---")    
 
 
@@ -536,7 +461,6 @@ These are core values that guide the construction of a new social contract.""")
         if new_value and new_value not in st.session_state['custom_values']:
             st.session_state['custom_values'].append(new_value)
             st.toast(f"Added new value: {new_value}")
-            
 
     values = values + negative_values + neutral_values
     values = values + st.session_state['custom_values']
@@ -545,22 +469,36 @@ These are core values that guide the construction of a new social contract.""")
 
     _reshuffle(values)
     
-    # num_values = st.slider("Select the number of neutral values to display", 1, len(values), 5)
-
-    # Example usage in a Streamlit app:
-    
     selected_value = pills("Select values", values, icons, multiselect=True, clearable=True, index=None)
     
     new_value_input = survey.text_input("Add a new value", key="new_value_input")
+    st.button("Add a new value", on_click=add_new_value, use_container_width=True)
     
     """
-    # HERE GOES THE CONTEXT/INTRO
+    # Unerstanding Worldviews
+    
+Understanding each other's worldviews is crucial for creating a social contract that reflects collective values and fosters cooperation. Each individual's perspective is shaped by culture, experiences, and the environment, and these diverse worldviews influence how we approach issues like justice, governance, and sustainability.
+
+In the context of constructing a social contract, knowing each other's worldviews allows us to:
+
+1.	**Bridge differences**: By recognizing different perspectives, we can build bridges rather than divisions, ensuring that no viewpoint is left unheard.
+2.	**Shape inclusive solutions**: Solutions to complex societal challenges must consider varying worldviews, whether rooted in cultural, spiritual, or philosophical beliefs.
+3.	**Encourage empathy**: Understanding how others see the world promotes empathy, making space for more nuanced discussions that honor every participant's lived reality.
+
+By exploring and integrating these diverse worldviews, we can create a social contract that reflects our shared humanity and common goals, while also respecting our differences.
     """
     
     """
 
-Each of these worldviews provides unique insights into how humans relate to the universe, nature, and each other. Would you like to explore how these perspectives could influence the social contract or other aspects of your work?
+Different worldviews provide unique insights into how humans relate to the universe, nature, and each other. Would you like to explore how these perspectives could influence the social contract or other aspects of our work?
 
+We've identified **five qualitatively distinct worldviews**, each of which highlights different and complementary traits in the way we approach the world. As products of exchange, dialogue, and experience, we believe your worldview will resonate with many of these perspectives.
+
+But more than that, your personal worldview is likely to be a unique blend of these singular standpoints—a mix of cultural, philosophical, and personal views.
+
+_**Let's play!**_ Together, we'll explore what defines our collective worldview. Through this exercise, we'll discover how our individual perspectives come together to shape the shared vision we'll use to build our social contract.
+
+## We've identified **five qualitatively distinct worldviews**
 
 ### 1. **Mechanical**: 
 This view sees the universe and life as a machine, with components working together in predictable, mechanical ways. It emphasises control, order, and predictability, with humans as parts of a larger "machine" governed by natural laws.
@@ -696,17 +634,17 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     
     # if st.button("Display Choices"):
     
-    # st.write(st.session_state['current_element'])
+    st.write(st.session_state['current_element'])
     
     if st.session_state['current_element'] == None:
         statement = list(statement_dict.items())[-1]
     else:
         statement = st.session_state['current_element']
-        
-    # st.subheader(f"Statement (ID {statement[0][1]})")
+    
+    
     f"""
-    ### {statement[0][1]["statement"]}
-    # """
+    ### {statement[1]["statement"]} 
+    """
     
 
     name = 'there'
@@ -716,11 +654,55 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     ## On this scale, how well do you resonate with the statement?
     
     """
+
+
+    resonance_levels = {
+        0.0: {
+            "title": "Dissonance",
+            "subtitle": "Complete Disagreement",
+            "description": "This statement does not resonate with me at all. It feels distant from my beliefs, values, or worldview, and I find myself fundamentally disagreeing with its premise or implications."
+        },
+        0.25: {
+            "title": "Low Resonance",
+            "subtitle": "Mild Disagreement",
+            "description": "I can see where this statement is coming from, but it doesn't align with my way of thinking. While I acknowledge its perspective, it feels incomplete or flawed to me, and I have reservations about it."
+        },
+        0.5: {
+            "title": "Neutral",
+            "subtitle": "Ambivalence",
+            "description": "I find myself _somewhere_ in the middle. This statement neither fully resonates with me nor fully disagrees with my beliefs. I understand both sides of the argument and feel somewhat indifferent."
+        },
+        0.75: {
+            "title": "High Resonance",
+            "subtitle": "Partial Agreement",
+            "description": "This statement resonates with me strongly. I can relate to its message and align with much of what it expresses, though there may be a few aspects where I hesitate or need further clarity."
+        },
+        1.0: {
+            "title": "Full Resonance",
+            "subtitle": "Complete Agreement",
+            "description": "I completely resonate with this statement. It aligns perfectly with my values, worldview, and understanding of the topic. I fully endorse and support what it stands for."
+        }
+    }
+
+    def get_resonance_level(user_value, levels):
+    # Find the nearest key in resonance_levels to the user's input
+        nearest_key = min(levels.keys(), key=lambda x: abs(x - user_value))
+        return nearest_key, levels[nearest_key]
     
-    _msg_labels = ["*Not at all* I resonate with the statement!", 
-                                         "*I do resonate* with statement!",
-                                         "*Intermediate*...", 
-                                         ],
+    # Lambda function to retrieve the corresponding nuanced trust description
+    inverse_choice = lambda x: resonance_levels.get(x, {"title": "Invalid", "subtitle": "", "description": "Invalid resonance level."})
+
+    def _display_nuance(trust_level):
+    # Check if trust_level has the necessary keys
+        if "title" in trust_level and "subtitle" in trust_level and "description" in trust_level:
+            # Display the information
+            st.markdown(f"## {trust_level['title']}")
+            st.markdown(f"### *{trust_level['subtitle']}*")
+            st.write(trust_level['description'])
+        else:
+            st.write("Invalid resonance level data.")
+
+
     dicho = my_create_dichotomy(key = f"choice",
                                 id= f"choice",
                         kwargs={'survey': survey,
@@ -733,6 +715,10 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
                             'messages': ["", "", ""],
                             }
                         )
+    
+    if dicho is not None:
+        _resonance = get_resonance_level(float(dicho), resonance_levels)
+        _display_nuance(inverse_choice(_resonance[0]))
 
     def update_state(value):
         # Append the current element and result to the results list
@@ -742,26 +728,29 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
         })
         
         # Pick two new random statements for the next round
-        st.session_state.current_element = random.sample(list(statement_dict.items()), 2)
+        st.session_state.current_element = random.choice(list(statement_dict.items()))
 
     st.button("Submit", use_container_width=True, on_click=update_state, args=(dicho,), type="primary")
     
-    st.write("Retrieved values:")
+    st.markdown("## Provided values:")
     if selected_value is not None:
         for value in selected_value:
             st.write(f"🌟 {value}")
-        
+    
+    st.markdown("## Worldview results:")
     results = st.session_state['results']
-    generate_review(results)
-    resonated, both = resumes_statements(results)
+    st.write(results)
+    # generate_review(results)
+    # resonances = resumes_statements(results)
     
-    st.write(f"Resonated statements: {resonated}")
-    st.write(f"Both statements: {both}")
+    # st.json(st.session_state.results)
+    # st.json(survey.data, expanded=False)
+    
+    
+    """
+    # HERE GOES THE VISUALISATION
+    """
 
-    
-    st.json(st.session_state.results)
-    st.json(survey.data, expanded=False)
-    
     
     """
     # HERE GOES THE INTEGRATION
@@ -788,11 +777,6 @@ How you feel about the results?"""
         
     if st.session_state['authentication_status']:
         st.markdown(f"#### Sign #`{mask_string(st.session_state['username'])}`.")
-    
-    """
-    # HERE GOES THE VISUALISATION
-    """
-
 
     """
     # HERE GOES THE ANSWER // WHAT DOES THIS MEAN
