@@ -335,6 +335,44 @@ def authentifier():
                 # with col2:
             authenticator.logout()
 
+@st.dialog('Cast your preferences dashboard')
+def _form_submit():
+    with st.spinner("Checking your signature..."):
+        signature = st.session_state["username"]
+        serialised_data = st.session_state['serialised_data']
+
+        if not serialised_data:
+            st.error("No data available. Please ensure data is correctly entered before proceeding.")
+        else:
+            preferences_exists = db.check_existence(signature)
+            st.write(f"Integrating preferences `{mask_string(signature)}`")
+            _response = "Yes!" if preferences_exists else "Not yet"
+            st.info(f"Some of your preferences exist...{_response}")
+
+            try:
+                data = {
+                    'signature': signature,
+                    'session_3_relations_systems_healing': json.dumps(serialised_data),
+                }
+                # throw an error if signature is null
+                if not signature:
+                    raise ValueError("Signature cannot be null or empty.")
+                
+                query = conn.table('discourse-data')                \
+                       .upsert(data, on_conflict=['signature'])     \
+                       .execute()
+                
+                if query:
+                    st.success("🎊 Preferences integrated successfully!")
+                    st.balloons()
+
+            except ValueError as ve:
+                st.error(f"Data error: {ve}")                
+            except Exception as e:
+                st.error("🫥 Sorry! Failed to update data.")
+                st.write(e)
+
+
 
 def question_trust():
     inverse_choice = lambda x: x
@@ -610,11 +648,6 @@ To find out, we'll revisit a classic trust game, testing not only their words bu
         st.markdown("Link to Social Responsibility Statement: [Link](https://www.google.com)")
     
     
-    
-    """
-    # HERE GOES VIS
-    
-    """
     probabilities = [0.05, 0.03, 0.07, 0.06, 0.15, 0.04, 0.02, 0.05, 0.10, 0.03]
     assets = [1200, 2600, 2700, 1700, 1600, 1900, 3000, 1800, 1200, 1500]  # Total assets in billions
 
@@ -653,6 +686,19 @@ To find out, we'll revisit a classic trust game, testing not only their words bu
 
     # Show the plotly chart in streamlit
     st.plotly_chart(fig, use_container_width=True)
+    
+    """
+    This bar chart represents a playful guessing game, let's collaborate to identify the financial corporation most exposed. The bars show the probability of each bank facing playing _the Trustee_ in our Trust game scenario. With probabilities ranging from 3.3% to 25%, forget the numbers - reflect on the power dynamics and transparency issues in global financial systems. Who do you think *** is?
+    """
+    
+    """
+    We might wonder how these institutions compare in terms of their global influence and assets.
+    
+    Moving from probabilities to concrete relations, we shift focus to a second visualisation, where the size of each corporation's assets is represented visually. 
+    
+    This plot introduces a new dimension: their financial power. We also include Greece's GDP for comparison, highlighting the vast disparities in financial influence across nations and corporations.
+    
+    """
     import plotly.express as px
 
     df = pd.DataFrame({
@@ -740,6 +786,11 @@ To find out, we'll revisit a classic trust game, testing not only their words bu
 
     # Display the chart in Streamlit
     st.plotly_chart(fig, use_container_width=True)
+    
+    """
+    This plot shows some major global banking corporations with sizes proportional to their assets and transparency levels reflecting their _scrutiny risk_. Greece's GDP is included for scale, emphasising the power imbalance between nation-states and financial corporations. The opacity of each bank highlights the varying levels of scrutiny they face, raising questions about transparency, accountability, and the role these institutions play in shaping global financial and economic landscapes.
+    """
+    
     st.divider()
 
     """
@@ -954,7 +1005,8 @@ In the spirit of building a truly inclusive conversation, we'll be asking you a 
     
     """
     
-We are framing the beginning of a shared journey, leaving space for future collaboration and deeper exploration. 
+## We are framing the beginning of a shared journey, 
+leaving space for future collaboration and deeper exploration. 
 
 Many topics still require our attention, and the journey is far from over. As we move forward to organising a new event, either a gastronomic one - a metaphor for spiritual nourishment, or a new workshop — centering on presenting the insights built through your feedback, and renewed motivation.
     
@@ -1020,16 +1072,16 @@ The philosophical dinner fosters connection, dialogue, and introspection, allowi
     The button below integrates the data into our database.
     
     """
-    _form_submit = lambda: outro()
+
     if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
               disabled=not bool(st.session_state['authentication_status']), 
               type='primary',
               use_container_width=True,
               on_click=lambda: _form_submit()):
         """
-        Congratulations!
+        ✨ ✨ ✨ Congratulations! Thank you very much for participating. ✨ ✨ ✨ 
 
-Check back in a few days or reach out to us by email. 
+Save this page in your bookmarks and check again in a few days. Otherwise, reach out to us by email. 
 
 social.from.scratch@proton.me
 
