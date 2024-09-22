@@ -335,38 +335,76 @@ def authentifier():
                 # with col2:
             authenticator.logout()
 
-def question(): 
-    name = 'there'
-    dicho = my_create_dichotomy(key = "executive", id= "executive",
-                        kwargs={'survey': survey,
-                            'label': 'future_outlook', 
-                            'question': 'Do we exclude? (White: Yes, Black: No, Nuances: We exclude for other reasons)',
-                            'gradientWidth': 20,
-                            'height': 250,
-                            'title': '',
-                            'name': f'{name}',
-                            'messages': ["*Zero,* black!", 
-                                         "*One*. White", 
-                                         "*between* gray"],
-                            # 'inverse_choice': inverse_choice,
-                            'callback': lambda x: ''
-                            }
-                        )
+# def question(): 
+#     name = 'there'
+#     dicho = my_create_dichotomy(key = "executive", id= "executive",
+#                         kwargs={'survey': survey,
+#                             'label': 'future_outlook', 
+#                             'question': 'Do we exclude? (White: Yes, Black: No, Nuances: We exclude for other reasons)',
+#                             'gradientWidth': 20,
+#                             'height': 250,
+#                             'title': '',
+#                             'name': f'{name}',
+#                             'messages': ["*Zero,* black!", 
+#                                          "*One*. White", 
+#                                          "*between* gray"],
+#                             # 'inverse_choice': inverse_choice,
+#                             'callback': lambda x: ''
+#                             }
+#                         )
             
-    my_create_dichotomy(key = "outlook", id= "outlook",
-                        kwargs={'survey': survey,
-                            'label': 'future_outlook', 
-                            'question': 'Click to express your viewpoint.',
-                            'gradientWidth': 30,
-                            'height': 250,
-                            'title': '',
-                            'name': 'intuition',
-                            'messages': ["*The future looks* dark like an impending storm", "*The future looks* bright and positive", "*The future looks* gray like an uncertain mix"],
-                            # 'inverse_choice': inverse_choice,
-                            'callback': lambda x: ''
-                            }
-                        )
-    
+#     my_create_dichotomy(key = "outlook", id= "outlook",
+#                         kwargs={'survey': survey,
+#                             'label': 'future_outlook', 
+#                             'question': 'Click to express your viewpoint.',
+#                             'gradientWidth': 30,
+#                             'height': 250,
+#                             'title': '',
+#                             'name': 'intuition',
+#                             'messages': ["*The future looks* dark like an impending storm", "*The future looks* bright and positive", "*The future looks* gray like an uncertain mix"],
+#                             # 'inverse_choice': inverse_choice,
+#                             'callback': lambda x: ''
+#                             }
+#                         )
+
+@st.dialog('Cast your preferences dashboard')
+def _form_submit():
+    with st.spinner("Checking your signature..."):
+        signature = st.session_state["username"]
+        serialised_data = st.session_state['serialised_data']
+
+        if not serialised_data:
+            st.error("No data available. Please ensure data is correctly entered before proceeding.")
+        else:
+            preferences_exists = db.check_existence(signature)
+            st.write(f"Integrating preferences `{mask_string(signature)}`")
+            _response = "Yes!" if preferences_exists else "Not yet"
+            st.info(f"Some of your preferences exist...{_response}")
+
+            try:
+                data = {
+                    'signature': signature,
+                    'session_2_structure_participation': json.dumps(serialised_data),
+                }
+                # throw an error if signature is null
+                if not signature:
+                    raise ValueError("Signature cannot be null or empty.")
+                
+                query = conn.table('discourse-data')                \
+                       .upsert(data, on_conflict=['signature'])     \
+                       .execute()
+                
+                if query:
+                    st.success("🎊 Preferences integrated successfully!")
+                    st.balloons()
+
+            except ValueError as ve:
+                st.error(f"Data error: {ve}")                
+            except Exception as e:
+                st.error("🫥 Sorry! Failed to update data.")
+                st.write(e)
+
+
 if __name__ == "__main__":
     
     intro()
@@ -391,14 +429,14 @@ Unlike modern representative democracies, where citizens elect officials to make
 
 Nowadays, the social contract has been a pact between the individual and the state in exchange for protection (of property, order, etc.).
     
-Tomorrow, the Social Contract is an agreement that fulfills needs, and maybe instead of citizens we will feel like _planetizens_.
+Tomorrow, the Social Contract is an agreement that fulfills needs, and maybe instead of citizens we will feel like _planetizens_$^1$.
 
 ____
 
-Remark: 
+Remarks and References: 
 •	Citizenship was inherited, meaning you needed to be born to Athenian parents to qualify.
 •	These citizens had the right to vote, hold office, and participate in the Ekklesia (the assembly) and other democratic institutions like the Boule (the council).
-
+$^1$: Learning Planetizen Manifesto, https://www.learning-planet.org/learning-planetizen-manifesto/
  
     """
     
@@ -413,27 +451,30 @@ Remark:
     
     For example, allowing only women aged 15 and above, only French citizens, only people born in a certain place, or only individuals descended from a particular group.
     
-    IN YOU EXPERIENCE, HAVE  INDIVIDUALS BEEN EXCLUDED FROM THE SOCIAL CONTRACT BASED ON CRITERIA?
+
+    Think of your experience, have individuals been excluded from participating in or benefiting from _the goods of society_ due to specific criteria, such as race, gender, nationality, social class, or other _non_-defining factors?
+    
+    Should such exclusion mechanisms be part of the Social Contract?
     
     """
-    dicho = my_create_dichotomy(key = "executive", id= "executive",
+    dicho = my_create_dichotomy(key = "exclude", id= "exclude",
                         kwargs={'survey': survey,
-                            'label': 'future_outlook', 
+                            'label': 'exclude_criteria', 
                             'question': 'Do we exclude based on criteria? (White: Yes, Black: No, Nuances: We exclude for other reasons)',
                             'gradientWidth': 20,
                             'height': 250,
                             'title': '',
-                            'name': f'',
-                            'messages': ["*Zero,* black!", 
-                                         "*One*. White", 
-                                         "*between* gray"],
+                            'name': f'humanity',
+                            'messages': ["*Nope,* we don't exclude", 
+                                         "*Yes*. We exclude based on external criteria", 
+                                         "*maybe* we exclude for other reasons"],
                             # 'inverse_choice': inverse_choice,
                             'callback': lambda x: ''
                             }
                         )
 
     """
-    # A Strategic Choice?
+    # What is a Strategic Choice?
     
     """
     """
@@ -448,12 +489,12 @@ Remark:
         """
         Sounds like a good idea. Let's explore some criteria for inclusion.
         """
-        quanti_3 = create_quantitative("quantitative3_key", 
+        quanti_3 = create_quantitative("inclusive_criteria", 
                                     kwargs={"survey": survey, 
-                                            "label": "Quanti3", 
+                                            "label": "inclusive_criteria", 
                                             'name': 'Hello,',
                                             "question": 'What do you include in your consideration for the Social Contract?',
-                                            "key": "demo_quantitative_2", 
+                                            "key": "inclusive_criteria", 
                                             "data_values": [0, 10, 30, 50]})
         
         
@@ -473,7 +514,7 @@ Remark:
         st.markdown(feedback_messages.get(quanti_3, ''))
     
     elif strategy == "Exclusion":
-        exclusion_categories = survey.text_area("We are happy to hear. What are criteria for exclusion?")
+        exclusion_categories = survey.text_area("We are happy to hear. What are criteria for exclusion?", id="exclude_criteria_ext")
     else:
         st.warning("Strategy is key. Make a choice to proceed.")
     
@@ -485,7 +526,7 @@ Remark:
     How can we integrate these symbolic elements into the social contract?
 
     """
-    societal_issues = st.text_area("Share your thoughts:", placeholder="E.g., inequality, climate change, governance...")
+    societal_issues = survey.text_area("Share your thoughts:", placeholder="E.g., inequality, climate change, governance...", key="symbolic_elements")
 
 
 
@@ -511,7 +552,7 @@ Remark:
     
     """
 
-    my_create_dichotomy(key = "future", id= "executive",
+    my_create_dichotomy(key = "future", id= "future",
                         kwargs={'survey': survey,
                             'label': 'future_outlook', 
                             'question': 'Click to express your viewpoint.',
@@ -520,10 +561,10 @@ Remark:
                             'title': '',
                             'name': 'intuition',
                             'messages': ["*The future looks* dark like an impending storm", "*The future looks* bright and positive", "*The future looks* gray like an uncertain mix"],
-                            # 'inverse_choice': inverse_choice,
                             'callback': lambda x: ''
                             }
                         )
+
 
 
     """
@@ -532,29 +573,34 @@ Remark:
     
     """
 
-
     my_create_dichotomy(key = "transitions", id= "executive",
                         kwargs={'survey': survey,
-                            'label': 'future_outlook', 
+                            'label': 'transition_rate', 
                             'question': 'Click to express your viewpoint.',
                             'gradientWidth': 10,
                             'height': 250,
                             'title': '',
                             'name': 'intuition',
-                            'messages': ["*The future looks* dark like an impending storm", "*The future looks* bright and positive", "*The future looks* gray like an uncertain mix"],
+                            'messages': ["*Fast transition* rapid and transformative", "*Slow* gradual and long", "*A mix of the two* with the implications of both"],
                             # 'inverse_choice': inverse_choice,
                             'callback': lambda x: ''
                             }
                         )
-    """
-    # Do you trust your neighbor?
-    """
+
 
     """
-    
-    # Do you enjoy collaborative work?
-    
+    # HERE GOES THE VISUALISATION
     """
+
+    # """
+    # # Do you trust your neighbour?
+    # """
+
+    # """
+    
+    # # Do you enjoy collaborative work?
+    
+    # """
     """
     
     # How do you prefer to engage with us?
@@ -564,7 +610,7 @@ Remark:
 
     # Create the multiselect widget
     selected_options = st.multiselect('I would like to:', options)
-    survey.data['preferred_engage'] = selected_options
+    survey.data['preferred_mode'] = selected_options
 
     """
     
@@ -612,13 +658,16 @@ Remark:
     selected_ingredients = multiselect_pills("Conflict Resolution Elements",
                       list(conflict_resolution_elements_split.keys()), key="conflict_resolution_elements", multiselect=True, 
                       clearable=True, index=None)
-    # st.write(selected_ingredients)
+
     if selected_ingredients:
         st.markdown("### " + selected_ingredients[-1]+ "💭")
         # ✨
         st.info("📣 " + conflict_resolution_elements_split.get(selected_ingredients[-1], ''))
     
-    # selected_value = multiselect_pills("Select values", values, icons, multiselect=True, clearable=True, index=None)
+    survey.data['conflict_resolution_elements'] = selected_ingredients
+    
+    # clear the multiselect
+    # st.button("Clear", on_click=lambda: st.session_state.pop("conflict_resolution_elements", None))
     
     """
     
@@ -647,29 +696,21 @@ Remark:
     # How do you see your role in the ecosystem?
     
     """
-    survey.text_area("Share your thoughts:", placeholder="E.g., inequality, climate change, governance...")
+    survey.text_area("Share your thoughts:", placeholder="Describe how you see yourself contributing to the balance and growth of the ecosystem. What actions, responsibilities, or roles do you take on in relation to the world and others around you?", key="ecosystem_role")
 
  
 
     st.divider()
 
-    """
-    # HERE GOES THE INTERACTION
-    """
+    with st.expander("Review your answers"):
+        st.json(survey.data)
 
-    """
-    # HERE GOES THE REVIEW
-    """
-    st.json(survey.data)
-    """
-    # HERE GOES THE INTEGRATION
-    """
     st.session_state['serialised_data'] = survey.data
     """
     The button below integrates the data into our database.
     
     """
-    _form_submit = lambda: outro()
+
     if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
               disabled=not bool(st.session_state['authentication_status']), 
               type='primary',
@@ -687,10 +728,6 @@ How you feel about the results?"""
     if st.session_state['authentication_status']:
         st.markdown(f"#### Sign #`{mask_string(st.session_state['username'])}`.")
     
-    """
-    # HERE GOES THE VISUALISATION
-    """
-
     """
     # HERE GOES THE ANSWER // WHAT DOES THIS MEAN // what do you mean for the sc?
     
