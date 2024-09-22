@@ -881,9 +881,6 @@ How Can We Implement Effective Transparency?
 Transparency is the cornerstone of our collaborative systems.
     """
     
-    """
-    # HERE GOES THE INTEGRATION
-    """    
     with st.expander("Review your responses"):
         st.json(survey.data)
     
