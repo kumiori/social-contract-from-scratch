@@ -433,7 +433,7 @@ Remark:
                         )
 
     """
-    # Strategic choice
+    # A Strategic Choice?
     
     """
     """
@@ -442,8 +442,7 @@ Remark:
     
     """
     
-    
-    strategy = survey.radio("What is a _strategic_ choice?", options=["Inclusion", "Exclusion"])
+    strategy = survey.radio("What is a _strategic_ choice?", options=["Inclusion", "Exclusion", "I don't know"], index = 2)
     
     if strategy == "Inclusion":
         """
@@ -473,12 +472,13 @@ Remark:
         
         st.markdown(feedback_messages.get(quanti_3, ''))
     
-    else:
+    elif strategy == "Exclusion":
         exclusion_categories = survey.text_area("We are happy to hear. What are criteria for exclusion?")
-    
+    else:
+        st.warning("Strategy is key. Make a choice to proceed.")
     
     """
-    ### Humans, beneath and beyond?
+    ### Fair for Humans, but Beneath and Beyond?
     """
     """
     This is a wild ask (but we are the _Athena_ Collective). Some cultures give symbolic representation to natural elements—ghosts, spirits, gods.
@@ -491,7 +491,7 @@ Remark:
 
 
 
-
+    st.divider()
     st.markdown("# Perceptions: Subjective Points of View, an Observatory")
     st.markdown("Does perception shape reality? This observatory platform captures subjective points of view, providing a space where different perspectives on social, political, and economic issues are shared.")
     
@@ -559,11 +559,13 @@ Remark:
     
     # How do you prefer to engage with us?
     
-    
-    read, write, speak, listen, watch, play, give, take..
     """
-    
-    
+    options = ['Read', 'Write', 'Speak', 'Listen', 'Watch', 'Play', 'Give', 'Take']
+
+    # Create the multiselect widget
+    selected_options = st.multiselect('I would like to:', options)
+    survey.data['preferred_engage'] = selected_options
+
     """
     
     # What is your approach to conflict resolution?
@@ -607,9 +609,14 @@ Remark:
         "Suppression": "Silencing dissent or ignoring the needs of one party."
     }
     
-    multiselect_pills("Conflict Resolution Elements",
+    selected_ingredients = multiselect_pills("Conflict Resolution Elements",
                       list(conflict_resolution_elements_split.keys()), key="conflict_resolution_elements", multiselect=True, 
                       clearable=True, index=None)
+    # st.write(selected_ingredients)
+    if selected_ingredients:
+        st.markdown("### " + selected_ingredients[-1]+ "💭")
+        # ✨
+        st.info("📣 " + conflict_resolution_elements_split.get(selected_ingredients[-1], ''))
     
     # selected_value = multiselect_pills("Select values", values, icons, multiselect=True, clearable=True, index=None)
     
@@ -626,8 +633,10 @@ Remark:
     
     # What are your thoughts on global cooperation?
     
-    Two members of our collective argue that the need for cooperation has never been greater, while the historical link between cooperation, economic progress, and development is increasingly hindered by global challenges. 
-    We discuss cooperation as a historical product and explore triangular and polygonal cooperation, following a trend from Japan. Furthermore, we delve into the case where polygonal cooperation evolves into circular cooperation, drawing a metaphorical connection and analogy to the dynamics of multi-body celestial systems, aiming to build a foundation for new models of direct collaboration.
+    Two members of our collective argue that the need for cooperation has never been greater, and the equilibrium between cooperation, economic progress, and development is questioned by global challenges. 
+    I a short article, they discuss cooperation as a historical product and explore triangular and polygonal cooperation schemes, following a trend from Japan. Furthermore, delving into the case where polygonal cooperation evolves into _circular_ cooperation, drawing a metaphorical connection and analogy to the dynamics of multi-body celestial systems, we aim to build a foundation for new models of direct collaboration.
+    
+    The article draft is available for review. Would you like to read it?
     
     """
     

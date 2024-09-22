@@ -1,7 +1,9 @@
-import streamlit as st
-import requests
 import time
+
+import requests
+import streamlit as st
 from numpy import around
+
 if st.secrets["runtime"]["STATUS"] == "Production":
     st.set_page_config(
         page_title="The Social Contract from Scratch • Relations, Systems & Healing",
@@ -26,7 +28,6 @@ if st.secrets["runtime"]["STATUS"] == "Production":
 
 import json
 from datetime import datetime
-from streamlit_timeline import timeline
 
 import pandas as pd
 import philoui
@@ -35,23 +36,25 @@ import streamlit_shadcn_ui as ui
 import yaml
 from philoui.authentication_v2 import AuthenticateWithKey
 from philoui.io import QuestionnaireDatabase as IODatabase
-from philoui.io import conn, create_dichotomy, create_equaliser, create_qualitative, create_quantitative
+from philoui.io import (conn, create_dichotomy, create_equaliser,
+                        create_qualitative, create_quantitative)
 from philoui.survey import CustomStreamlitSurvey
 from philoui.texts import hash_text, stream_text
+from streamlit_elements import elements, mui, nivo
 from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.row import row
+from streamlit_gtag import st_gtag
+from streamlit_player import st_player
 from streamlit_timeline import timeline
 from yaml import SafeLoader
-from streamlit_player import st_player
-from streamlit_gtag import st_gtag
 
 st_gtag(
     key="gtag_app_XXX",
     id="G-Q55XHE2GJB",
-    event_name="s&p_main_page",
+    event_name="session4_main_page",
     params={
-        "event_category": "apply_s&p",
-        "event_label": "test_s&p",
+        "event_category": "session",
+        "event_label": "_session4",
         "value": 97,
     },
 )
@@ -73,6 +76,10 @@ config = {
   }
 }
 
+@st.cache_data    
+def fetch_data():
+    response = db.fetch_data(kwargs={'verbose': True})
+    return response
 
 authenticator = AuthenticateWithKey(
     credentials=config['credentials'],
@@ -185,6 +192,10 @@ timeline_data = {
           "year": current_year,
           "month":"10"
         },
+        "end_date": {
+          "year": current_year,
+          "month":"11"
+        },
         "text": {
           "headline": "Athena's Collective<br> participatory timelines.",
           "text": "<p>Athena's Collective is ... </p>"
@@ -197,12 +208,17 @@ timeline_data = {
         },
         "start_date": {
           "year": current_year,
-          "month":"7",
-          "day":"13"
+          "month":"9",
+          "day":"26"
+        },
+        "end_date": {
+          "year": current_year,
+          "month":"9",
+          "day":"29"
         },
         "text": {
-          "headline": "Event<br>version 0.1",
-          "text": "Streamlit lets you turn data scripts into sharable web apps in minutes, not weeks. It's all Python, open-source, and free! And once you've created an app you can use our free sharing platform to deploy, manage, and share your app with the world."
+          "headline": "The Social Contract From Scratch<br>Conference in Athens",
+          "text": "Europe in Discourse IV."
         }
       },
     ]
@@ -385,22 +401,50 @@ def authentifier():
             authenticator.logout()
 
 def question(): 
-    name = 'there'
-    dicho = my_create_dichotomy(key = "executive", id= "executive",
+    
+    st.markdown("""
+    ### This is not a one-time deal. Just like society, consent evolves with new challenges and perspectives. You'll be part of that evolution.
+    """)
+    name = ''
+    role = my_create_dichotomy(key = "socialcontract", id= "socialcontract",
                         kwargs={'survey': survey,
-                            'label': 'future_outlook', 
-                            'question': 'Are you ready to donate? (White: Yes, Black: No, Nuances: I need time)',
+                            'label': 'willingness', 
+                            'question': 'How willing are you to give up your freedoms? (Black: Zero, White: Fully, Nuances: Partial & Conditional)',
                             'gradientWidth': 20,
                             'height': 250,
                             'title': '',
                             'name': f'{name}',
-                            'messages': ["*Zero,* black!", 
-                                         "*One*. White", 
-                                         "*between* gray"],
+                            'messages': ["I am unwilling! *Does not sound like a good deal,* let's question these fundamentals", 
+                                         "*Plenty of willingness*. And full trust in the authority", 
+                                         "*My willingness is* conditional"],
                             # 'inverse_choice': inverse_choice,
                             'callback': lambda x: ''
                             }
                         )
+            
+    
+
+
+    """
+1.	**Zero Willingness** emphasises individual liberty and distrust in giving up freedoms.
+2.	**Conditional Willingness** highlights opennes to negotiation but under specific conditions, prompting reflection on those conditions.
+3.	**Full Willingness** shows complete trust in the system and prioritises collective security and stability over personal freedom.
+    """
+ 
+# Function to extract willingness and updated_at
+def extract_willingness_and_timestamp(data):
+    results = []
+    for entry in data:
+        if entry.get("consent_00"):
+            consent_data = json.loads(entry["consent_00"])
+            willingness = consent_data.get("willingness", {}).get("value")
+            updated_at = entry.get("updated_at")
+            if willingness and updated_at:
+                # Convert the updated_at to a more readable format
+                updated_at = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
+                results.append({"willingness": willingness, "updated_at": updated_at})
+    return results
+
 
     
 if __name__ == "__main__":
@@ -413,8 +457,12 @@ if __name__ == "__main__":
     authentifier()
 
     """
-    Our focus shifts to Consent and Action — a critical reflection on the commitments we make through the Social Contract. 
+    ## Our focus shifts to Consent and Action 
     
+    — a critical reflection on the commitments we make through the Social Contract. 
+
+    This is where the theory meets the ground, where ideas turn into actionable processes.
+
     Consent isn't just passive agreement; it's an active choice that shapes how we live, govern, and engage with one another.
     
     As a first step we will engage in a Consent Game—an interactive exercise designed to explore the classical understanding of the social contract. In the traditional framework, the individual consents to surrender certain personal liberties in exchange for protection and governance by a sovereign entity. 
@@ -432,6 +480,202 @@ if __name__ == "__main__":
     """
     # HERE GOES THE CONSENT GAME
     """
+    
+    """
+    We choose to live in society because it offers us the benefits of cooperation and connection that we could not achieve in isolation.
+    Living together lets us achieve what we can't on our own — sharing resources, knowledge, and building systems that elevate our lives from mere survival to thriving.
+    """
+
+    
+    
+    """
+    ## A contract is an agreement, a story between two or more parties. 
+    
+    As an agreement, it is an understanding.
+    When the understanding is shared, it becomes social.
+    """
+    """
+    # But how _should_ a social contract work?
+    """
+    f"""
+Let's take a foundational idea from the 17th century—one that still underpins much of Western and European governance—and put it to the test in today's world. 
+It _assumes implicit consent_, meaning people agree without ever explicitly being asked. 
+Starting today, {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')}, _we challenge that assumption._    """
+    """
+Here is whre we _cut through_ and ask directly:  **Are you willing to relinquish some of your freedoms in exchange for the benefits of living in a society?** _In other words_, **Do you accept _that_ deal?** 
+
+This is where _you_ come in, casting a real, meaningful preference—_yours_.
+
+Our approach is explicit and participatory, aiming for informed, active consent. 
+    Here, participants contribute directly to the construction of our bonds, 
+    manifesting a real voice in determining their principles. 
+    Stakeholders are real and governing structures are transparent.
+    
+### We would like clarity. Ready to make your voice count?
+
+This makes _our consent_ both foundational and dynamic, allowing it to evolve as the contract itself grows and responds to new inputs and challenges. 
+    
+    """
+    """
+    By participating, you actively shape the foundations of _a new social contract_ experiment. Your consent isn't just a checkbox — 
+    it's a voice in the construction of principles we live by.
+    """
+
+    """
+### This is more than just a game, this is a collective discovery process.
+
+"""
+    
+    """
+    """
+
+    """
+    ## So how does _this foundational deal_ look?
+    """
+    """
+    It assumes you respond _fully_ to the following question:
+    """
+    """
+    # _How_ willing are you to give up your freedoms in exchange for protection and stability, relinquishing your participation in decisions that affect you?
+    """
+    
+    
+    """
+    The deal is a "classic" social contract: the individual surrenders certain liberties in exchange for the protection and decision-making provided by a sovereign or governing entity. But, crucially, the individual doesn't get to participate in the decision-making process—they trust that the sovereign will act in their best interest.
+    """
+    
+    """
+    Here's a simple question which still allows for a nuanced response. 
+    
+    
+    
+    **Choose between** Not willing to give up freedom (0 given up/black), fully willing to give up freedom (1/white), and all values in between - the greys - representing conditional, small or large, willingness. We will gather detailed insights!
+    
+    At this clickable interface we arrive at a crossroads where you can choose...
+    """
+    question()
+    
+        
+    response = fetch_data()
+    response = extract_willingness_and_timestamp(response)
+    # df = pd.DataFrame(response)
+    
+    def sum_data(A, B):
+        summed_data = []
+        for A_item in A:
+            # Find corresponding item in result based on 'id'
+            for B_item in B:
+                if A_item['id'] == B_item['id']:
+                    # Sum the 'value' fields
+                    new_value = A_item['value'] + B_item['value']
+                    summed_data.append({
+                        "id": A_item["id"],
+                        "label": A_item["label"],
+                        "value": new_value
+                    })
+                    break
+        return summed_data
+
+    def map_willingness(data):
+        full_willingness = len([i for i in data if i["willingness"] == "1"])
+        zero_willingness = len([i for i in data if i["willingness"] == "0"])
+        conditional_willingness = len([i for i in data if 0 < float(i["willingness"]) < 1])
+        
+        st.session_state["consents"] = full_willingness
+
+        return [
+            {"id": "Full Willingness", "label": "Full Willingness", "value": full_willingness},
+            {"id": "Zero Willingness", "label": "Zero Willingness", "value": zero_willingness},
+            {"id": "Conditional", "label": "Conditional", "value": conditional_willingness}
+        ]
+
+    # Apply the function to the data
+    state = map_willingness(response)
+
+    
+    INITIAL_CONDITION = [
+  {
+    "id": "Full Willingness",
+    "label": "Full Willingness",
+    "value": 0
+  },
+  {
+    "id": "Zero Willingness",
+    "label": "Zero Willingness",
+    "value": 0
+  },
+  {
+    "id": "Conditional",
+    "label": "Conditional",
+    "value": 0
+  }
+]
+    DATA = sum_data(state, INITIAL_CONDITION)
+    
+    """
+    ## The results
+    """
+    
+    """
+    Here's some partial data from this living _consent_ survey. Our target is to fill the box with responses from 100 participants.
+    """
+    
+    with elements("nivo_charts"):
+
+        with mui.Box(sx={"height": 600}):
+            nivo.Waffle(
+                borderRadius=3,
+                data=DATA,
+                total=100,
+                rows=8,
+                columns=10,
+                # borderWidth=1,
+                emptyOpacity=0.15,
+                padding=3,
+                colors={'scheme': 'accent'},
+                legends=[
+                    {
+                        "anchor": "top",
+                        "direction": "row",
+                        "justify": False,
+                        "translateX": 0,
+                        "translateY": 0,
+                        "itemsSpacing": 0,
+                        "itemWidth": 200,
+                        "itemHeight": 18,
+                        "itemDirection": "left-to-right",
+                        "itemOpacity": 0.85,
+                        "itemTextColor": "#777",
+                        "symbolSize": 24,
+                    }
+                ]
+            )
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     """
     # HERE GOES THE REVIEW
     """
@@ -444,16 +688,12 @@ if __name__ == "__main__":
     This shift invites us to reconsider the nature of consent and action, encouraging us to think critically about the responsibilities and commitments that form the foundation of a truly inclusive and participatory social contract.
     
     In common usage, a commitment is a declaration of intent—a promise or obligation for the future, an agreement to act or uphold certain values. In programming, however, a commit refers to a definitive action where changes to a project are finalized and recorded. This dual meaning can guide us in thinking about commitments in the context of the social contract: both as a future-oriented promise and as a recorded action, solidified within a community structure.
+    
+    ## What kind of relationships we wish to foster among ourselves?
+    
+    These relationships can exist on a continuum, spanning from bare coexistence—where individuals live alongside one another with minimal interaction or mutual influence—to a state of interdependent responsibility, where we actively engage in each other's well-being, decisions, and the health of our shared environments.
+    
     """    
-    equaliser_data = [
-            ("Curated Publication", ""),
-            ("...", ""),
-            ("Arts", ""),
-            ("Events", ""),
-            ]
-
-    create_equaliser(key = "equaliser", id= "equaliser", kwargs={"survey": survey, "data": equaliser_data})
-
     
     responsibility_levels = {
     0.0: {
@@ -469,7 +709,7 @@ if __name__ == "__main__":
     0.2: {
         "title": "Non-Interference",
         "subtitle": "Avoiding harm or disruption",
-        "description": "Individuals avoid actions that could harm or disrupt others’ lives, but without actively engaging or supporting one another."
+        "description": "Individuals avoid actions that could harm or disrupt others' lives, but without actively engaging or supporting one another."
     },
     0.3: {
         "title": "Basic Respect",
@@ -503,7 +743,7 @@ if __name__ == "__main__":
     },
     0.9: {
         "title": "Deep Interdependence",
-        "subtitle": "Mutual reliance for a better future",
+        "subtitle": "Mutual reliance for a better present & future",
         "description": "Individuals understand that their own well-being is tied to that of others, and their actions reflect a deep ethical commitment to the collective."
     },
     1.0: {
@@ -533,10 +773,10 @@ if __name__ == "__main__":
         else:
             st.write("Invalid trust level data.")
 
-    dicho = my_create_dichotomy(key = "executive", id= "executive",
+    dicho = my_create_dichotomy(key = "relations", id= "relations",
                         kwargs={'survey': survey,
-                            'label': 'future_outlook', 
-                            'question': 'Is this a dichotomy?',
+                            'label': 'spectrum_relations', 
+                            'question': 'What kind of society do we are creating?',
                             'gradientWidth': 100,
                             'height': 250,
                             'title': '',
@@ -558,37 +798,44 @@ if __name__ == "__main__":
 ## New forms of collaboration and systems of transparency.
 
 Do we need transparency?
-_Yes!_, transparency is essential to ensure that 
-// commitments and responsibilities are upheld. 
+_Yes!_, transparency is essential, not just as a buzzword, but as the foundation effective collaboration in any collective system. When interactions span physical and digital spaces, and decisions often affect a vast range of people, transparency becomes the glue that holds together our social fabric.
 
-Without systems of XXX, mutual responsibilities become merely aspirational, lacking the enforcement needed to ensure fairness, justice, and the well-being of all members of society.
+    """
+    survey.text_area("Why is Transparency Crucial, in your view?", id="transparency", placeholder="Share your thoughts on the importance of transparency in collective systems.")
 
-1.	Transparent _Peer_ Review Systems: Individuals or groups regularly review each other’s contributions and adherence to community standards or responsibilities, providing feedback and corrective action if necessary.
-2.	Transparent Reporting: A system where actions and decisions are documented and openly shared with all stakeholders, allowing for public scrutiny and ensuring that everyone is held accountable to their commitments.
-3.	Collective Decision-Making: Group decisions are made collectively, with individuals being held accountable for their part in the process and for the results of the collective decision.
-5.	Restorative Models: When XXX is breached, systems focus on healing and restoring relationships, rather than punishment. Individuals are responsible for making amends through actions that benefit the harmed party and the community.
-6.	Automated Tracking & Feedback: Utilising technology, systems can track individual and collective actions against agreed-upon goals, providing real-time feedback on how well individuals or groups are adhering to their responsibilities.
-7.	Public Acknowledgment & Reward Systems: A positive reinforcement model where individuals who consistently meet or exceed their responsibilities are publicly acknowledged or rewarded, creating an incentive for others to follow suit.
+# 1.	Building Trust: Transparency creates an environment where individuals and groups can trust the system and each other. When actions, decisions, and processes are made visible, it removes the shadow of doubt and suspicion. People are more willing to collaborate, share resources, and engage when they know what is happening and why.
+# 2.	Accountability: With transparency, decision-makers are held accountable for their actions. Whether it's a government, corporation, or community leader, knowing that their choices are visible encourages them to act responsibly, ethically, and in the interest of the broader group. It prevents hidden agendas, misuse of power, and corruption.
+# 3.	Empowerment Through Knowledge: Transparency provides access to information, which in turn empowers people. When people understand how systems work, what decisions are being made, and why resources are allocated in certain ways, they can participate more meaningfully. This also promotes equity—ensuring that everyone, regardless of background, has the opportunity to engage and contribute.
+# 4.	Collaboration and Innovation: When processes are open and clear, it encourages collaboration. New ideas and innovations are more likely to emerge when everyone has access to the same information. Transparency fosters an environment where knowledge and insights are shared freely, allowing for cross-pollination of ideas and creative problem-solving.
+
+    """
+How Can We Implement Effective Transparency?
+
+1.	**Open Decision-Making:** Decisions, especially those affecting large groups, should be made in an open forum or through participatory mechanisms. This allows for the inclusion of diverse voices and ensures that the rationale behind decisions is clear and understood.
+    """
+    
+    survey.radio("How do you feel about Open Decision-Making?", id="open_decision_making", options=["I agree", "I disagree", "I go with the flow"], index=2)
+    """
+2.	**Clear and Accessible Communication:** Transparency isn't just about making information available, it's about making it accessible and understandable to everyone involved. Whether it's through open-source technology, clear reporting systems, or regular updates, people should be able to easily access and interpret the information they need.
+"""
+    survey.radio("How do you feel about Clear and Accessible Communication?", id="clear_communication", options=["I agree", "I disagree", "I go with the flow"], index=2)
+    """
+3.	**Collaborative Technologies**: Leveraging technology can enhance transparency. Blockchain, for example, provides immutable and transparent ledgers for financial transactions and contracts. Collaborative platforms allow for real-time tracking of project progress and decision-making, ensuring everyone stays informed and engaged.
+    """
+    survey.radio("How do you feel about Collaborative Technologies?", id="collaborative_technologies", options=["I agree", "I disagree", "I go with the flow"], index=2)
+    """
+4.	**Feedback Loops: Transparency should also be a two-way street. It's not just about providing information but also creating feedback mechanisms where individuals can voice concerns, offer suggestions, or hold decision-makers accountable. These loops ensure that transparency is dynamic and responsive to the community's needs.
+
+## New Forms of Collaboration
+
+Transparency is the cornerstone of our collaborative systems.
     """
     
     """
     # HERE GOES THE INTEGRATION
-    """
+    """    
     
-    options = {"selectable": True, 
-                "multiselect": True, 
-                "zoomable": True, 
-                "verticalScroll": True, 
-                "stack": False,
-                "height": 200, 
-                "margin": {"axis": 5}, 
-                "groupHeightMode": "auto", 
-                "orientation": {"axis": "top", "item": "top"}}
-    timeline(timeline_data, height=800)
-    
-    
-    
-    
+    st.json(survey.data)
     st.session_state['serialised_data'] = survey.data
     """
     The button below integrates the data into our database.
@@ -612,10 +859,19 @@ How you feel about the results?"""
     if st.session_state['authentication_status']:
         st.markdown(f"#### Sign #`{mask_string(st.session_state['username'])}`.")
     
+    
+    
     """
     # HERE GOES THE VISUALISATION
     """
+    
+    """
+    # HERE GOES THE TIMELINE
+    """
+    
 
+    timeline(timeline_data, height=800)
+    
 
 
     if st.button(f"Clear all and restart",type='secondary', key=f"restart", use_container_width=True):

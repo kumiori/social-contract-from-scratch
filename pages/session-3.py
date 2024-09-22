@@ -335,23 +335,6 @@ def authentifier():
                 # with col2:
             authenticator.logout()
 
-def question(): 
-    name = 'there'
-    dicho = my_create_dichotomy(key = "executive", id= "executive",
-                        kwargs={'survey': survey,
-                            'label': 'future_outlook', 
-                            'question': 'Are you ready to donate? (White: Yes, Black: No, Nuances: I need time)',
-                            'gradientWidth': 20,
-                            'height': 250,
-                            'title': '',
-                            'name': f'{name}',
-                            'messages': ["*Zero,* black!", 
-                                         "*One*. White", 
-                                         "*between* gray"],
-                            # 'inverse_choice': inverse_choice,
-                            'callback': lambda x: ''
-                            }
-                        )
 
 def question_trust():
     inverse_choice = lambda x: x
@@ -436,7 +419,7 @@ def question_trust():
 
     dicho = my_create_dichotomy(key = "executive", id= "executive",
                         kwargs={'survey': survey,
-                            'label': 'future_outlook', 
+                            'label': 'trust_unknown', 
                             'question': 'Are you ready to express your trust?',
                             'gradientWidth': 100,
                             'height': 250,
@@ -464,7 +447,7 @@ if __name__ == "__main__":
     authentifier()
 
     """
-    
+    # What Lays at the Core?    
 At the core of any effective social contract lies the essential question of governance and decision-making. If we agree to ground our social contract in mutual respect and cooperation, we must ask: What processes and mechanisms do we want to establish to ensure smooth governance, effective conflict resolution, and dispute settlement?
 
 ### How do we collectively make decisions? 
@@ -480,18 +463,36 @@ As we delve into this session, we will explore the interplay between trust and g
     
     st.markdown(f"# <center>Start With Trust</center> ", unsafe_allow_html=True)
     st.markdown("## <center>Not A Simple Yes/No $\mathcal Q$uestion</center>", unsafe_allow_html=True)
+    """
+As we continue, we shall address something that carries a weight in our world: money. It is more than a tool—it's a fetish, a symbol that holds and hides beliefs, ideologies, and twisted taboos within it. It is woven into each individual life in ways that evoke strong emotions and shape behaviors.
 
-    st.write("Click the link below to authorise this. Your authorisation is key to proceed. If everything is in order, you will read above a message of success, or a unique ID below.")
+Money itself, as a tool, is not neutral. It can be used to build, to connect, and to sustain, but it can also divide, manipulate, and control. As a tool, money can be harnessed for good or ill. But where does it power lie?
+
+Because we are not just here to speculate - only in theory - but to debate and to take action, to turn our collective ideas into real forms, processes, and dynamics. This is why we ask for _permission_ to bring _money into the game_. We shall use _money_, as a tool, in several ways differently from customary.  How we use money, and how we interact with it in the context of this social contract, will shape the outcomes of our shared journey.
+
+Let's be deliberate about this decision. 
+
+### Can we agree to include money—not as a source of tension or taboo, but as a practical tool to move from theory to practice?
+
+"""
+
+    st.write("Click the link below to authorise this. Your authorisation is key to proceed. If everything is _in order_, read below a message of success.")
     
-    if st.button("It is OK to bring money into the game", type='primary', key="authorise", use_container_width=True, disabled=not bool(st.session_state['authentication_status'])):
-        st.info("We are authorised to proceed.")
+    if authorise_money := st.button("It is OK to bring money into the game", type='primary', key="authorise", use_container_width=True, disabled=not bool(st.session_state['authentication_status'])):
+        st.info("📯 We are authorised to proceed 💫.")
+        st.balloons()
+        survey.data['authorise_money'] = authorise_money
+    else:
+        st.warning("Your authorisation is pending to proceed.")
+        survey.data['authorise_money'] = authorise_money
+        
     # event_2 = st_player("https://vimeo.com/1007606689", key='vimeo_player_2')
     # name = survey.text_input("We may have already met", id="given-name")
 
     # Sample page for "Game 1: Financial Trust Game"
     st.markdown("# Part I: Can financial institutions be trusted?")
     st.markdown("### Introduction")
-    st.markdown("The Financial Trust Game simulates the balance of trust and risk in power relations, "
+    st.markdown("The Trust Game _plays_ the balance of trust and risk in power relations, "
                 "mirroring real-world interactions between individuals,  the public, and corporations.")
     st.markdown("### Context")
     
@@ -550,7 +551,7 @@ require action in which everyone, *** included, has a role to play. *** has been
 
 To find out, we'll revisit a classic trust game, testing not only their words but the real actions backing up these claims. 
 
-### _Can you guess who is ***, the corporation is under scrutiny?_
+### _Can you guess who *** is, the corporation under scrutiny?_
 
     """
     from streamlit_pills import pills
@@ -614,10 +615,131 @@ To find out, we'll revisit a classic trust game, testing not only their words bu
     # HERE GOES VIS
     
     """
+    probabilities = [0.05, 0.03, 0.07, 0.06, 0.15, 0.04, 0.02, 0.05, 0.10, 0.03]
+    assets = [1200, 2600, 2700, 1700, 1600, 1900, 3000, 1800, 1200, 1500]  # Total assets in billions
+
+    total_sum = sum(probabilities)
+    normalized_probabilities = [p / total_sum for p in probabilities]
+
+    import plotly.graph_objects as go
+
+
+    # Create the plotly bar chart
+    fig = go.Figure()
+
+    # Add bars to the chart
+    fig.add_trace(go.Bar(
+        x=financial_groups,
+        y=normalized_probabilities,
+        marker=dict(color='rgba(50, 171, 96, 0.6)'),
+        text=[f"{p*100:.1f}%" for p in normalized_probabilities],  # Display percentages on bars
+        textposition='outside'
+    ))
+
+    # Customize the layout
+    fig.update_layout(
+        title="Who is ***? Probability measure",
+        xaxis_title="Financial Corporation",
+        yaxis_title="Probability",
+        showlegend=False,
+        plot_bgcolor="white",
+        margin=dict(l=20, r=20, t=40, b=20),
+        font=dict(size=12),
+    )
+
+    # Remove grid lines
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
+
+    # Show the plotly chart in streamlit
+    st.plotly_chart(fig, use_container_width=True)
+    import plotly.express as px
+
+    df = pd.DataFrame({
+        "Bank Groups": financial_groups,
+        "Assets (B)": assets,
+        # "Probability": probabilities,
+        "Probability": normalized_probabilities
+    })
     
-    
-    
-    
+    greece_data = pd.DataFrame({
+        'Bank Groups': ['Greece'],
+        'Assets (B)': [200],
+        'Probability': [0.25],  # You can adjust the probability accordingly
+        'x': [0],  # Position on the x-axis
+        'y': [0]   # Position on the y-axis
+    })
+
+    # Append Greece to the original DataFrame
+    # df = pd.concat([df, greece_data], ignore_index=True)
+
+    import numpy as np
+    np.random.seed(42)
+    n_points = len(financial_groups)
+    x = np.random.randn(n_points)
+    y = np.random.randn(n_points)
+
+    # Add the random points to the DataFrame
+    df['x'] = x
+    df['y'] = y
+
+    # Define the color (Centered around DodgerBlue with varying transparency)
+    base_color = 'rgba(30, 144, 255, {})'
+    # dir(px.colors.sequential.YlGn_r)
+    # Create the scatter plot
+    fig = px.scatter(df, x='x', y='y', size='Assets (B)', 
+                    size_max=100,
+                    hover_name="Bank Groups", title="Bank Corporations: Size (Assets) and Scrutiny Risk + Greece", color='Probability',
+                    color_continuous_scale=px.colors.sequential.YlGn)
+    size_scaling = 100 / df['Assets (B)'].max()
+    greece_size = greece_data['Assets (B)'].values[0] * size_scaling
+    print(greece_size, size_scaling)
+    # Update markers with varying transparency based on the bankruptcy probability
+    fig.update_traces(marker=dict(
+        # color=[base_color.format(1-prob) for prob in df["Probability"]],
+        line=dict(width=1)
+    ))
+    # print([base_color.format(1-prob) for prob in df["Probability"]])
+    # Customize the layout to remove grid lines and make it visually clean
+    fig.update_layout(
+        # plot_bgcolor="white",
+        margin=dict(l=20, r=20, t=40, b=20),
+        font=dict(size=12),
+        showlegend=False
+    )
+    fig.update_traces(marker=dict(
+    line=dict(width=3, color='black')  # Set the border width and color
+    ))
+    fig.update_traces(customdata=np.array(df[['Probability']].values))
+
+    # Update hovertemplate
+    fig.update_traces(hovertemplate=
+                    '<b>%{hovertext}</b><br><br>' +
+                    'Probability: %{customdata[0]:.2%}<br>' +  # Format the probability as a percentage
+                    'Assets: %{marker.size:,} B USD' +  # Show assets with commas and labeled as billions
+                    '<extra></extra>'  # Removes default hover info like x, y
+                    )
+
+    # Ensure Greece is displayed with a red marker
+    for i, row in greece_data.iterrows():
+        if row['Bank Groups'] == 'Greece':
+            fig.add_scatter(
+                x=[2],
+                y=[row['y']],
+                mode='markers',
+                marker=dict(size=row['Assets (B)']*np.sqrt(size_scaling), color='red', 
+                            # line=dict(width=1, color='black')
+                            ),
+                name='Greece',
+                hovertext=f"<b>Greece</b><br><br>GDP: {row['Assets (B)']} B USD<br>Probability: {row['Probability']:.2%}",
+                hoverinfo='text'
+            )
+    # Remove grid lines
+    fig.update_xaxes(showgrid=False, visible=False)
+    fig.update_yaxes(showgrid=False, visible=False)
+
+    # Display the chart in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
     st.divider()
 
     """
@@ -656,14 +778,46 @@ By testing these models, we explore how collective decision-making and governanc
             ("Observatory of Perceptions", ""),
             ]
 
-    create_equaliser(key = "equaliser", id= "equaliser", kwargs={"survey": survey, "data": equaliser_data})
+    # create_equaliser(key = "equaliser", id= "equaliser", kwargs={"survey": survey, "data": equaliser_data})
 
     """
-    ## Where is your current base or location? 
-    #### For events and remote workshops that are accessible to you.
-
+    ... = reading2discussion4creation1action, dance, theatre play, music, movie/documentary, brainstorming sessions.
     """
-    survey.text_input("This will help us coordinate", id="location")
+    # turn the list above into a list of tuples with the first element being the name of the item and the second element being the description
+    equaliser_data = [
+        ("Curated Publication", "A collection of essays, articles, and insights from the workshop, summarising key takeaways and future directions."),
+        ("...", "Other"),
+        ("Working Groups", "Small teams formed to tackle specific challenges or questions, fostering collaboration and innovation."),
+        ("Policy Proposals", "Concrete suggestions and recommendations for future policy or action, based on workshop discussions and insights."),
+        ("Games", "Interactive activities and games designed to engage participants and explore complex topics in a dynamic way."),
+        ("Observatory of Perceptions", "A platform for sharing and discussing diverse perspectives on key issues, fostering dialogue and understanding."),
+    ]
+    
+    create_equaliser(key = "equaliser_extend", id= "equaliser_ext", kwargs={"survey": survey, "data": equaliser_data})
+        
+    """
+    Now that we have explored the broader landscape and considered the outcomes we aim to achieve together, it's time to shift our focus a little closer.
+
+As we continue, let's start with something simple yet fundamental: What is your name?
+
+In the spirit of building a truly inclusive conversation, we'll be asking you a few questions. These are designed to bring your unique perspective into the fold, because your voice—and the person behind it—matters in shaping this social contract.
+    """
+    
+    name = survey.text_input("What is your name?", id="given-name")
+    
+    if name:
+        # greet with a toast
+        st.toast("Hello " + name + "!")
+    
+    """ 
+    ## Now, where in the world 
+    
+    are you based? Your location is more than just a place—it shapes your experiences, your challenges, and your insights. Understanding where you're coming from, both literally and figuratively, helps us appreciate the richness of the perspectives that will guide this collective journey.
+
+    Knowing your location also allows us to tailor future events and remote workshops that are accessible to you.
+"""
+
+    survey.text_input("This will help us ideate and coordinate", id="location")
     
     import random
     
@@ -802,11 +956,10 @@ By testing these models, we explore how collective decision-making and governanc
     
 We are framing the beginning of a shared journey, leaving space for future collaboration and deeper exploration. 
 
-Many topics still require our attention, and the journey is far from over. As we move forward to organising either a gastronomic event - one that is metaphor for spiritual nourishment, or a new workshop — one that centers on gathering your feedback, insights, and renewed motivation.
+Many topics still require our attention, and the journey is far from over. As we move forward to organising a new event, either a gastronomic one - a metaphor for spiritual nourishment, or a new workshop — centering on presenting the insights built through your feedback, and renewed motivation.
     
 # For our next event, 
 ### would you prefer a hands-on workshop or a gastronomic experience?
-_or reading-discussion-to-creation-action, dance, theatre play, music, movie/documentary, brainstorming) and curated publications.XXX_
     
 
 
@@ -838,7 +991,9 @@ The philosophical dinner fosters connection, dialogue, and introspection, allowi
     """
     # HERE GOES THE VISUALISATION
     """
-
+    st.json(survey.data)
+    
+    
     """
     what does it mean and what have you brought to the table? 
     """

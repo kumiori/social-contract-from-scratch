@@ -43,14 +43,17 @@ from streamlit_timeline import timeline
 from yaml import SafeLoader
 from streamlit_player import st_player
 from streamlit_gtag import st_gtag
+import hashlib
+import random
+from philoui.texts import hash_text, stream_text, stream_once_then_write
 
 st_gtag(
-    key="gtag_app_XXX",
+    key="gtag_app_session1",
     id="G-Q55XHE2GJB",
-    event_name="s&p_main_page",
+    event_name="session1_page",
     params={
-        "event_category": "apply_s&p",
-        "event_label": "test_s&p",
+        "event_category": "session",
+        "event_label": "session1",
         "value": 97,
     },
 )
@@ -133,6 +136,9 @@ if 'choices' not in st.session_state:
        
 if 'price' not in st.session_state:
     st.session_state.price = .01
+       
+if 'reshuffled' not in st.session_state:
+    st.session_state.reshuffled = False
 
 
 # Replace with your SumUp API credentials
@@ -199,6 +205,45 @@ def resumes_statements(results):
 def _reshuffle(values):
     import random
     random.shuffle(values)
+
+@st.dialog('Cast your preferences dashboard')
+def _form_submit():
+    with st.spinner("Checking your signature..."):
+        signature = st.session_state["username"]
+        serialised_data = st.session_state['serialised_data']
+
+        if not serialised_data:
+            st.error("No data available. Please ensure data is correctly entered before proceeding.")
+        else:
+            preferences_exists = db.check_existence(signature)
+            st.write(f"Integrating preferences `{mask_string(signature)}`")
+            _response = "Yes!" if preferences_exists else "Not yet"
+            st.info(f"Some of your preferences exist...{_response}")
+
+            try:
+                data = {
+                    'signature': signature,
+                    'session_1_values': json.dumps(serialised_data["values"]),
+                    'session_1_worldview': json.dumps(serialised_data["worldview"])
+                }
+                # throw an error if signature is null
+                if not signature:
+                    raise ValueError("Signature cannot be null or empty.")
+                
+                query = conn.table('discourse-data')                \
+                       .upsert(data, on_conflict=['signature'])     \
+                       .execute()
+                
+                if query:
+                    st.success("🎊 Preferences integrated successfully!")
+                    st.balloons()
+
+            except ValueError as ve:
+                st.error(f"Data error: {ve}")                
+            except Exception as e:
+                st.error("🫥 Sorry! Failed to update data.")
+                st.write(e)
+
 
 
 def intro():
@@ -332,6 +377,56 @@ def generate_review(results):
         # st.write(f"**Result**: {choice}")
     st.write("---")    
 
+def dataset_to_outro(data):
+    # name = data['name']
+    name = 'You'
+    ext = 'will'
+    formatted_text = f"""
+    ## {name} {ext} submit
+    """
+    return formatted_text, name, ext
+
+def outro():
+    st.markdown("## <center> _Chapter One_</center>", unsafe_allow_html=True)
+
+    formatted_text, name, ext = dataset_to_outro(survey.data)
+    st.markdown(formatted_text)
+    
+    _submit = st.button(f'I {ext} submit, _{name}_')
+    
+    
+    if _submit:
+        stream_once_then_write(
+            """
+            Congrats! 
+            
+            Thank you for your interest. Save this page in your bookmarks, and check again in a few days.
+        
+            """
+"""
+_In the meantime_:""")
+    with st.spinner("Thinking?"):
+        time.sleep(3)
+    col1, col2, col3 = st.columns([1, 9, 1])
+    with col2:
+        text = """
+        Your insight could provide the next key piece in this collaborative puzzle. 
+
+        Reach out by email, _submit_ your thoughts — each is a step that brings ideas closer to reality.
+
+        <social.from.scratch@proton.me>
+
+            """
+        # stream_once_then_write(text)
+        # st.markdown(text)
+        if st.session_state['authentication_status']:
+            st.toast(f'Authenticated successfully {mask_string(st.session_state["username"])}')
+            col1, col2, col3 = st.columns([1, 1, 1])
+            # with col2:
+                # authenticator.logout()
+        st.markdown("""
+        `Your dashboard is saved.`
+        """)
 
 if __name__ == "__main__":
     
@@ -340,7 +435,18 @@ if __name__ == "__main__":
     authentifier()
 
     """
-    # FIRST SESSION
+    # Introduction
+    
+We continue the journey with the _Athena Collective_ — we are an group of thinkers, scholars, artists, practicioners, and changemakers. 
+    
+Our mission is simple and profound: _to collaboratively shape a new social contract that reflects the complexity and diversity of the world we live in._
+
+The Social Contract, at its core, is about how we relate to each other, our environment, and the systems that govern us. But this cannot be built through one perspective alone. It requires opening ourselves to the full spectrum of points of view, ideas, and perceptions—from the bold and radical to the subtle and _infinitely nuanced_. 
+
+Every thought, every lived experience matters in shaping a contract that is truly inclusive and reflective of our shared essence.
+
+As we move through this session, we explore the values that connect us and the dynamics that define our collective future. 
+Let's embrace the power of diversity and the richness of each voice in crafting a social contract that speaks to all.
     
     """
     st.markdown(f"# <center>Values and Worldview</center> ", unsafe_allow_html=True)
@@ -351,20 +457,18 @@ if __name__ == "__main__":
     
     # authenticate()
 
-    # Sample page for "Values and Worldview"
-    st.markdown("### Introduction")
-    
     st.markdown("Our worldview shapes the very core of our beliefs, actions, and how we interact with others. "
                 "By sharing these values, we build the foundation for any social contract.")
     # authenticate()
     st.markdown("From philosophical, social, and economic perspectives, our worldview creates boundaries and possibilities.")
     st.markdown("### Question")
     st.write("""
-             Which values do you embody?
+### Which values do you embody?
 Which values do you see reflected in yourself, and which ones guide your everyday actions?
              
 These are core values that guide the construction of a new social contract.""")
     
+    st.warning("Sometimes the pills may not display correctly on Chrome browsers. If you encounter this issue, hit the button below that clears the board.")
         # in quali valori ti identifichi e quali valori poni a guida del tuo agire quotidiano
     values = [
         "Equality", "Freedom", "Justice", "Compassion", "Sustainability", "Innovation", "Collaboration", 
@@ -431,7 +535,7 @@ These are core values that guide the construction of a new social contract.""")
         "remove_circle",        # Indifference
     ]
 
-    neutral_values = neutral_values = [
+    neutral_values = [
     "Stability",
     "Structure",
     "Efficiency",
@@ -452,7 +556,14 @@ These are core values that guide the construction of a new social contract.""")
     "Conformity",
     "Transparency",
     "Objectivity",
-    "None"
+    "None",
+    "Pride",
+	"Greed",
+	"Lust",
+	"Envy",
+	"Gluttony",
+	"Rage",
+	"Apathy",
     ]
 
     
@@ -464,12 +575,15 @@ These are core values that guide the construction of a new social contract.""")
 
     values = values + negative_values + neutral_values
     values = values + st.session_state['custom_values']
-    icons = icons + negative_icons + ["new"] * len(neutral_values)
+    icons = icons + negative_icons + icons[0:len(neutral_values)]
     icons = icons + ["new"] * len(st.session_state['custom_values'])
 
-    _reshuffle(values)
+    # if not st.session_state.reshuffled:
+    #     _reshuffle(values)
+    #     st.session_state.reshuffled = True
+        
     
-    selected_value = pills("Select values", values, icons, multiselect=True, clearable=True, index=None)
+    selected_value = pills("Select a handful of the values that you most reflect in your actions", values, icons, multiselect=True, clearable=True, index=None)
     
     new_value_input = survey.text_input("Add a new value", key="new_value_input")
     st.button("Add a new value (clears the board)", on_click=add_new_value, use_container_width=True)
@@ -501,20 +615,20 @@ _**Let's play!**_ Together, we'll explore what defines our collective worldview.
 ## We've identified **five qualitatively distinct worldviews**
 
 ### 1. **Mechanical**: 
-This view sees the universe and life as a machine, with components working together in predictable, mechanical ways. It emphasises control, order, and predictability, with humans as parts of a larger "machine" governed by natural laws.
+This view sees **the universe and life as a machine**, with components working together in predictable, mechanical ways. It emphasises control, order, and predictability, with humans as parts of a larger "machine" governed by natural laws.
 
 ### 2. **Organic**: 
-The organic worldview sees life and the universe as a living, interconnected system, like a biological organism. It emphasises harmony, interdependence, and growth, where all parts are intimately connected and affect each other.
+The organic worldview sees life and **the universe as a living, interconnected system**, like a biological organism. It emphasises harmony, interdependence, and growth, where all parts are intimately connected and affect each other.
 
 ### 3. **Dramatic**: 
 The third worldview is **dramatic or playful**. In this view, life is seen as a cosmic drama or play, where existence is an unfolding, dynamic performance rather than something rigid or predetermined. This perspective celebrates spontaneity, creativity, and the notion that life is to be experienced like a game or theatrical performance, rather than something to be controlled or merely survived.
 
 
-### 4. **Shamanic or Animistic Worldview**
+### 4. **Shamanic or Animistic**
 The **Shamanic worldview** is deeply rooted in **animism**, the belief that all living and non-living things—such as animals, plants, rivers, and even rocks—have a spirit. This perspective, often found in indigenous Amazonian cultures, views the world as a complex, interconnected web of relationships between humans, nature, and spiritual forces.
 
 
-### 5. **Ubuntu Worldview**
+### 5. **Ubuntu**
 In many African cultures, the **Ubuntu** philosophy represents a worldview that emphasises **collective humanity**, interdependence, and shared responsibility. The phrase often associated with Ubuntu is: “**I am because we are**,” highlighting the deep connection between individuals and their communities.
 
     """
@@ -610,8 +724,6 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
         for i, statement in enumerate(worldviews[worldview]["in_disaccord"], 1):
             st.write(f"{i}. {statement}")
             
-    import hashlib
-    import random
     # Function to assign unique IDs to statements
     def assign_ids(worldviews):
         id_counter = 1
@@ -643,7 +755,12 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     
     
     f"""
-    ### {statement[1]["statement"]} 
+    
+    # How our worldviews are a unique blend?
+    
+      
+    
+    ### _{statement[1]["statement"]}_ 
     """
     
 
@@ -703,10 +820,10 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
             st.write("Invalid resonance level data.")
 
 
-    dicho = my_create_dichotomy(key = f"choice",
-                                id= f"choice",
+    dicho = my_create_dichotomy(key = f"resonance_statement",
+                                id= f"resonance",
                         kwargs={'survey': survey,
-                            'label': f'choice', 
+                            'label': f'resonance_statement', 
                             'question': 'This is how I resonate',
                             'gradientWidth': 60,
                             'height': 250,
@@ -730,16 +847,15 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
         # Pick two new random statements for the next round
         st.session_state.current_element = random.choice(list(statement_dict.items()))
 
-    st.button("Submit", use_container_width=True, on_click=update_state, args=(dicho,), type="primary")
+    st.button("Send vibe", use_container_width=True, on_click=update_state, args=(dicho,), type="primary")
     
-    st.markdown("## Provided values:")
+    st.markdown("## The values you bring into the Contract:")
     if selected_value is not None:
         for value in selected_value:
             st.write(f"🌟 {value}")
     
     st.markdown("## Worldview results:")
     results = st.session_state['results']
-    st.write(results)
     # generate_review(results)
     # resonances = resumes_statements(results)
     
@@ -751,16 +867,18 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     # HERE GOES THE VISUALISATION
     """
 
+    extracted_data = [{"hash": item["element"][1]["hash"], "result": item["result"]} for item in results]
     
-    """
-    # HERE GOES THE INTEGRATION
-    """
-    st.session_state['serialised_data'] = survey.data
+    serialised_data = {"values": selected_value, "worldview": extracted_data}
+
+    st.session_state['serialised_data'] = serialised_data
     """
     The button below integrates the data into our database.
     
     """
-    _form_submit = lambda: outro()
+    
+    # _form_submit = lambda: outro()
+    
     if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
               disabled=not bool(st.session_state['authentication_status']), 
               type='primary',
@@ -785,7 +903,6 @@ How you feel about the results?"""
     what does it mean that we are driven by ...
     what does somebody driven by do...
     """
-
 
     if st.button(f"Clear all and restart",type='secondary', key=f"restart", use_container_width=True):
         st.session_state.clear()
