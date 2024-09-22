@@ -90,7 +90,7 @@ fields_forge = {'Form name':'Forge access key', 'Email':'Email', 'Username':'Use
 
 # ==================
 
-@st.cache_data
+# @st.cache_data
 def get_sumup_transaction_history(num_transactions):
     # Define the SumUp transaction history endpoint URL
     transaction_history_url = 'https://api.sumup.com/v0.1/me/transactions/history'
@@ -155,6 +155,7 @@ def intro():
         whitelist = ui.button(text="Join the XXX", url="", key="link_btn")
         if whitelist:
             st.toast("XXX")
+    cols = st.columns(4, vertical_alignment="center")
 
     st.markdown("# <center>The Social Contract from Scratch</center>", unsafe_allow_html=True)
 
@@ -170,7 +171,7 @@ def intro():
     # st_lottie("https://lottie.host/ec578eca-0d54-4173-b4a4-9bd5eadf577c/bIR9lUB6Sk.json")
     # st_lottie("https://lottie.host/8d0158ec-6eaf-4867-a96c-4774fd2890e2/wFLLXK2Tmj.json")
 
-@st.cache_data
+# @st.cache_data
 def return_SCFS_details(num_transactions, transaction_rows):
     
     _my_bar = st.progress(0, "Fetching transaction details")
@@ -192,7 +193,7 @@ def return_SCFS_details(num_transactions, transaction_rows):
 
     return filtered_transactions
 
-@st.cache_data    
+# @st.cache_data    
 def fetch_data():
     response = db.fetch_data(kwargs={'verbose': True})
     return response
@@ -425,7 +426,9 @@ if __name__ == "__main__":
         whitelist = ui.button(text="Join Dinner", url="", key="link_action")
         if whitelist:
             st.toast("XXX")
-    
+    with cols[0]:
+        ui.metric_card(title=".", content='0', description="Expenses, so far.", key="card_expenses")
+
     if st.session_state['authentication_status']:
         st.toast('Initialised authentication model')
         st.write(f'`Your signature is {st.session_state["username"][0:4]}***{st.session_state["username"][-4:]}`')

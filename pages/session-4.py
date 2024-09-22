@@ -270,6 +270,45 @@ def my_create_dichotomy(key, id = None, kwargs = {}):
             st.markdown(_response)
     return response
 
+
+@st.dialog('Cast your preferences dashboard')
+def _form_submit():
+    with st.spinner("Checking your signature..."):
+        signature = st.session_state["username"]
+        serialised_data = st.session_state['serialised_data']
+
+        if not serialised_data:
+            st.error("No data available. Please ensure data is correctly entered before proceeding.")
+        else:
+            preferences_exists = db.check_existence(signature)
+            st.write(f"Integrating preferences `{mask_string(signature)}`")
+            _response = "Yes!" if preferences_exists else "Not yet"
+            st.info(f"Some of your preferences exist...{_response}")
+
+            try:
+                data = {
+                    'signature': signature,
+                    'consent_00': json.dumps(serialised_data)
+                }
+                # throw an error if signature is null
+                if not signature:
+                    raise ValueError("Signature cannot be null or empty.")
+                
+                query = conn.table('discourse-data')                \
+                       .upsert(data, on_conflict=['signature'])     \
+                       .execute()
+                
+                if query:
+                    st.success("🎊 Preferences integrated successfully!")
+                    st.balloons()
+
+            except ValueError as ve:
+                st.error(f"Data error: {ve}")                
+            except Exception as e:
+                st.error("🫥 Sorry! Failed to update data.")
+                st.write(e)
+
+
 def outro():
     st.markdown("## <center> Step X: _Chapter One_</center>", unsafe_allow_html=True)
     
@@ -370,7 +409,7 @@ def authentifier():
     
 
     tab2, tab1, = st.tabs(["I am returning", "I am new"])
-    
+
     with tab2:
         if st.session_state['authentication_status'] is None:
             authenticator.login('Connect', 'main', fields = fields_connect)
@@ -430,22 +469,27 @@ def question():
 2.	**Conditional Willingness** highlights opennes to negotiation but under specific conditions, prompting reflection on those conditions.
 3.	**Full Willingness** shows complete trust in the system and prioritises collective security and stability over personal freedom.
     """
- 
-# Function to extract willingness and updated_at
+
+
 def extract_willingness_and_timestamp(data):
     results = []
     for entry in data:
-        if entry.get("consent_00"):
+        # Check for willingness in consent_00 first, fallback on session_4
+        consent_data = None
+        if entry.get("session_4_consent_action"):
+            consent_data = json.loads(entry["session_4_consent_action"])
+        elif entry.get("consent_00"):
             consent_data = json.loads(entry["consent_00"])
+
+        if consent_data:
             willingness = consent_data.get("willingness", {}).get("value")
             updated_at = entry.get("updated_at")
             if willingness and updated_at:
                 # Convert the updated_at to a more readable format
                 updated_at = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
                 results.append({"willingness": willingness, "updated_at": updated_at})
+
     return results
-
-
     
 if __name__ == "__main__":
     
@@ -477,9 +521,7 @@ if __name__ == "__main__":
     """
     st.divider()
 
-    """
-    # HERE GOES THE CONSENT GAME
-    """
+    st.markdown("# <center>On Consent (a Game)</center>", unsafe_allow_html=True)
     
     """
     We choose to live in society because it offers us the benefits of cooperation and connection that we could not achieve in isolation.
@@ -602,12 +644,12 @@ This makes _our consent_ both foundational and dynamic, allowing it to evolve as
   {
     "id": "Zero Willingness",
     "label": "Zero Willingness",
-    "value": 0
+    "value": 4
   },
   {
     "id": "Conditional",
     "label": "Conditional",
-    "value": 0
+    "value": 6
   }
 ]
     DATA = sum_data(state, INITIAL_CONDITION)
@@ -681,7 +723,6 @@ This makes _our consent_ both foundational and dynamic, allowing it to evolve as
     """
     
     """
-    # SECOND PART
     
     ### What commitments are we making to each other and to the broader community?
 
@@ -792,8 +833,17 @@ This makes _our consent_ both foundational and dynamic, allowing it to evolve as
         _display_nuance(inverse_choice(float(dicho)))
 
     
+    
+    
+    
+    
     """
-    # HERE GOES THE THIRD PART
+    # HERE GOES THE VISUALISATION
+    """
+    
+    """
+    
+    
     
 ## New forms of collaboration and systems of transparency.
 
@@ -824,7 +874,7 @@ How Can We Implement Effective Transparency?
     """
     survey.radio("How do you feel about Collaborative Technologies?", id="collaborative_technologies", options=["I agree", "I disagree", "I go with the flow"], index=2)
     """
-4.	**Feedback Loops: Transparency should also be a two-way street. It's not just about providing information but also creating feedback mechanisms where individuals can voice concerns, offer suggestions, or hold decision-makers accountable. These loops ensure that transparency is dynamic and responsive to the community's needs.
+4.	**Feedback Loops**: Transparency should also be a two-way street. It's not just about providing information but also creating feedback mechanisms where individuals can voice concerns, offer suggestions, or hold decision-makers accountable. These loops ensure that transparency is dynamic and responsive to the community's needs.
 
 ## New Forms of Collaboration
 
@@ -834,14 +884,16 @@ Transparency is the cornerstone of our collaborative systems.
     """
     # HERE GOES THE INTEGRATION
     """    
+    with st.expander("Review your responses"):
+        st.json(survey.data)
     
-    st.json(survey.data)
     st.session_state['serialised_data'] = survey.data
-    """
-    The button below integrates the data into our database.
     
     """
-    _form_submit = lambda: outro()
+    The button below integrates the data into the bigger picture.
+    
+    """
+    # _form_submit = lambda: outro()
     if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
               disabled=not bool(st.session_state['authentication_status']), 
               type='primary',
@@ -850,7 +902,7 @@ Transparency is the cornerstone of our collaborative systems.
         """
         Congratulations!
 
-Check back in a few days or reach out to us by email. 
+Save this page in your bookmarks and check again in a few days. Otherwise, reach out to us by email. 
 
 social.from.scratch@proton.me
 
@@ -859,14 +911,16 @@ How you feel about the results?"""
     if st.session_state['authentication_status']:
         st.markdown(f"#### Sign #`{mask_string(st.session_state['username'])}`.")
     
-    
-    
     """
-    # HERE GOES THE VISUALISATION
-    """
-    
-    """
-    # HERE GOES THE TIMELINE
+    # After sharing ideas, stretching
+thoughtful discussions, and engaging a deeper understanding of each other's perspectives, _time_  moves _us_ forward. 
+
+Now, we shift from dialogue to action. To take our collaboration to the next level, we can focus on just one dimension of the many possibilities: time. Together, we will co-create a shared timeline, where each contribution will shape our collective future. **This open agenda will serve** as a living map, adapting to the flow of events, ideas, and actions _as they unfold_.
+
+Let's sketch out a collaborative, flexible timeline—an open space where each step we take can be recorded, discussed, and adjusted. This is our opportunity to organize, plan, and visualize the actions that will drive change. 
+
+Your input shapes this evolving story.
+
     """
     
 

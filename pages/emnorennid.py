@@ -554,7 +554,7 @@ def question():
 if __name__ == "__main__":
     
     # intro()
-    st.markdown(f"# <center>What time is _it_?</center> ", unsafe_allow_html=True)
+    st.markdown(f"# <center>Dinner on _me_?</center> ", unsafe_allow_html=True)
 
     # event_2 = st_player("https://vimeo.com/1007606689", key='vimeo_player_2')
     # name = survey.text_input("We may have already met", id="given-name")
@@ -570,49 +570,49 @@ if __name__ == "__main__":
         frame = st.empty()
 
         abstract = ["""
-    # **The Time _may be_ now**, _then_.
+
+Our entire emotional history 
+.
+plays itself out
+.
+in the physicality of eating.
 
 
-    To be _fair_, the **World Economic Forum** says it clearly$^1$: |
-    _“The social contract that shaped the mid-20th century no longer works for the world we live in”_.
-
-    ### **But why _now_, in our times**? |
-
-    **Inequality is rising**, natural resources are vanishing, and yet _we_ cling to outdated rules. Rules that incentivise **short-term gain over long-term sustainability**. Rules that allow the few to prosper, while the many are left to produce and consume.
-
-    _But who is we_? |
+Personal experiences knit in the present, reveal invisible bar- riers which disappear in the blink of an eye.
 
 
-    The **UN Secretary-General** warns:  
-    _"We are a world in pieces, societies are fragmented, political discourse is polarized, and trust is lost within and among countries$^2$"_. 
+And the more we trust, the farther we are able to venture.
+—
+In this space, instead of the pulling from the past of our mem- ories, or pushing to the future of our fears, expectations, and struggles within a busy life, we have a chance to share and deeply sink on the same floating grounds, of the turning mo- ment
+-now-
+connecting to the present vibrant flow of everything that is energy.
 
 
 
-    ### _"Inequality defines our time$^3$"_
-    """,
-    """
-    The **current financial system** is faltering. Experts speak of a new financial world order. **What does that even mean**?
-
-    And more importantly—**are you part of it**?
-
-    Some say the crises we face today _are connected_, part of a larger **“organic crisis”** rooted in a failing hegemonic order. **Is this true**? | 
-
-    Good news? Nobody bathes in the same river twice.
-
-    ### **Have you been invited to the conversation**?
-
-    ### Or `are decisions about the future being made behind closed doors`?
+Think again, think from the side (of the Food).
+Food wants to know your hunger,
+Food wants to meet you to release all tasty nutrients, Food wants to taste the delicate flavours of your cravings, and to see it as a match for her own.
 
 
-    Your vision can help _all_ see through. **Who are** the architects of a new way forward? Who can reshape how **we govern**, how **we cooperate**, how **we play**, how **we love**, how **we eat**, and how **we trust**? The old systems are crumbling, and in their place, we craft something new. **Something collective.**
 
-    """,
-        """
-    ### **Is it time to re•think**?
+Forget passivity, is irritating, and your considerateness is the opposite of the food’s fantasy of unrestrained rapture.
+Your lustiness: an open endorsement for our long journey.
 
-    Discussion is not about _tweaks_ to ```the system```. This is time for action. We are digging a **new social contract**—one that rebalances power, rethinks cooperation, and addresses the **fundamentals** of relationships, touching inequalities, and shared prosperity.
 
-    If you feel _that urgency_ to do more than *just watch* history unfold—then **join us**.
+Our extravagant dinner is an experience of profound em- powerment and self-affirmation for the body and the soul.
+
+We bring to an hedonistic dinner a lifetime of injunctions against selfishness, in the context of relationships:
+I am here to share
+...our behaviour and inclinations which encode the details of our personal journey.
+Cultural legacies still weigh subconsciously, socialised to con- trol ourselves, to restrain impulses, to tame the animal within.
+But why?
+This entire emotional history plays itself out in the physicality of eating.
+
+Suggestions for the senses, is what makes everything alive
+a minimal setting dim light, some spots, otherwise smooth. Enticing food and deep grooves. Culinary experiments not confined to the tongue, it is surfing that all boundaries invite, from, to, and across your universe of vibes.
+
+To declare the service finished there is only one thing to do. Served in a riddle, for you to reflect, the closure token is served, at the end of this text.
+
 
 
     """
@@ -645,29 +645,30 @@ if __name__ == "__main__":
     """]
         _sleep= 5
         with frame:
-            stream_once_then_write(abstract[0], stream_function=stream_function)
-        with st.spinner('Thinking about it...'):
-            time.sleep(_sleep)
+            abstract[0]
+            # stream_once_then_write(abstract[0], stream_function=stream_function)
+        # with st.spinner('Thinking about it...'):
+            # time.sleep(_sleep)
 
         
-        frame.empty()
+        # frame.empty()
 
-        with frame:
-            stream_once_then_write(abstract[1], stream_function=stream_function)
-            # st.markdown(abstract[1])
-        with st.spinner('Think about it...'):
-            time.sleep(_sleep)
+        # with frame:
+        #     stream_once_then_write(abstract[1], stream_function=stream_function)
+        #     # st.markdown(abstract[1])
+        # with st.spinner('Think about it...'):
+        #     time.sleep(_sleep)
 
-        frame.empty()
+        # frame.empty()
 
-        with frame:
-            stream_once_then_write(abstract[2], stream_function=stream_function)        
-        with st.spinner('Do you feel it?'):
-            time.sleep(_sleep)
+        # with frame:
+        #     stream_once_then_write(abstract[2], stream_function=stream_function)        
+        # with st.spinner('Do you feel it?'):
+        #     time.sleep(_sleep)
         
-        frame.empty()
+        # frame.empty()
     
-        st.session_state['intro_done'] = True
+        # st.session_state['intro_done'] = True
     
     
     from philoui.texts import corrupt_string

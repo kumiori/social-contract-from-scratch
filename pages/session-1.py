@@ -873,7 +873,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
 
     st.session_state['serialised_data'] = serialised_data
     """
-    The button below integrates the data into our database.
+    The button below integrates the data into the bigger picture.
     
     """
     
@@ -887,7 +887,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
         """
         Congratulations!
 
-Check back in a few days or reach out to us by email. 
+Save this page in your bookmarks and check again in a few days. Otherwise, reach out to us by email. 
 
 social.from.scratch@proton.me
 

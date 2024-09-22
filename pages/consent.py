@@ -1158,7 +1158,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
 
     st.session_state['serialised_data'] = survey.data
     """
-    The button below integrates the data into our database.
+    The button below integrates the data into the bigger picture.
     
     """
     
@@ -1170,7 +1170,7 @@ By interacting, we question basic assumptions and actively engage in shaping con
         """
         Congratulations!
 
-Check back in a few days or reach out to us by email. 
+Save this page in your bookmarks and check again in a few days. Otherwise, reach out to us by email. 
 
 social.from.scratch@proton.me
 

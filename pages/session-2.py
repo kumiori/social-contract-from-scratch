@@ -683,7 +683,8 @@ $^1$: Learning Planetizen Manifesto, https://www.learning-planet.org/learning-pl
     # What are your thoughts on global cooperation?
     
     Two members of our collective argue that the need for cooperation has never been greater, and the equilibrium between cooperation, economic progress, and development is questioned by global challenges. 
-    I a short article, they discuss cooperation as a historical product and explore triangular and polygonal cooperation schemes, following a trend from Japan. Furthermore, delving into the case where polygonal cooperation evolves into _circular_ cooperation, drawing a metaphorical connection and analogy to the dynamics of multi-body celestial systems, we aim to build a foundation for new models of direct collaboration.
+    
+    In a short article, they discuss cooperation as a historical product and explore triangular and polygonal cooperation schemes, following a trend from Japan. Furthermore, delving into the case where polygonal cooperation evolves into _circular_ cooperation, drawing a metaphorical connection and analogy to the dynamics of multi-body celestial systems, we aim to build a foundation for new models of direct collaboration.
     
     The article draft is available for review. Would you like to read it?
     
@@ -707,7 +708,7 @@ $^1$: Learning Planetizen Manifesto, https://www.learning-planet.org/learning-pl
 
     st.session_state['serialised_data'] = survey.data
     """
-    The button below integrates the data into our database.
+    The button below integrates the data into the bigger picture.
     
     """
 
@@ -719,7 +720,7 @@ $^1$: Learning Planetizen Manifesto, https://www.learning-planet.org/learning-pl
         """
         Congratulations!
 
-Check back in a few days or reach out to us by email. 
+Save this page in your bookmarks and check again in a few days. Otherwise, reach out to us by email. 
 
 social.from.scratch@proton.me
 

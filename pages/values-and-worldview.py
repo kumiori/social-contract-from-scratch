@@ -601,7 +601,8 @@ The third worldview is **dramatic or playful**. In this view, life is seen as a 
 
 
 ### 4. **Shamanic or Animistic Worldview**
-The **Shamanic worldview** is deeply rooted in **animism**, the belief that all living and non-living things—such as animals, plants, rivers, and even rocks—have a spirit or consciousness. This perspective, often found in indigenous Amazonian cultures, views the world as a complex, interconnected web of relationships between humans, nature, and spiritual forces.
+The **Shamanic worldview** is deeply rooted in **animism**, the belief that all living and non-living things—such as animals, plants, rivers, and even rocks—have a spirit. This perspective, often found in indigenous Amazonian cultures, views the world as a complex, interconnected web of relationships between humans, nature, and spiritual forces.
+
 
 ### 5. **Ubuntu Worldview**
 In many African cultures, the **Ubuntu** philosophy represents a worldview that emphasises **collective humanity**, interdependence, and shared responsibility. The phrase often associated with Ubuntu is: “**I am because we are**,” highlighting the deep connection between individuals and their communities.
@@ -754,17 +755,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     # st.write(survey.data)
     # st.write(selected_value)
     # Display retrieved list of values
-    st.write("Retrieved values:")
-    if selected_value is not None:
-        for value in selected_value:
-            st.write(f"🌟 {value}")
-        
-    results = st.session_state['results']
-    generate_review(results)
-    resonated, both = resumes_statements(results)
-    
-    st.write(f"Resonated statements: {resonated}")
-    st.write(f"Both statements: {both}")
+
     
 
     """
@@ -833,7 +824,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
 
     st.session_state['serialised_data'] = survey.data
     """
-    The button below integrates the data into our database.
+    The button below integrates the data into the bigger picture.
     
     """
     
@@ -845,7 +836,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
         """
         Congratulations!
 
-Check back in a few days or reach out to us by email. 
+Save this page in your bookmarks and check again in a few days. Otherwise, reach out to us by email. 
 
 social.from.scratch@proton.me
 
