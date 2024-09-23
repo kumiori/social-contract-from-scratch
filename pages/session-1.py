@@ -962,8 +962,9 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     # Results
     st.write("Unique Values: ")
     st.json(unique_values, expanded=False)
-    st.write("Overlapping Values: ")
+    st.write("Shared Values: ")
     st.json(overlapping_values, expanded=False)
+    
     # Step 1: Aggregating data
     st.markdown("## Worldview results:")
 
