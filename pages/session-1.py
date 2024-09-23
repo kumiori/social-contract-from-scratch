@@ -46,6 +46,7 @@ from streamlit_gtag import st_gtag
 import hashlib
 import random
 from philoui.texts import hash_text, stream_text, stream_once_then_write
+from streamlit_elements import elements, mui, nivo
 
 st_gtag(
     key="gtag_app_session1",
@@ -146,6 +147,9 @@ API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]
 
 mask_string = lambda s: f"{s[0:4]}***{s[-4:]}"
+
+def generate_random_points(num_points):
+    return [{"id": i, "x": random.uniform(0, 100), "y": random.uniform(0, 100)} for i in range(num_points)]
 
 def my_create_dichotomy(key, id = None, kwargs = {}):
     dico_style = """<style>
@@ -442,7 +446,33 @@ We continue the journey with the _Athena Collective_ — we are an group of thin
 Our mission is simple and profound: _to collaboratively shape a new social contract that reflects the complexity and diversity of the world we live in._
 
 The Social Contract, at its core, is about how we relate to each other, our environment, and the systems that govern us. But this cannot be built through one perspective alone. It requires opening ourselves to the full spectrum of points of view, ideas, and perceptions—from the bold and radical to the subtle and _infinitely nuanced_. 
+"""
 
+    # Data for Voronoi chart
+    data = generate_random_points(17)
+
+    with elements("voronoi"):
+        with mui.Box(sx={"height": 600}):
+            nivo.Voronoi(
+                data=data,
+                xDomain=[0, 100],
+                yDomain=[0, 100],
+                enableLinks=True,
+                linkLineWidth={30},
+                cellLineWidth={30},
+                linkLineColor="#cccccc",
+                cellLineColor="#c6432d",
+                pointSize=30,
+                pointColor="#c6432d",
+                margin={"top": 10, "right": 10, "bottom": 10, "left": 10},
+            )
+    st.markdown(f""" <center>The Athena Collective is a group of 17. 
+                This image represents the interplay of individual in a collective frame. The dots symbolise the 17 members of the Athena Collective, each an individual with their own perspective which changes dynamically. Grey lines depict (some of) the connections, a web of relationships and interactions that weave the collective together. The red tessellation illustrates how these relationships naturally define spaces of influence and responsibility, as well as boundaries.
+This image tells many stories: it speaks of networks, collaboration, personal agency, shared spaces, and the fluid, evolving nature of social contracts. Each member of the collective shapes the landscape while being shaped by the web they are part of, highlighting the interconnectedness and balance needed to thrive together.</center> """, unsafe_allow_html=True)
+
+    """
+    # 
+    
 Every thought, every lived experience matters in shaping a contract that is truly inclusive and reflective of our shared essence.
 
 As we move through this session, we explore the values that connect us and the dynamics that define our collective future. 
@@ -583,10 +613,10 @@ These are core values that guide the construction of a new social contract.""")
     #     st.session_state.reshuffled = True
         
     
-    selected_value = pills("Select a handful of the values that you most reflect in your actions", values, icons, multiselect=True, clearable=True, index=None)
-    
-    new_value_input = survey.text_input("Add a new value", key="new_value_input")
+    new_value_input = survey.text_input("Add your unique value to the list", key="new_value_input")
     st.button("Add a new value (clears the board)", on_click=add_new_value, use_container_width=True)
+    
+    selected_value = pills("Select a handful of the values that you most reflect in your actions", values, icons, multiselect=True, clearable=True, index=None)
     
     """
     # Unerstanding Worldviews
@@ -768,7 +798,9 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     _id = len(st.session_state['choices'])
     """
     
-    #### On this scale, how well do you resonate with the statement?
+    #### On this scale, how well do you resonate with the statement? Match your feeling and hit the button 'Send vibe'. 
+    
+    A new sentence will appear, take the time to send a few vibes.
     
     """
 
@@ -828,7 +860,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
                             'gradientWidth': 60,
                             'height': 250,
                             'title': '',
-                            'name': f'{name}',
+                            'name': f'fellows',
                             'messages': ["", "", ""],
                             }
                         )
