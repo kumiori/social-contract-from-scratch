@@ -225,7 +225,7 @@ def parse_session_data(data):
     
     return parsed_data
 
-# @st.cache_data    
+@st.cache_data    
 def fetch_data():
     
     conn = db.conn
