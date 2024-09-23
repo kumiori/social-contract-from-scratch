@@ -601,7 +601,7 @@ if __name__ == "__main__":
 
     ### **Have you been invited to the conversation**?
 
-    ### Or `are decisions about the future being made behind closed doors`?
+    ### Or are decisions about the future being made behind closed doors?
 
 
     Your vision can help _all_ see through. **Who are** the architects of a new way forward? Who can reshape how **we govern**, how **we cooperate**, how **we play**, how **we love**, how **we eat**, and how **we trust**? The old systems are crumbling, and in their place, we craft something new. **Something collective.**
