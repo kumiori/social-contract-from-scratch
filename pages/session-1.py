@@ -468,7 +468,7 @@ The Social Contract, at its core, is about how we relate to each other, our envi
             )
     st.markdown(f""" <center>The Athena Collective is a group of 17. 
                 This image represents the interplay of individual in a collective frame. The dots symbolise the 17 members of the Athena Collective, each an individual with their own perspective which changes dynamically. Grey lines depict (some of) the connections, a web of relationships and interactions that weave the collective together. The red tessellation illustrates how these relationships naturally define spaces of influence and responsibility, as well as boundaries.
-This image tells many stories: it speaks of networks, collaboration, personal agency, shared spaces, and the fluid, evolving nature of social contracts. Each member of the collective shapes the landscape while being shaped by the web they are part of, highlighting the interconnectedness and balance needed to thrive together.</center> """, unsafe_allow_html=True)
+This image tells many stories: it speaks of networks, collaboration, personal agency, shared spaces, and the fluid, evolving nature of social contracts. Each member of the collective shapes the landscape while being shaped by the web they are part of, highlighting the interconnectedness and balance needed to thrive together. Note that connections are _underneath_ the boundaries.</center> """, unsafe_allow_html=True)
 
     """
     # 
