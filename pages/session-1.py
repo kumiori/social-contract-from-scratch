@@ -1,7 +1,9 @@
-import streamlit as st
-import requests
 import time
+
+import requests
+import streamlit as st
 from numpy import around
+
 if st.secrets["runtime"]["STATUS"] == "Production":
     st.set_page_config(
         page_title="The Social Contract from Scratch • Structure and Participation",
@@ -24,29 +26,31 @@ if st.secrets["runtime"]["STATUS"] == "Production":
         unsafe_allow_html=True,
     )
 
+import hashlib
 import json
+import random
 from datetime import datetime
-from streamlit_pills_multiselect import pills
+
 import pandas as pd
 import philoui
+import plotly.express as px
 import streamlit.components.v1 as components
 import streamlit_shadcn_ui as ui
 import yaml
 from philoui.authentication_v2 import AuthenticateWithKey
 from philoui.io import QuestionnaireDatabase as IODatabase
-from philoui.io import conn, create_dichotomy, create_equaliser, create_qualitative, create_quantitative
+from philoui.io import (conn, create_dichotomy, create_equaliser,
+                        create_qualitative, create_quantitative)
 from philoui.survey import CustomStreamlitSurvey
-from philoui.texts import hash_text, stream_text
+from philoui.texts import hash_text, stream_once_then_write, stream_text
+from streamlit_elements import elements, mui, nivo
 from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.row import row
+from streamlit_gtag import st_gtag
+from streamlit_pills_multiselect import pills
+from streamlit_player import st_player
 from streamlit_timeline import timeline
 from yaml import SafeLoader
-from streamlit_player import st_player
-from streamlit_gtag import st_gtag
-import hashlib
-import random
-from philoui.texts import hash_text, stream_text, stream_once_then_write
-from streamlit_elements import elements, mui, nivo
 
 st_gtag(
     key="gtag_app_session1",
@@ -190,20 +194,57 @@ def my_create_dichotomy(key, id = None, kwargs = {}):
             st.markdown(_response)
     return response
 
-
-def resumes_statements(results):
-    # List to store the statements the user resonates with
-    resonated_statements = []
-    dissonated_statements = []
-    _statements = []
+def parse_session_data(data):
+    parsed_data = []
     
-    # Iterate through each result
-    for result in results:
-        element = result["element"]
-        st.write(element)        
-        st.write(result)        
-        _statements.append({"element": element[1]['hash'], "resonance": result})
-    return _statements
+    for entry in data:
+        # Check if the entry has values for session_1_values and session_1_worldview
+        session_1_values = entry.get("session_1_values")
+        session_1_worldview = entry.get("session_1_worldview")
+        
+        # Parse session_1_values if it exists and isn't null
+        if session_1_values:
+            try:
+                session_1_values = json.loads(session_1_values)
+                parsed_data.append({
+                    "session_1_values": session_1_values,
+                })
+            except json.JSONDecodeError:
+                session_1_values = None
+        
+        # Parse session_1_worldview if it exists and isn't null
+        if session_1_worldview:
+            try:
+                session_1_worldview = json.loads(session_1_worldview)
+                parsed_data.append({
+                    "session_1_worldview": session_1_worldview
+                })
+            except json.JSONDecodeError:
+                session_1_worldview = None
+        
+    
+    return parsed_data
+
+# @st.cache_data    
+def fetch_data():
+    
+    conn = db.conn
+    table_name = db.table_name
+    response = conn.table(table_name).select("session_1_values", "session_1_worldview").execute()
+    
+    if response and response.data:
+        data = response.data
+        _data = []
+        
+        # Display each row of data
+        for row in data:
+            _data.append(row)
+    else:
+        st.error(f"No data found in the {table_name} table.")
+    
+    return _data
+    
+    return response
 
 @st.cache_data
 def _reshuffle(values):
@@ -773,11 +814,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
                     id_counter += 1
         return statement_dict
     statement_dict = assign_ids(worldviews)
-    
-    # if st.button("Display Choices"):
-    
-    # st.write(st.session_state['current_element'])
-    
+
     if st.session_state['current_element'] == None:
         statement = list(statement_dict.items())[-1]
     else:
@@ -787,8 +824,6 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     f"""
     
     # How our worldviews are a unique blend?
-    
-      
     
     ### _{statement[1]["statement"]}_ 
     """
@@ -869,41 +904,215 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
         _resonance = get_resonance_level(float(dicho), resonance_levels)
         _display_nuance(inverse_choice(_resonance[0]))
 
-    def update_state(value):
+    def update_state(value, element):
         # Append the current element and result to the results list
+        print(value)
         st.session_state.results.append({
-            "element": statement,
+            "element": element,
             "result": value
         })
-        
+        print(st.session_state.current_element)
         # Pick two new random statements for the next round
         st.session_state.current_element = random.choice(list(statement_dict.items()))
 
-    st.button("Send vibe", use_container_width=True, on_click=update_state, args=(dicho,), type="primary")
+    st.button("Send vibe", use_container_width=True, on_click=update_state, args=(dicho, statement), type="primary")
     
     st.markdown("## The values you bring into the Contract:")
+    
     if selected_value is not None:
         for value in selected_value:
             st.write(f"🌟 {value}")
     
-    st.markdown("## Worldview results:")
     results = st.session_state['results']
-    # generate_review(results)
-    # resonances = resumes_statements(results)
-    
-    # st.json(st.session_state.results)
-    # st.json(survey.data, expanded=False)
-    
-    
-    """
-    # HERE GOES THE VISUALISATION
-    """
 
+    """
+    
+    # HERE GOES THE VISUALISATION
+    
+    """
+    data = fetch_data()
+
+    parsed_session = parse_session_data(data)
+    
+    # Extract all session_1_values data
+    
+    all_values_data = []
+    for entry in parsed_session:
+        if "session_1_values" in entry and entry['session_1_values'] is not None:
+            all_values_data.extend(entry["session_1_values"])
+
+    # Extract all session_1_worldview data
+    all_worldview_data = []
+    for entry in parsed_session:
+        if "session_1_worldview" in entry and entry['session_1_worldview'] is not None:
+            all_worldview_data.extend(entry["session_1_worldview"])
+    
+    # all_worldview_data
+    from collections import Counter
+
+    # Flatten the list to get all the values together
+    # Count the occurrences of each value
+    value_counts = Counter(all_values_data)
+
+    # Find the unique and overlapping values
+    # custom_values = [value for value, count in value_counts.items() if count == 1]
+    unique_values = [value for value, count in value_counts.items() if count == 1]
+    overlapping_values = [(value, count) for value, count in value_counts.items() if count > 1]
+
+    # Results
+    st.write("Unique Values: ")
+    st.json(unique_values, expanded=False)
+    st.write("Overlapping Values: ")
+    st.json(overlapping_values, expanded=False)
+    # Step 1: Aggregating data
+    st.markdown("## Worldview results:")
+
+    def aggregate_worldview_data(data):
+        # Initialize a dictionary to hold hash values and corresponding results
+        aggregated_data = {}
+
+        # Iterate through each entry in the worldview data
+        for statement in data:
+            hash_val = statement['hash']
+            
+            try:
+                result = float(statement['result'])
+
+                if hash_val in aggregated_data:
+                    aggregated_data[hash_val]['sum'] += result
+                    aggregated_data[hash_val]['count'] += 1
+                else:
+                    aggregated_data[hash_val] = {'sum': result, 'count': 1}
+
+                # Calculate the average for each hash
+                for hash_val, stats in aggregated_data.items():
+                    stats['average'] = stats['sum'] / stats['count']
+
+            except:
+                    print(f"Invalid result for hash: {hash_val}")
+                    continue
+        return aggregated_data
+
+    import numpy as np
+    hash_to_statement = {value["hash"]: value for value in statement_dict.values()}
+
+    # Step 2: Prepare the data for plotting
+    def prepare_matrix_data(aggregated_data):
+        hashes = list(aggregated_data.keys())
+        averages = [aggregated_data[h]['average'] for h in hashes]
+        counts = [aggregated_data[h]['count'] for h in hashes]
+
+        # Creating a square matrix with dummy y-values (for matrix representation)
+        n = int(np.ceil(np.sqrt(len(hashes))))  # Determine size of square matrix
+        matrix_size = n * n
+        # n
+        # Pad the data if needed to fill the square matrix
+        padded_hashes = hashes + [None] * (matrix_size - len(hashes))
+        padded_averages = averages + [None] * (matrix_size - len(averages))  # Padding with zero
+        padded_counts = counts + [0] * (matrix_size - len(counts))  # Padding with zero
+
+        # Create coordinates for the square matrix
+        x_coords = np.repeat(np.arange(n), n)
+        y_coords = np.tile(np.arange(n), n)
+
+        # Create a DataFrame for plotting
+        df = pd.DataFrame({
+            'Hash': padded_hashes,
+            'Average Result': padded_averages,
+            'Count': padded_counts,
+            'x': x_coords,
+            'y': y_coords
+        })
+
+        df['Statement'] = df['Hash'].apply(lambda h: hash_to_statement.get(h, {}).get('statement', 'Unknown') if h else 'Waiting for new data')
+        df['Worldview'] = df['Hash'].apply(lambda h: hash_to_statement.get(h, {}).get('worldview', 'Unknown') if h else '')
+        df['Category'] = df['Hash'].apply(lambda h: hash_to_statement.get(h, {}).get('category', 'Unknown') if h else '')
+
+        return df
+
+    # Step 3: Create a square matrix scatter plot
+    def plot_matrix_scatter(df):
+        fig = px.scatter(
+            df,
+            x='x', y='y',
+            # size='Count',  # Size based on how many times a hash occurs
+            # size='1',  # Size based on how many times a hash occurs
+            color='Average Result',  # Color by the average result
+            color_continuous_scale='gray',  # Grayscale color mapping
+            title="Have you seen the Matrix? Fragments of Worldviews ",
+            labels={'Average Result': 'Resonance Level'}
+        )
+        fig.update_traces(marker=dict(
+            size=70,  # Set the size of the dots
+            line=dict(width=1, color='black')  # Add a border to the dots
+        ))
+        fig.update_traces(hovertemplate=
+            '<b>Hash:</b> %{customdata[0]}<br>' +
+            '<b>Resonance:</b> %{marker.color:.2f}<extra></extra>'
+        )
+
+        # Customize hovertemplate to show Hash (first 6 chars), Worldview, Category, and Statement
+        fig.update_traces(hovertemplate=
+            # '<b>Hash:</b> %{customdata[0]:.6s}<br>' +  # Show first 6 characters of the hash
+            # '<b>Worldview:</b> %{customdata[1]}<br>' +
+            # '<b>Category:</b> %{customdata[2]}<br>' +
+            '<b>Statement:</b> %{customdata[3]}<br>' +
+            '<b>Resonance:</b> %{marker.color:.2f}<extra></extra>'
+        )
+        # Attach the customdata (hash values) for the hovertemplate
+        fig.update_traces(customdata=df[['Hash', 'Worldview', 'Category', 'Statement']].values)
+
+        # Customize the layout to remove gridlines and ensure a square-like appearance
+        fig.update_layout(
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            plot_bgcolor="white",
+            margin=dict(l=40, r=40, t=40, b=40),
+            showlegend=False,
+            height=600,  # Force the plot to be square-shaped
+            width=800
+        )
+
+        return fig    
+    
+    aggregated_data = aggregate_worldview_data(all_worldview_data)
+    df = prepare_matrix_data(aggregated_data)
+    st.markdown(f"We are tracking {len(aggregated_data)} statements")
+    # st.table(df)
+    fig = plot_matrix_scatter(df)
+
+    # To display in Streamlit:
+    # st.plotly_chart(fig)
+    st.plotly_chart(fig)
+    f"Remark: {len(df)-len(aggregated_data)} dummy elements represented in dark grey."
+    # Filter for statements that resonate > 0.7
+    _resonating_statements = {key: value for key, value in aggregated_data.items() if value["average"] > 0.7}
+
+    # Filter for statements that do not resonate < 0.3
+    _non_resonating_statements = {key: value for key, value in aggregated_data.items() if value["average"] < 0.3}
+
+    # Display results
+    st.subheader("Statements that resonate")
+    # st.write(_resonating_statements)
+    resonating_statements = [hash_to_statement.get(h) for h in _resonating_statements.keys()]
+    for _statement in resonating_statements:
+        if _statement and 'statement' in _statement:
+            st.markdown(f"#### ✨ {_statement['statement']}")    # st.write(resonating_statements)
+
+    st.subheader("\nStatements that do not resonate")
+    # st.write(_non_resonating_statements)
+    non_resonating_statements = [hash_to_statement.get(h) for h in _non_resonating_statements.keys()]
+    for _statement in non_resonating_statements:
+        if _statement and 'statement' in _statement:
+            st.markdown(f"🔕 {_statement['statement']}")
+    
     extracted_data = [{"hash": item["element"][1]["hash"], "result": item["result"]} for item in results]
     
     serialised_data = {"values": selected_value, "worldview": extracted_data}
-
     st.session_state['serialised_data'] = serialised_data
+
+    "Remark: _Statements resonate or do not resonate, respectively, when the average resonace is > 0.7, or < 0.3._"
+    
     """
     The button below integrates the data into the bigger picture.
     
