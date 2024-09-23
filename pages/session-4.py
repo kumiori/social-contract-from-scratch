@@ -288,7 +288,7 @@ def _form_submit():
             try:
                 data = {
                     'signature': signature,
-                    'consent_00': json.dumps(serialised_data)
+                    'session_4_consent_action': json.dumps(serialised_data)
                 }
                 # throw an error if signature is null
                 if not signature:
