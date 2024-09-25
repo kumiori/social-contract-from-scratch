@@ -51,6 +51,7 @@ from streamlit_pills_multiselect import pills
 from streamlit_player import st_player
 from streamlit_timeline import timeline
 from yaml import SafeLoader
+import streamlit_wordcloud as wordcloud
 
 st_gtag(
     key="gtag_app_session1",
@@ -521,7 +522,7 @@ Let's embrace the power of diversity and the richness of each voice in crafting 
     
     """
     st.markdown(f"# <center>Values and Worldview</center> ", unsafe_allow_html=True)
-    # st.markdown("# Values and Worldview")
+    st.markdown("### Values and Worldview")
 
     # event_2 = st_player("https://vimeo.com/1007606689", key='vimeo_player_2')
     # name = survey.text_input("We may have already met", id="given-name")
@@ -547,7 +548,7 @@ These are core values that guide the construction of a new social contract.""")
         "Self-determination", "Security", "Community", "Accountability", "Environmental Stewardship", 
         "Growth", "Curiosity", "Wisdom", "Peace", "Respect", "Honesty", "Creativity", "Humility", 
         "Forgiveness", "Gratitude", "Kindness", "Unity", "Trust", "Solidarity", "Patience", "Altruism", 
-        "Courage", "Loyalty", "Self-discipline", "Ethical Leadership", "Equality of Opportunity", 
+        "Courage", "Loyalty", "Self-discipline", "Ethical Leadership",  
         "Democracy", "Balance", "Mindfulness", "Optimism", "Generosity", "Care", "Joy", "Prudence", 
         "Authenticity", "Fortitude", "Innovation", "Tolerance", "Inclusion", "Health", "Fairness", 
         "Adaptability", "Responsiveness", "Wisdom", "Resourcefulness", "Harmony", "Open-mindedness", 
@@ -556,9 +557,9 @@ These are core values that guide the construction of a new social contract.""")
         "Nonviolence", "Volunteerism", "Interconnectedness", "Civic Duty", "Dignity", "Shared Prosperity", 
         "Cultural Heritage", "Justice for All", "Personal Growth", "Vision", "Restorative Justice", 
         "Empowerment", "Innovation", "Lifelong Learning", "Spirituality", "Environmental Justice", 
-        "Food Security", "Water Rights", "Public Health", "Economic Fairness", "Climate Action", 
+        "Food Security", "Water Rights", "Health", "Economic Fairness", "Climate Action", 
         "Simplicity", "Shared Responsibility", "Peacebuilding", "Human Potential", "Compromise", 
-        "Understanding", "Social Cohesion", "Financial Literacy", "Work-Life Balance"
+        "Understanding", "Social Cohesion", "Financial Literacy", "Work-Life Balance", "Purity", "Cleanliness", "Coexistence", "Partnership", "Accessibility", "Education", "Beauty", "Aesthetics", 
     ]
 
     icons = [
@@ -644,6 +645,9 @@ These are core values that guide the construction of a new social contract.""")
             st.session_state['custom_values'].append(new_value)
             st.toast(f"Added new value: {new_value}")
 
+    random.seed(42)
+    random.shuffle(neutral_values)
+    
     values = values + negative_values + neutral_values
     values = values + st.session_state['custom_values']
     icons = icons + negative_icons + icons[0:len(neutral_values)]
@@ -657,7 +661,7 @@ These are core values that guide the construction of a new social contract.""")
     new_value_input = survey.text_input("Add your unique value to the list", key="new_value_input")
     st.button("Add a new value (clears the board)", on_click=add_new_value, use_container_width=True)
     
-    selected_value = pills("Select a handful of the values that you most reflect in your actions", values, icons, multiselect=True, clearable=True, index=None)
+    selected_value = pills("Select a handful of the values that you most reflect in your actions", values, multiselect=True, clearable=True, index=None)
     
     """
     # Unerstanding Worldviews
@@ -955,9 +959,25 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     value_counts = Counter(all_values_data)
 
     # Find the unique and overlapping values
-    # custom_values = [value for value, count in value_counts.items() if count == 1]
+    custom_values = [value for value, count in value_counts.items() if value.startswith("🎁 ")]
     unique_values = [value for value, count in value_counts.items() if count == 1]
     overlapping_values = [(value, count) for value, count in value_counts.items() if count > 1]
+    # Prepare the data in the required format
+
+    words = []
+    for value, count in value_counts.items():
+        word_data = {
+            "text": value,  # The actual value
+            "value": count,  # The frequency of the value
+            "color": "#{:06x}".format(random.randint(0, 0xFFFFFF)),  # Random color for now, can be adjusted
+        }
+        words.append(word_data)
+    # print(words)
+    # if st.button("Visualize word cloud"):
+    return_obj = wordcloud.visualize(words, 
+                                    tooltip_data_fields={'text':'Company', 'value':'Mentions'}, per_word_coloring=False)
+
+    st.write(return_obj)
 
     # Results
     st.write("Unique Values: ")
@@ -1041,7 +1061,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
             color='Average Result',  # Color by the average result
             color_continuous_scale='gray',  # Grayscale color mapping
             title="Have you seen the Matrix? Fragments of Worldviews ",
-            labels={'Average Result': 'Resonance Level'}
+            labels={'Average Result': 'Resonance'}
         )
         fig.update_traces(marker=dict(
             size=70,  # Set the size of the dots
