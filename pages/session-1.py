@@ -226,7 +226,7 @@ def parse_session_data(data):
     
     return parsed_data
 
-@st.cache_data    
+# @st.cache_data    
 def fetch_data():
     
     conn = db.conn
@@ -643,7 +643,7 @@ These are core values that guide the construction of a new social contract.""")
         "Equality", "Freedom", "Justice", "Compassion", "Sustainability", "Innovation", "Collaboration", 
         "Responsibility", "Resilience", "Integrity", "Diversity", "Transparency", "Empathy", 
         "Self-determination", "Security", "Community", "Accountability", "Environmental Stewardship", 
-        "Growth", "Curiosity", "Wisdom", "Peace", "Respect", "Honesty", "Creativity", "Humility", 
+        "Growth", "Curiosity", "Peace", "Respect", "Honesty", "Creativity", "Humility", 
         "Forgiveness", "Gratitude", "Kindness", "Unity", "Trust", "Solidarity", "Patience", "Altruism", 
         "Courage", "Loyalty", "Self-discipline", "Ethical Leadership",  
         "Democracy", "Balance", "Mindfulness", "Optimism", "Generosity", "Care", "Joy", "Prudence", 
