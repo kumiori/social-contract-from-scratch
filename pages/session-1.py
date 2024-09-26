@@ -51,7 +51,7 @@ from streamlit_pills_multiselect import pills
 from streamlit_player import st_player
 from streamlit_timeline import timeline
 from yaml import SafeLoader
-import streamlit_wordcloud as wordcloud
+# import streamlit_wordcloud as wordcloud
 
 st_gtag(
     key="gtag_app_session1",
@@ -981,10 +981,10 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
         words.append(word_data)
     # print(words)
     # if st.button("Visualize word cloud"):
-    return_obj = wordcloud.visualize(words, 
-                                    tooltip_data_fields={'text':'Company', 'value':'Mentions'}, per_word_coloring=False)
+    # return_obj = wordcloud.visualize(words, 
+    #                                 tooltip_data_fields={'text':'Company', 'value':'Mentions'}, per_word_coloring=False)
 
-    st.write(return_obj)
+    # st.write(return_obj)
 
     # Results
     st.write("Unique Values: ")
