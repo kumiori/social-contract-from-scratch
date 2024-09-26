@@ -315,7 +315,7 @@ def intro():
         switch_value = ui.switch(default_checked=True, label="Economic mode", key="switch1")
         # if switch_value:
         st.toast(f"Economic mode is {switch_value}")
-        whitelist = ui.button(text="Check the results", url="", key="link_btn")
+        whitelist = ui.button(text="Check the results", url="#results", key="link_btn")
         # if whitelist:
             # st.toast("Whitelist")
             # join_waitlist()
@@ -362,6 +362,84 @@ def authentifier():
             st.info('It seems that I am already connected')
                 # with col2:
             authenticator.logout()
+
+worldviews = {
+    "Mechanical": {
+        "in_accord": [
+            "The universe operates like a precise clockwork mechanism, following fixed, predictable laws.",
+            "Human progress is achieved through mastering and controlling nature via technology.",
+            "Success is measured by efficiency and productivity, with everything in its rightful place.",
+            "Order and predictability are essential for a stable society, and disruption is to be minimised.",
+            "The individual's role is to fit into pre-defined systems, optimising their function within it."
+        ],
+        "in_disaccord": [
+            "Life is spontaneous and cannot be reduced to predictable formulas or systems.",
+            "Human beings should focus on emotional and spiritual growth rather than control and efficiency.",
+            "The natural world is too complex and interconnected to be treated as a mere machine."
+        ]
+    },
+    
+    "Organic": {
+        "in_accord": [
+            "All beings and elements of nature are interconnected in a web of life.",
+            "Growth and evolution occur naturally through balance and adaptation, not control.",
+            "Humans are part of a larger living system and must respect nature's cycles and rhythms.",
+            "Diversity in ecosystems and societies fosters resilience and strength.",
+            "Healing and well-being come from harmony and alignment with natural forces."
+        ],
+        "in_disaccord": [
+            "Nature is something to be mastered, controlled, and manipulated for human benefit.",
+            "The world can be fully understood and managed by breaking it down into separate, independent parts.",
+            "Human progress is measured only by technological advancements and resource exploitation."
+        ]
+    },
+    
+    "Dramatic/Playful": {
+        "in_accord": [
+            "Life is a creative expression where spontaneity and improvisation are valued.",
+            "Every individual plays a unique role in the cosmic drama, contributing to the collective story.",
+            "Mistakes and failures are simply part of the playful unfolding of life, not to be feared.",
+            "The world is a stage, and human existence is filled with opportunities for personal expression and creativity.",
+            "Reality is flexible, open to interpretation, and subject to change based on the play of ideas."
+        ],
+        "in_disaccord": [
+            "Life must follow strict rules, and spontaneity should be suppressed in favor of order and control.",
+            "The world is a machine with no room for creativity or improvisation.",
+            "Success is about efficiency and productivity, not playfulness and joy."
+        ]
+    },
+    
+    "Animistic": {
+        "in_accord": [
+            "Everything in nature, from animals to rivers, possesses a spiritual essence and is interconnected.",
+            "Humans must live in harmony with the natural world and respect its spiritual forces.",
+            "Rituals and offerings are vital for maintaining balance between the human and spiritual realms.",
+            "The Earth is a living being, and its well-being is inseparable from our own.",
+            "Knowledge comes from deep, direct experience with nature and the spirit world, not from abstract reasoning."
+        ],
+        "in_disaccord": [
+            "Nature is devoid of spirit and exists solely for human exploitation and control.",
+            "Progress is measured by the extraction of natural resources without regard for environmental consequences.",
+            "Humans are superior to other living beings and should dominate the natural world."
+        ]
+    },
+    
+    "Ubuntu": {
+        "in_accord": [
+            '"I am because we are" – Human beings are fundamentally interconnected and interdependent.',
+            "Collective well-being is more important than individual success, and compassion guides decision-making.",
+            "Shared responsibility and mutual support are key to a thriving community.",
+            "Dignity and respect must be afforded to all members of the community, regardless of their differences.",
+            "Humanity is enriched through cooperation, generosity, and a sense of belonging to the collective."
+        ],
+        "in_disaccord": [
+            "Individualism and self-interest should guide actions, with little regard for the community.",
+            "Success is measured by individual wealth and status, rather than shared prosperity.",
+            "The needs of the collective are secondary to personal ambition and competition."
+        ]
+    }
+}
+    # Function to display choices
 
 def question(): 
     name = 'there'
@@ -473,6 +551,25 @@ _In the meantime_:""")
         st.markdown("""
         `Your dashboard is saved.`
         """)
+
+# Function to assign unique IDs to statements
+def assign_ids(worldviews):
+    id_counter = 1
+    statement_dict = {}
+    
+    for worldview, types in worldviews.items():
+        for category, statements in types.items():
+            for statement in statements:
+                # hash statement to create unique ID
+                statement_hash = hashlib.md5(statement.encode()).hexdigest()
+                statement_dict[id_counter] = {
+                    "worldview": worldview,
+                    "category": category,
+                    "statement": statement,
+                    "hash": statement_hash
+                }
+                id_counter += 1
+    return statement_dict
 
 if __name__ == "__main__":
     
@@ -663,47 +760,49 @@ These are core values that guide the construction of a new social contract.""")
     
     selected_value = pills("Select a handful of the values that you most reflect in your actions", values, multiselect=True, clearable=True, index=None)
     
+
+
+
+
     """
-    # Unerstanding Worldviews
+    # Understanding Worldviews
     
-Understanding each other's worldviews is crucial for creating a social contract that reflects collective values and fosters cooperation. Each individual's perspective is shaped by culture, experiences, and the environment, and these diverse worldviews influence how we approach issues like justice, governance, and sustainability.
+Each individual's perspective is shaped by culture, experiences, and the environment. These diverse worldviews influence how we approach issues like justice, governance, and sustainability.
 
-In the context of constructing a social contract, knowing each other's worldviews allows us to:
+Knowing each other's worldviews allows us to:
 
-1.	**Bridge differences**: By recognizing different perspectives, we can build bridges rather than divisions, ensuring that no viewpoint is left unheard.
-2.	**Shape inclusive solutions**: Solutions to complex societal challenges must consider varying worldviews, whether rooted in cultural, spiritual, or philosophical beliefs.
-3.	**Encourage empathy**: Understanding how others see the world promotes empathy, making space for more nuanced discussions that honor every participant's lived reality.
+-	**Bridge differences**
+-	**Shape inclusive solutions**
+-	**Encourage empathy**
 
-By exploring and integrating these diverse worldviews, we can create a social contract that reflects our shared humanity and common goals, while also respecting our differences.
     """
     
+
     """
 
-Different worldviews provide unique insights into how humans relate to the universe, nature, and each other. Would you like to explore how these perspectives could influence the social contract or other aspects of our work?
+Different worldviews provide unique insights into how humans relate to the universe, nature, and each other. Would you like to explore how these perspectives could influence the social contract or other aspects of our coexistence?
 
-We've identified **five qualitatively distinct worldviews**, each of which highlights different and complementary traits in the way we approach the world. As products of exchange, dialogue, and experience, we believe your worldview will resonate with many of these perspectives.
+Your personal worldview is likely to be a unique blend of these singular standpoints—a mix of cultural, philosophical, and personal views.
 
-But more than that, your personal worldview is likely to be a unique blend of these singular standpoints—a mix of cultural, philosophical, and personal views.
-
-_**Let's play!**_ Together, we'll explore what defines our collective worldview. Through this exercise, we'll discover how our individual perspectives come together to shape the shared vision we'll use to build our social contract.
+_**Let's play!**_ Together, we'll explore what defines a collective worldview. Through this exercise, we'll discover how our individual perspectives come together to shape the shared vision we'll use to build our social contract.
 
 ## We've identified **five qualitatively distinct worldviews**
 
 ### 1. **Mechanical**: 
-This view sees **the universe and life as a machine**, with components working together in predictable, mechanical ways. It emphasises control, order, and predictability, with humans as parts of a larger "machine" governed by natural laws.
+**The universe and life constitute a machine**, with components working together in predictable, mechanical ways. It emphasises control, order, and predictability, with humans as parts of a larger "mechanism" governed by natural laws.
 
 ### 2. **Organic**: 
-The organic worldview sees life and **the universe as a living, interconnected system**, like a biological organism. It emphasises harmony, interdependence, and growth, where all parts are intimately connected and affect each other.
+**The universe as a living, interconnected system**, like a biological organism. It emphasises harmony, interdependence, and growth, where all parts are intimately connected and affect each other.
 
 ### 3. **Dramatic**: 
-The third worldview is **dramatic or playful**. In this view, life is seen as a cosmic drama or play, where existence is an unfolding, dynamic performance rather than something rigid or predetermined. This perspective celebrates spontaneity, creativity, and the notion that life is to be experienced like a game or theatrical performance, rather than something to be controlled or merely survived.
+The world is **a play**. Life is seen as a cosmic drama, where existence is an unfolding, dynamic performance rather than something rigid or predetermined. This  celebrates spontaneity, creativity, and the notion that life is to be experienced like a game or theatre, rather than something to be controlled or merely survived.
 
 
-### 4. **Shamanic or Animistic**
-The **Shamanic worldview** is deeply rooted in **animism**, the belief that all living and non-living things—such as animals, plants, rivers, and even rocks—have a spirit. This perspective, often found in indigenous Amazonian cultures, views the world as a complex, interconnected web of relationships between humans, nature, and spiritual forces.
+### 4. **Animistic**:
+**Animist** belief holds that all living and non-living things—such as animals, plants, rivers, and even rocks—have a spirit. Many indigenous cultures view the world as a complex, interconnected web of relationships between humans, nature, and spiritual forces.
 
 
-### 5. **Ubuntu**
+### 5. **Ubuntu**:
 In many African cultures, the **Ubuntu** philosophy represents a worldview that emphasises **collective humanity**, interdependence, and shared responsibility. The phrase often associated with Ubuntu is: “**I am because we are**,” highlighting the deep connection between individuals and their communities.
 
     """
@@ -711,84 +810,6 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     st.divider()
 
     # Worldview statements for the game
-
-    worldviews = {
-        "Mechanical": {
-            "in_accord": [
-                "The universe operates like a precise clockwork mechanism, following fixed, predictable laws.",
-                "Human progress is achieved through mastering and controlling nature via technology.",
-                "Success is measured by efficiency and productivity, with everything in its rightful place.",
-                "Order and predictability are essential for a stable society, and disruption is to be minimised.",
-                "The individual's role is to fit into pre-defined systems, optimising their function within it."
-            ],
-            "in_disaccord": [
-                "Life is spontaneous and cannot be reduced to predictable formulas or systems.",
-                "Human beings should focus on emotional and spiritual growth rather than control and efficiency.",
-                "The natural world is too complex and interconnected to be treated as a mere machine."
-            ]
-        },
-        
-        "Organic": {
-            "in_accord": [
-                "All beings and elements of nature are interconnected in a web of life.",
-                "Growth and evolution occur naturally through balance and adaptation, not control.",
-                "Humans are part of a larger living system and must respect nature's cycles and rhythms.",
-                "Diversity in ecosystems and societies fosters resilience and strength.",
-                "Healing and well-being come from harmony and alignment with natural forces."
-            ],
-            "in_disaccord": [
-                "Nature is something to be mastered, controlled, and manipulated for human benefit.",
-                "The world can be fully understood and managed by breaking it down into separate, independent parts.",
-                "Human progress is measured only by technological advancements and resource exploitation."
-            ]
-        },
-        
-        "Dramatic/Playful": {
-            "in_accord": [
-                "Life is a creative expression where spontaneity and improvisation are valued.",
-                "Every individual plays a unique role in the cosmic drama, contributing to the collective story.",
-                "Mistakes and failures are simply part of the playful unfolding of life, not to be feared.",
-                "The world is a stage, and human existence is filled with opportunities for personal expression and creativity.",
-                "Reality is flexible, open to interpretation, and subject to change based on the play of ideas."
-            ],
-            "in_disaccord": [
-                "Life must follow strict rules, and spontaneity should be suppressed in favor of order and control.",
-                "The world is a machine with no room for creativity or improvisation.",
-                "Success is about efficiency and productivity, not playfulness and joy."
-            ]
-        },
-        
-        "Animistic": {
-            "in_accord": [
-                "Everything in nature, from animals to rivers, possesses a spiritual essence and is interconnected.",
-                "Humans must live in harmony with the natural world and respect its spiritual forces.",
-                "Rituals and offerings are vital for maintaining balance between the human and spiritual realms.",
-                "The Earth is a living being, and its well-being is inseparable from our own.",
-                "Knowledge comes from deep, direct experience with nature and the spirit world, not from abstract reasoning."
-            ],
-            "in_disaccord": [
-                "Nature is devoid of spirit and exists solely for human exploitation and control.",
-                "Progress is measured by the extraction of natural resources without regard for environmental consequences.",
-                "Humans are superior to other living beings and should dominate the natural world."
-            ]
-        },
-        
-        "Ubuntu": {
-            "in_accord": [
-                '"I am because we are" – Human beings are fundamentally interconnected and interdependent.',
-                "Collective well-being is more important than individual success, and compassion guides decision-making.",
-                "Shared responsibility and mutual support are key to a thriving community.",
-                "Dignity and respect must be afforded to all members of the community, regardless of their differences.",
-                "Humanity is enriched through cooperation, generosity, and a sense of belonging to the collective."
-            ],
-            "in_disaccord": [
-                "Individualism and self-interest should guide actions, with little regard for the community.",
-                "Success is measured by individual wealth and status, rather than shared prosperity.",
-                "The needs of the collective are secondary to personal ambition and competition."
-            ]
-        }
-    }
-        # Function to display choices
     def display_choices(worldview):
         st.write(f"\nWorldview: {worldview}\n")
         st.write("In Accord Statements:")
@@ -799,24 +820,6 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
         for i, statement in enumerate(worldviews[worldview]["in_disaccord"], 1):
             st.write(f"{i}. {statement}")
             
-    # Function to assign unique IDs to statements
-    def assign_ids(worldviews):
-        id_counter = 1
-        statement_dict = {}
-        
-        for worldview, types in worldviews.items():
-            for category, statements in types.items():
-                for statement in statements:
-                    # hash statement to create unique ID
-                    statement_hash = hashlib.md5(statement.encode()).hexdigest()
-                    statement_dict[id_counter] = {
-                        "worldview": worldview,
-                        "category": category,
-                        "statement": statement,
-                        "hash": statement_hash
-                    }
-                    id_counter += 1
-        return statement_dict
     statement_dict = assign_ids(worldviews)
 
     if st.session_state['current_element'] == None:
@@ -827,11 +830,15 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     
     f"""
     
-    # How our worldviews are a unique blend?
-    
-    ### _{statement[1]["statement"]}_ 
+    # How do we weave our worldviews together into a unique blend?
+
+    Here we shuffle a deck of statements. Each time you click 'Send vibe' button, a new statement will appear.
+
+    #### On this scale, how well do you resonate with the statement? Match your feeling and hit the button 'Send vibe'. 
+        
     """
     
+    st.info("### " + "_"+ statement[1]["statement"]+"_")
 
     name = 'there'
     _id = len(st.session_state['choices'])
@@ -915,9 +922,10 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
             "element": element,
             "result": value
         })
-        print(st.session_state.current_element)
         # Pick two new random statements for the next round
+        random.seed(time.time())
         st.session_state.current_element = random.choice(list(statement_dict.items()))
+        print(st.session_state.current_element)
 
     st.button("Send vibe", use_container_width=True, on_click=update_state, args=(dicho, statement), type="primary")
     
@@ -931,7 +939,6 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
 
     """
     
-    # HERE GOES THE VISUALISATION
     
     """
     data = fetch_data()
@@ -986,7 +993,7 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     st.json(overlapping_values, expanded=False)
     
     # Step 1: Aggregating data
-    st.markdown("## Worldview results:")
+    st.markdown("## Weaving together our worldviews")
 
     def aggregate_worldview_data(data):
         # Initialize a dictionary to hold hash values and corresponding results
@@ -1113,14 +1120,14 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     _non_resonating_statements = {key: value for key, value in aggregated_data.items() if value["average"] < 0.3}
 
     # Display results
-    st.subheader("Statements that resonate")
+    st.subheader("Statements that resonate more widely")
     # st.write(_resonating_statements)
     resonating_statements = [hash_to_statement.get(h) for h in _resonating_statements.keys()]
     for _statement in resonating_statements:
         if _statement and 'statement' in _statement:
             st.markdown(f"#### ✨ {_statement['statement']}")    # st.write(resonating_statements)
 
-    st.subheader("\nStatements that do not resonate")
+    st.subheader("\nStatements that dissonate")
     # st.write(_non_resonating_statements)
     non_resonating_statements = [hash_to_statement.get(h) for h in _non_resonating_statements.keys()]
     for _statement in non_resonating_statements:
@@ -1135,7 +1142,8 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
     "Remark: _Statements resonate or do not resonate, respectively, when the average resonace is > 0.7, or < 0.3._"
     
     """
-    The button below integrates the data into the bigger picture.
+    
+    Click the button below to add your inputs to the bunch.
     
     """
     
