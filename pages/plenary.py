@@ -514,21 +514,18 @@ This is the approach of the _Athena_ collective.
 
     st.markdown(f"# <center>Shifts, pathways, and hope?</center> ", unsafe_allow_html=True)
 
-    st.markdown("### Q1: prog, lib, pop?")
+    st.markdown("### Q1: A choice of three pathways")
     
     """#### Agency is making concious and significant decisions."""
 
     """
-    As we deepen our understanding of _Polycrises_, let's make a conscious choice on the three possible pathways presented by Vivien A. Schmidt in the Opening Keynote:
+    In yesterday’s keynote presentation, Vivien Schmidt theorises three pathways that the social discourse could follow in the future:
     
-1.	**The Liberal Pathway:**
-        Dominant and well-established, represents continuity with the status quo. It prioritises market solutions and technocratic governance.
+1. **Liberal:** prioritising “market” solutions and technocratic governance, this dominant pathway represents continuity or “business as usual”. 
 
-2.	**The Populist Pathway:**
-        A reaction to perceived institutional failures, quick and oversimplified solutions to complex, interconnected problems.
+2. **Populist:** reaction to experience of institutional failures, this pathway proposes simplistic, exclusionary and divisive solutions to the interconnected problems.
 
-3.	**The Progressive Pathway:**
-        Inclusivity, bottom-up solutions, and systemic transformation. We seek to realign governance to prioritise human needs with long-term thinking.
+3. **Progressive:** based around inclusivity, bottom-up solutions, and systemic transformation, this pathway seeks to realign governance to prioritise human and environmental wellbeing and needs.
 
     """
     
@@ -550,9 +547,7 @@ This is the approach of the _Athena_ collective.
     if pathway is not None:
         st.write(feedback_messages.get(str(pathway), "Thank you for your dedication so far!"))
 
-    """### Crises, Uncertainty, and Insecurity?
-    """
-    
+
 
     if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
               disabled=not bool(st.session_state['authentication_status']), 
@@ -752,11 +747,7 @@ How you feel about the results?"""
     """
 
     """
-    # HERE GOES THE ANSWER // WHAT DOES THIS MEAN
-    
-    what does it mean for the world that we are driven by ...
-    what does it mean that we are driven by ...
-    what does somebody driven by do...
+    # HERE GO THE VISUALISATION // WHAT DOES THIS MEAN, FOR US TO SHARE
     
     """
 
