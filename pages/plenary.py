@@ -538,6 +538,20 @@ This is the approach of the _Athena_ collective.
                                 "categories": engage_categories
                         })
     
+    # my_create_dichotomy(key = "outlook", id= "outlook",
+    #                 kwargs={'survey': survey,
+    #                     'label': 'future_outlook', 
+    #                     'question': 'Click to express your viewpoint.',
+    #                     'gradientWidth': 40,
+    #                     'height': 250,
+    #                     'title': '',
+    #                     'name': 'intuition',
+    #                     'messages': ["*Progressinve", "*The future looks* bright and positive", "*The future looks* gray like an uncertain mix"],
+    #                     # 'inverse_choice': inverse_choice,
+    #                     'callback': lambda x: ''
+    #                     }
+    #                 )
+    
     feedback_messages = {
         '1': "I've chosen the **Liberal** pathway. This path emphasizes free markets, individual freedoms, and gradual reform. It's the dominant pathway today, but does it address the crises we face?",
         '2': "I've chosen the **Populist** pathway. Populism seeks to empower 'the people' against elites, but is often criticized for oversimplifying complex problems. Do you think it can handle our interconnected crises?",
