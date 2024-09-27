@@ -737,7 +737,7 @@ We shall take this into account in shaping workgroups, discussions, and future e
     st.write(f"Thank you `{name}` for your interest. We will keep in touch!")
     
     st.session_state['serialised_data'] = survey.data
-    st.write(survey.data)
+    # st.write(survey.data)
     
     # _form_submit = lambda: outro()
     
