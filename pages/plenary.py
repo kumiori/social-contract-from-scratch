@@ -761,7 +761,6 @@ How you feel about the results?"""
     """
     
     # Results
-    
     """
 
     """
