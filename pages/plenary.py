@@ -639,10 +639,10 @@ How you feel about the results?"""
     st.write(challenge)
     
     
-    feedback_messages = {'1': "I've chosen to support **challenging** financial institutions, questioning of the current systems and power relations, to better serve the general good.",
-                         '2': "I've chosen **not to challenge** financial institutions. The status quo is _just fine_ and trusts in the current financial systems is deserved."}
-    if pathway is not None:
-        st.write(feedback_messages.get(str(challenge), "Thank you for your dedication so far!"))
+    feedback_messages = {'1': "### I've chosen to support **challenging** financial institutions, questioning of the current systems and power relations, to better serve the general good.",
+                         '2': "### I've chosen **not to challenge** financial institutions. The status quo is _just fine_ and trusts in the current financial systems is deserved."}
+    if challenge is not None:
+        st.info(feedback_messages.get(str(challenge), "Thank you for your dedication so far!"))
     
                 
     """
@@ -713,7 +713,7 @@ We shall take this into account in shaping workgroups, discussions, and future e
     
     """
     
-    st.write(f"Thank you `{name}` for your interest. We will get back to you by email.")
+    st.write(f"Thank you `{name}` for your interest. We will keep in touch!")
     
     st.session_state['serialised_data'] = survey.data
     st.write(survey.data)
