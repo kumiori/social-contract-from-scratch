@@ -52,7 +52,6 @@ from streamlit_pills_multiselect import pills
 from streamlit_player import st_player
 from streamlit_timeline import timeline
 from yaml import SafeLoader
-import streamlit_wordcloud as wordcloud
 
 st_gtag(
     key="gtag_app_session1",
