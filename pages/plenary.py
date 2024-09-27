@@ -574,75 +574,96 @@ How you feel about the results?"""
     st.divider()
 
 
-    st.markdown("### Q2: Soc transitions: fast or slow?")
+#     st.markdown("### Q2: Soc transitions: fast or slow?")
 
-    """
-    #### Global crises highlight the need for significant social transitions.
+#     """
+#     #### Global crises highlight the need for significant social transitions.
 
-    When you think about the social changes we need, do you personally prefer and are happy to support **a fast, decisive _disruptive_ (nonlinear) transition**  (Black), 
-    or a slow, gradual transition that allows for adjustment, compromise, and adaptation (White)? The two choices are _not mutually exclusive_, choose a Shade of 
-    Gray if you believe in a mix of both approaches. 
+#     When you think about the social changes we need, do you personally prefer and are happy to support **a fast, decisive _disruptive_ (nonlinear) transition**  (Black), 
+#     or a slow, gradual transition that allows for adjustment, compromise, and adaptation (White)? The two choices are _not mutually exclusive_, choose a Shade of 
+#     Gray if you believe in a mix of both approaches. 
 
-    _Remark: This is about how you would like to see change happen, rather than what you think is most likely._
+#     _Remark: This is about how you would like to see change happen, rather than what you think is most likely._
 
-    """
+#     """
 
-    my_create_dichotomy(key = "transitions", id= "executive",
-                        kwargs={'survey': survey,
-                            'label': 'transition_rate', 
-                            'question': 'Click to express your viewpoint.',
-                            'gradientWidth': 20,
-                            'height': 250,
-                            'title': '',
-                            'name': 'intuition',
-                            'messages': ["*Fast transition* rapid and transformative", "*Slow* gradual and long", "*A mix of the two* with the implications of both"],
-                            # 'inverse_choice': inverse_choice,
-                            'callback': lambda x: ''
-                            }
-                        )
+#     my_create_dichotomy(key = "transitions", id= "executive",
+#                         kwargs={'survey': survey,
+#                             'label': 'transition_rate', 
+#                             'question': 'Click to express your viewpoint.',
+#                             'gradientWidth': 20,
+#                             'height': 250,
+#                             'title': '',
+#                             'name': 'intuition',
+#                             'messages': ["*Fast transition* rapid and transformative", "*Slow* gradual and long", "*A mix of the two* with the implications of both"],
+#                             # 'inverse_choice': inverse_choice,
+#                             'callback': lambda x: ''
+#                             }
+#                         )
 
-    st.markdown("### Q3: how do you see?")
+#     st.divider()
+    
+#     """
+    
+#     """    
+#     # my_create_dichotomy(key = "wodak", id= "executive",
+#     #                     kwargs={'survey': survey,
+#     #                         'label': 'transition_rate', 
+#     #                         'question': 'Click to express your viewpoint.',
+#     #                         'gradientWidth': 20,
+#     #                         'height': 250,
+#     #                         'title': '',
+#     #                         'name': 'intuition',
+#     #                         'messages': ["*Fast transition* rapid and transformative", "*Slow* gradual and long", "*A mix of the two* with the implications of both"],
+#     #                         # 'inverse_choice': inverse_choice,
+#     #                         'callback': lambda x: ''
+#     #                         }
+#     #                     )
+
     
     
-    """
-    During a recent meeting at UNESCO headquarters in Paris, in a conversation addressing migration, social inequalities, and systemic crises, the Chair issued a compelling challenge: “It is time to challenge financial institutions.”
+#     st.markdown("### Q3: how do you see?")
     
-    We are living in a moment of profound uncertainty, where the financial systems that once seemed solid are now being called into question. The world is facing stark inequalities, environmental degradation, and global migration crises. The call to action is clear.
     
-    Should we trust financial institutions as they stand, or is it time to reshape them to serve a broader global good?”
+#     """
+#     During a recent meeting at UNESCO headquarters in Paris, in a conversation addressing migration, social inequalities, and systemic crises, the Chair issued a compelling challenge: “It is time to challenge financial institutions.”
+    
+#     We are living in a moment of profound uncertainty, where the financial systems that once seemed solid are now being called into question. The world is facing stark inequalities, environmental degradation, and global migration crises. The call to action is clear.
+    
+#     Should we trust financial institutions as they stand, or is it time to reshape them to serve a broader global good?”
 
-"""
-    # name = 'intuition'
-    # dicho = my_create_dichotomy(key = "executive", id= "executive",
-    #                     kwargs={'survey': survey,
-    #                         'label': 'future_outlook', 
-    #                         'question': 'Are you ready to donate? (White: Yes, Black: No, Nuances: I need time)',
-    #                         'gradientWidth': 20,
-    #                         'height': 250,
-    #                         'title': '',
-    #                         'name': f'{name}',
-    #                         'messages': ["*Zero,* black!", 
-    #                                      "*One*. White", 
-    #                                      "*between* gray"],
-    #                         # 'inverse_choice': inverse_choice,
-    #                         'callback': lambda x: ''
-    #                         }
-    #                     )
+# """
+#     # name = 'intuition'
+#     # dicho = my_create_dichotomy(key = "executive", id= "executive",
+#     #                     kwargs={'survey': survey,
+#     #                         'label': 'future_outlook', 
+#     #                         'question': 'Are you ready to donate? (White: Yes, Black: No, Nuances: I need time)',
+#     #                         'gradientWidth': 20,
+#     #                         'height': 250,
+#     #                         'title': '',
+#     #                         'name': f'{name}',
+#     #                         'messages': ["*Zero,* black!", 
+#     #                                      "*One*. White", 
+#     #                                      "*between* gray"],
+#     #                         # 'inverse_choice': inverse_choice,
+#     #                         'callback': lambda x: ''
+#     #                         }
+#     #                     )
 
-    challenge = create_quantitative("quantitative_key", 
-                                   kwargs={"survey": survey, 
-                                           "label": "fin_challenge", 
-                                           'name': f'Hello, there',
-                                           "question": 'Should we challenge or should we not?',
-                                           "key": "challenge", 
-                                           "data_values": [2, 1]})
-    st.write(challenge)
+#     challenge = create_quantitative("quantitative_key", 
+#                                    kwargs={"survey": survey, 
+#                                            "label": "fin_challenge", 
+#                                            'name': f'Hello, there',
+#                                            "question": 'Should we challenge or should we not?',
+#                                            "key": "challenge", 
+#                                            "data_values": [2, 1]})
+#     st.write(challenge)
     
     
-    feedback_messages = {'1': "### I've chosen to support **challenging** financial institutions, questioning of the current systems and power relations, to better serve the general good.",
-                         '2': "### I've chosen **not to challenge** financial institutions. The status quo is _just fine_ and trusts in the current financial systems is deserved."}
-    if challenge is not None:
-        st.info(feedback_messages.get(str(challenge), "Thank you for your dedication so far!"))
+#     feedback_messages = {'1': "### I've chosen to support **challenging** financial institutions, questioning of the current systems and power relations, to better serve the general good.",
+#                          '2': "### I've chosen **not to challenge** financial institutions. The status quo is _just fine_ and trusts in the current financial systems is deserved."}
+#     if challenge is not None:
+#         st.info(feedback_messages.get(str(challenge), "Thank you for your dedication so far!"))
     
                 
     """
