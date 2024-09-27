@@ -547,7 +547,7 @@ This is the approach of the _Athena_ collective.
     if pathway is not None:
         st.write(feedback_messages.get(str(pathway), "Thank you for your dedication so far!"))
 
-
+    survey.text_area("What are your thoughts on these three pathways?", height=100)
 
     if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
               disabled=not bool(st.session_state['authentication_status']), 
