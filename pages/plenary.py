@@ -322,7 +322,7 @@ def intro():
 
     st.markdown("# <center>Inter•Active•Plenary</center>", unsafe_allow_html=True)
 
-    st.markdown("## <center>People bring values into the Social Contract.</center>", unsafe_allow_html=True)
+    st.markdown("## <center>Time to Redraw the Social Contract (from Scratch).</center>", unsafe_allow_html=True)
 
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')} - Plenary", unsafe_allow_html=True)
 
@@ -482,7 +482,7 @@ if __name__ == "__main__":
 
     """
     # What is change _made_ (of)?
-        
+
 Our mission is simple and profound: _to collaboratively shape a new social contract that reflects the complexity and diversity of the world we live in._
 
 The Social Contract, at its core, is about how we relate to each other, our environment, and the systems that govern us. But this cannot be built through one perspective alone. It requires opening ourselves to the full spectrum of points of view, ideas, and perceptions—from the bold and radical to the subtle and _infinitely nuanced_. 
@@ -549,6 +549,35 @@ This is the approach of the _Athena_ collective.
     
     if pathway is not None:
         st.write(feedback_messages.get(str(pathway), "Thank you for your dedication so far!"))
+
+    """### Crises, Uncertainty, and Insecurity?
+    """
+    
+
+    if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
+              disabled=not bool(st.session_state['authentication_status']), 
+              type='primary',
+              use_container_width=True,
+              on_click=lambda: _form_submit()):
+        """
+        Congratulations!
+
+Save this page in your bookmarks and check again in a few days. Otherwise, reach out to us by email. 
+
+social.from.scratch@proton.me
+
+How you feel about the results?"""
+        
+    if st.session_state['authentication_status']:
+        st.markdown(f"#### Signed #`{mask_string(st.session_state['username'])}`.")
+
+
+    st.divider()
+    st.divider()
+    st.divider()
+    st.divider()
+    st.divider()
+
 
     st.markdown("### Q2: Soc transitions: fast or slow?")
 
@@ -699,7 +728,7 @@ We shall take this into account in shaping workgroups, discussions, and future e
     
     # _form_submit = lambda: outro()
     
-    if st.button("Integrate the Bigger Picture", key="integrate", help="Integrate your data", 
+    if st.button("Integrate the Bigger Picture", key="integrate-final", help="Integrate your data", 
               disabled=not bool(st.session_state['authentication_status']), 
               type='primary',
               use_container_width=True,
