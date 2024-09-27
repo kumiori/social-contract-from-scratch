@@ -644,9 +644,6 @@ How you feel about the results?"""
     if pathway is not None:
         st.write(feedback_messages.get(str(challenge), "Thank you for your dedication so far!"))
     
-    
-
-
                 
     """
     
@@ -654,7 +651,7 @@ How you feel about the results?"""
     
     """
     
-    name = survey.text_input("Let's start with your name — we may have already crossed paths.", id="name")
+    name = survey.text_input("Let's start with your name — we may have already shared ideas.", id="name")
     
     email = st.text_input("Your email address")
     if email:
