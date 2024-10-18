@@ -337,6 +337,39 @@ def parse_feedback(data):
     return df
 
 
+
+def hash_to_statement_dict(dict):
+    return {value["hash"]: value for value in dict.values()}
+
+
+def aggregate_worldview_data(data):
+    # Initialize a dictionary to hold hash values and corresponding results
+    aggregated_data = {}
+
+    # Iterate through each entry in the worldview data
+    for statement in data:
+        hash_val = statement['hash']
+        
+        try:
+            result = float(statement['result'])
+
+            if hash_val in aggregated_data:
+                aggregated_data[hash_val]['sum'] += result
+                aggregated_data[hash_val]['count'] += 1
+            else:
+                aggregated_data[hash_val] = {'sum': result, 'count': 1}
+
+            # Calculate the average for each hash
+            for hash_val, stats in aggregated_data.items():
+                stats['average'] = stats['sum'] / stats['count']
+
+        except:
+                print(f"Invalid result for hash: {hash_val}")
+                continue
+    return aggregated_data
+
+
+
 def parse_session_data(data):
     parsed_data = []
     
@@ -566,12 +599,12 @@ if __name__ == "__main__":
 
 
     import importlib  
-    session1 = importlib.import_module("pages.session-1")
+    # session1 = importlib.import_module("pages.session-1")
     
     # all_worldview_data
     signed_worldview_data = assign_hash_to_dictionary(worldviews)
 
-    aggregated_data = session1.aggregate_worldview_data(all_worldview_data)
+    aggregated_data = aggregate_worldview_data(all_worldview_data)
     
     _resonating_statements = {key: value for key, value in aggregated_data.items() if value["average"] > 0.7}
 
@@ -582,13 +615,13 @@ if __name__ == "__main__":
     # Display results
     st.subheader("Statements that resonate more widely")
 
-    resonating_statements = [session1.hash_to_statement_dict(signed_worldview_data).get(h) for h in _resonating_statements.keys()]
+    resonating_statements = [hash_to_statement_dict(signed_worldview_data).get(h) for h in _resonating_statements.keys()]
     for _statement in resonating_statements:
         if _statement and 'statement' in _statement:
             st.markdown(f"#### ✨ {_statement['statement']}")    # st.write(resonating_statements)
     st.subheader("\nStatements that dissonate")
     # st.write(_non_resonating_statements)
-    non_resonating_statements = [session1.hash_to_statement_dict(signed_worldview_data).get(h) for h in _non_resonating_statements.keys()]
+    non_resonating_statements = [hash_to_statement_dict(signed_worldview_data).get(h) for h in _non_resonating_statements.keys()]
     for _statement in non_resonating_statements:
         if _statement and 'statement' in _statement:
             st.markdown(f"🔕 {_statement['statement']}")
