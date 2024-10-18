@@ -137,11 +137,10 @@ def fetch_data(column = "*, signature"):
         _data = []
         empty_values = 0
         for row in data:
-            if row.get(column):
+            if row.get(column) and row.get(column) != "null":
                 _data.append(row)
             else:
                 empty_values += 1
-            # _data.append(row)
     else:
         st.error(f"No data found in the {table_name} table.")
     
@@ -439,11 +438,18 @@ if __name__ == "__main__":
     
     # data, empty_rows = fetch_values_worldview_data()
     data, empty_rows = fetch_values_data()
+    st.table(data)
+    st.write(f"Length of data: {len(data)}")
+    st.write(f"Empty rows: {empty_rows}")
+    st.write(f"Data density: {around((len(data) / (len(data) + empty_rows)) * 100, 2)}%") 
     
     # st.table(data)
     
     presence = check_signature_presence_in_data(data, st.session_state["username"])
     st.write("Signature presence in data: ", presence)
+    _my_data = get_row_by_signature(data, st.session_state["username"])
+    st.write("My data:", _my_data)
+    "---"
 
     parsed_session = parse_session_data(data)
 
