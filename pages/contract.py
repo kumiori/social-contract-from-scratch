@@ -152,7 +152,8 @@ def fetch_values_worldview_data():
     conn = db.conn
     table_name = db.table_name
     response = conn.table(table_name).select("session_1_values", "session_1_worldview").execute()
-    
+    # _data, empty_rows = fetch_data(column="plenary_01")    
+
     if response and response.data:
         data = response.data
         _data = []
@@ -165,6 +166,16 @@ def fetch_values_worldview_data():
     
     return _data
     
+@st.cache_data(ttl=60)
+def fetch_values_data():
+    _data, empty_rows = fetch_data(column="session_1_values")    
+    return _data, empty_rows
+
+@st.cache_data(ttl=60)
+def fetch_worldview_data():
+    _data, empty_rows = fetch_data(column="session_1_worldview")    
+    return _data, empty_rows
+
 @st.cache_data(ttl=60)
 def fetch_consent_data():
     conn = db.conn
@@ -424,8 +435,15 @@ if __name__ == "__main__":
     st.table(df)
     
     "### Values and Worldview"
+    "#### Values"
     
-    data = fetch_values_worldview_data()
+    # data, empty_rows = fetch_values_worldview_data()
+    data, empty_rows = fetch_values_data()
+    
+    # st.table(data)
+    
+    presence = check_signature_presence_in_data(data, st.session_state["username"])
+    st.write("Signature presence in data: ", presence)
 
     parsed_session = parse_session_data(data)
 
@@ -477,10 +495,57 @@ if __name__ == "__main__":
 
     "#### Worldview"
 
-    import importlib  
-    foobar = importlib.import_module("pages.session-1")
+    from pages.input_data_worldviews import worldviews
     
-    all_worldview_data
+    # this is duplicated from input_data_worldviews.py
+    def assign_hash_to_dictionary(worldviews):
+        id_counter = 1
+        statement_dict = {}
+        
+        for worldview, types in worldviews.items():
+            for category, statements in types.items():
+                for statement in statements:
+                    # hash statement to create unique ID
+                    statement_hash = hashlib.md5(statement.encode()).hexdigest()
+                    statement_dict[id_counter] = {
+                        "worldview": worldview,
+                        "category": category,
+                        "statement": statement,
+                        "hash": statement_hash
+                    }
+                    id_counter += 1
+        return statement_dict
+
+
+    import importlib  
+    session1 = importlib.import_module("pages.session-1")
+    
+    # all_worldview_data
+    signed_worldview_data = assign_hash_to_dictionary(worldviews)
+
+    aggregated_data = session1.aggregate_worldview_data(all_worldview_data)
+    
+    _resonating_statements = {key: value for key, value in aggregated_data.items() if value["average"] > 0.7}
+
+    # Filter for statements that do not resonate < 0.3
+    _non_resonating_statements = {key: value for key, value in aggregated_data.items() if value["average"] < 0.3}
+
+
+    # Display results
+    st.subheader("Statements that resonate more widely")
+
+    resonating_statements = [session1.hash_to_statement_dict(signed_worldview_data).get(h) for h in _resonating_statements.keys()]
+    for _statement in resonating_statements:
+        if _statement and 'statement' in _statement:
+            st.markdown(f"#### ✨ {_statement['statement']}")    # st.write(resonating_statements)
+    st.subheader("\nStatements that dissonate")
+    # st.write(_non_resonating_statements)
+    non_resonating_statements = [session1.hash_to_statement_dict(signed_worldview_data).get(h) for h in _non_resonating_statements.keys()]
+    for _statement in non_resonating_statements:
+        if _statement and 'statement' in _statement:
+            st.markdown(f"🔕 {_statement['statement']}")
+
+
     
     "### Consent"
 
