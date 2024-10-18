@@ -454,13 +454,6 @@ if __name__ == "__main__":
         if "session_1_values" in entry and entry['session_1_values'] is not None:
             all_values_data.extend(entry["session_1_values"])
 
-    # Extract all session_1_worldview data
-    all_worldview_data = []
-    for entry in parsed_session:
-        if "session_1_worldview" in entry and entry['session_1_worldview'] is not None:
-            all_worldview_data.extend(entry["session_1_worldview"])
-    
-    # all_worldview_data
     from collections import Counter
 
     # Flatten the list to get all the values together
@@ -494,9 +487,25 @@ if __name__ == "__main__":
     st.json(overlapping_values, expanded=False)
 
     "#### Worldview"
+    # Extract all session_1_worldview data
 
     from pages.input_data_worldviews import worldviews
+    data, empty_rows = fetch_worldview_data()
     
+    
+    presence = check_signature_presence_in_data(data, st.session_state["username"])
+    st.write("Signature presence in data: ", presence)
+
+    parsed_session = parse_session_data(data)
+
+    all_worldview_data = []
+    
+    for entry in parsed_session:
+        if "session_1_worldview" in entry and entry['session_1_worldview'] is not None:
+            all_worldview_data.extend(entry["session_1_worldview"])
+    
+    # all_worldview_data
+
     # this is duplicated from input_data_worldviews.py
     def assign_hash_to_dictionary(worldviews):
         id_counter = 1
