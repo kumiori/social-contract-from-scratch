@@ -81,13 +81,6 @@ config = {
   }
 }
 
-authenticator = AuthenticateWithKey(
-    credentials=config['credentials'],
-    cookie_name=config['cookie']['name'],
-    cookie_key=config['cookie']['key'],
-    cookie_expiry_days=config['cookie']['expiry_days'],
-    pre_authorized=config['preauthorized'],
-)
 fields_connect = {'Form name':'Open with your access key', 'Email':'Email', 'Username':'Username',
             'Password':'Password', 'Repeat password':'Repeat password',
             'Register':' Retrieve access key ', 'Captcha':'Captcha'}
@@ -104,8 +97,6 @@ with open("assets/discourse.css", "r") as f:
 with open('assets/credentials.yml') as file:
     config = yaml.load(file, Loader=SafeLoader)
     now = datetime.now()
-
-survey = CustomStreamlitSurvey()
 
 if 'read_texts' not in st.session_state:
     st.session_state.read_texts = set()
@@ -325,9 +316,7 @@ def intro():
 
     st.divider()
 
-def authentifier():
-
-    
+def authentifier(authenticator):
 
     tab2, tab1, = st.tabs(["I am returning", "I am new"])
     
@@ -380,7 +369,6 @@ def assign_hash_to_dictionary(worldviews):
                 }
                 id_counter += 1
     return statement_dict
-
 
 
 def question(): 
@@ -496,10 +484,20 @@ _In the meantime_:""")
 
 
 if __name__ == "__main__":
+    authenticator = AuthenticateWithKey(
+        credentials=config['credentials'],
+        cookie_name=config['cookie']['name'],
+        cookie_key=config['cookie']['key'],
+        cookie_expiry_days=config['cookie']['expiry_days'],
+        pre_authorized=config['preauthorized'],
+    )
+
+    survey = CustomStreamlitSurvey()
+
     
     intro()
 
-    authentifier()
+    authentifier(authenticator)
 
     """
     # Introduction
