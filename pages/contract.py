@@ -126,6 +126,16 @@ def generate_random_points(num_points):
 def fetch_plenary_data():
     _data, empty_rows = fetch_data(column="plenary_01")    
     return _data, empty_rows
+   
+@st.cache_data(ttl=60)
+def fetch_updated_data():
+    _data, empty_rows = fetch_data(column="updated_at")    
+    return _data, empty_rows
+   
+@st.cache_data(ttl=60)
+def fetch_consent_action_data():
+    _data, empty_rows = fetch_data(column="session_4_consent_action")    
+    return _data, empty_rows
     
 @st.cache_data(ttl=60)
 def fetch_data(column = "*, signature"):
@@ -230,7 +240,12 @@ def intro():
 
     st.divider()
 
-
+def data_density(data, empty_rows, progress_bar=False):
+    _density = around((len(data) / (len(data) + empty_rows)) * 100, 2)
+    st.write(f"Data density: {_density}%") 
+    if progress_bar:
+        st.progress(_density/100)
+        
 def parse_structure_participation(data):
     parsed_data = []
 
@@ -301,6 +316,25 @@ def parse_plenary(dataset):
         extracted_data['categorical_choice'] = dataset['categorical'].get('value', None)
 
     return extracted_data
+
+def parse_feedback(data):
+    parsed_data = []
+
+    for entry in data:
+        session = entry.get("session_4_consent_action")
+        parsed_entry = {
+            "willingness": session.get("willingness", {}).get("value"),
+            "spectrum_relations": session.get("spectrum_relations", {}).get("value"),
+            "transparency": session.get("transparency", {}).get("value"),
+            "open_decision_making": session.get("open_decision_making", {}).get("value"),
+            "clear_communication": session.get("clear_communication", {}).get("value"),
+            "collaborative_technologies": session.get("collaborative_technologies", {}).get("value")
+        }
+        parsed_data.append(parsed_entry)
+
+    # Convert to pandas DataFrame for easier manipulation and visualization
+    df = pd.DataFrame(parsed_data)
+    return df
 
 
 def parse_session_data(data):
@@ -404,10 +438,11 @@ if __name__ == "__main__":
     data, empty_rows = fetch_plenary_data()
     st.write(f"Length of data: {len(data)}")
     st.write(f"Empty rows: {empty_rows}")
-    st.write(f"Data density: {around((len(data) / (len(data) + empty_rows)) * 100, 2)}%") 
+    data_density(data, empty_rows, progress_bar=True)
     presence = check_signature_presence_in_data(data, st.session_state["username"])
     st.write("Signature presence in data: ", presence)
 
+    
     for entry in data:
         plenary_values = entry.get("plenary_01")
         
@@ -438,12 +473,10 @@ if __name__ == "__main__":
     
     # data, empty_rows = fetch_values_worldview_data()
     data, empty_rows = fetch_values_data()
-    st.table(data)
     st.write(f"Length of data: {len(data)}")
     st.write(f"Empty rows: {empty_rows}")
-    st.write(f"Data density: {around((len(data) / (len(data) + empty_rows)) * 100, 2)}%") 
-    
-    # st.table(data)
+
+    data_density(data, empty_rows, progress_bar=True)
     
     presence = check_signature_presence_in_data(data, st.session_state["username"])
     st.write("Signature presence in data: ", presence)
@@ -560,8 +593,55 @@ if __name__ == "__main__":
         if _statement and 'statement' in _statement:
             st.markdown(f"🔕 {_statement['statement']}")
 
+    "### Updates"
+    data, empty_rows = fetch_updated_data()
+    # st.json(data)
+    df = pd.DataFrame(data)
 
+    # Convert updated_at to timezone-aware datetime
+    df['updated_at'] = pd.to_datetime(df['updated_at'], utc=True)
+
+    # Get current time with timezone (UTC)
+    current_time = pd.Timestamp.now(tz='UTC')
+
+    # Calculate days since last update
+    df['days_since_update'] = (current_time - df['updated_at']).dt.days
+    df = df.sort_values('days_since_update', ascending=True)
+
+    # st.table(df)
+    # # Create a bar chart for days since update
+    fig = px.bar(df, x='signature', y='days_since_update', title="Days Since Last Update", labels={'days_since_update': 'Days'}, color='days_since_update')
+    fig.update_layout(
+        xaxis_title="Date of Update", 
+        yaxis_title="Days Since Last Update",
+        xaxis=dict(showticklabels=False),
+        showlegend=False,
+        height=300,
+    )
+
+    st.plotly_chart(fig)
+
+    "### Consent/Action"
+    data, empty_rows = fetch_consent_action_data()
+    st.write(f"Length of data: {len(data)}")
+    st.write(f"Empty rows: {empty_rows}")
+
+    data_density(data, empty_rows, progress_bar=True)
     
+    presence = check_signature_presence_in_data(data, st.session_state["username"])
+    st.write("Signature presence in data: ", presence)
+    _my_data = get_row_by_signature(data, st.session_state["username"])
+    st.write("My data:", _my_data)
+    "---"
+    # st.json(data)
+    
+    for entry in data:
+        session = entry.get("session_4_consent_action")
+        st.json(session)
+        # st.write(entry.get("session_4_consent_action").get("willingness", {}).get("value"))
+    
+    # df = parse_feedback(data)
+    # st.table(df)    
     "### Consent"
 
     # extracted_data = parse_plenary(data)
