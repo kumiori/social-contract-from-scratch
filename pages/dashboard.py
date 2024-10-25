@@ -400,6 +400,7 @@ if __name__ == "__main__":
         user_data = retrieve_user_by_signature(data, st.session_state["username"])
         # If data is found, display it
         """### Personal data"""
+        authenticator.logout()
         if user_data is not None:
             st.write(f"--- User ID: {user_data['id'].values[0]} ---")
             st.write(f"Updated at: {user_data['updated_at'].values[0]}")
@@ -457,7 +458,6 @@ if __name__ == "__main__":
         
         st.write(data["updated_at"].to_json())
         
-        authenticator.logout()
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
     elif st.session_state['authentication_status'] is None:
