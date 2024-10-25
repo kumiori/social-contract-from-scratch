@@ -414,6 +414,7 @@ if __name__ == "__main__":
             st.write(f"Updated at: {user_data['updated_at'].values[0]}")
             
             # Personal Details Section
+            st.write(user_data['personal_data'].values[0])
             personal_data = json.loads(user_data['personal_data'].values[0])
             st.write("# Personal Details:")
             if personal_data is not None:
