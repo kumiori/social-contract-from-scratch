@@ -394,40 +394,7 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(transaction_rows)
     print(df)
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-    df_successful = df[df['Status'] == 'SUCCESSFUL']
-    df_failed = df[df['Status'] == 'FAILED']
-
-    # Sum the amounts for all 'SUCCESSFUL' transactions
-    total_amount = df_successful['Amount'].sum()
-    # st.write(f"Total transactions: {len(df)}")
-    # st.write(f"Total FAILED: {len(df_failed)}")
-    # st.write(f"Total FAILED: {len(df_successful)}")
-    # st.write(f"Total Amount for SUCCESSFUL transactions: {total_amount}")
-
-    # st.write(df_successful)
     
-    
-    cols = st.columns(4, vertical_alignment="center")
-        
-    with cols[0]:
-        ui.metric_card(title="Total funds", content=f'{total_amount:.2f}', description="€, so far.", key="fund")
-    with cols[1]:
-        ui.metric_card(title="Donations", content=f'{len(df_successful):d}', description="so far.", key="donations")
-
-    #     ui.metric_card(title="Total GAME", content="0.1 €", description="Since  _____ we start", key="card2")
-    with cols[2]:
-        ui.metric_card(title="Rate", content=f"{len(df_successful)/len(df):.0%}", description="of success", key="success")
-    with cols[3]:
-        st.markdown("#### Questions")
-        ui.badges(badge_list=[("existential", "secondary")], class_name="flex gap-2", key="exp")
-        # ui.badges(badge_list=[("production", "outline")], class_name="flex gap-2", key="viz_badges3")
-        # switch_value = ui.switch(default_checked=True, label="Enable economic", key="switch1")
-        whitelist = ui.button(text="Join Dinner", url="", key="link_action")
-        if whitelist:
-            st.toast("XXX")
-    with cols[0]:
-        ui.metric_card(title=".", content='0', description="Expenses, so far.", key="card_expenses")
 
     if st.session_state['authentication_status']:
         st.toast('Initialised authentication model')
