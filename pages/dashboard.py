@@ -90,7 +90,6 @@ fields_forge = {'Form name':'Forge access key', 'Email':'Email', 'Username':'Use
 
 # ==================
 
-# @st.cache_data
 def get_sumup_transaction_history(num_transactions):
     # Define the SumUp transaction history endpoint URL
     transaction_history_url = 'https://api.sumup.com/v0.1/me/transactions/history'
@@ -167,11 +166,7 @@ def intro():
     st.markdown(f"# <center>Dashboard</center> ", unsafe_allow_html=True)
     
     st_lottie("https://lottie.host/91efca67-fa13-43db-8302-f5c182af8152/ufDyVWvWdR.json")
-    # st_lottie("https://lottie.host/d8addf11-2974-4c28-80be-df3d9d7273c5/9FuMagA41S.json")
-    # st_lottie("https://lottie.host/ec578eca-0d54-4173-b4a4-9bd5eadf577c/bIR9lUB6Sk.json")
-    # st_lottie("https://lottie.host/8d0158ec-6eaf-4867-a96c-4774fd2890e2/wFLLXK2Tmj.json")
 
-# @st.cache_data
 def return_SCFS_details(num_transactions, transaction_rows):
     
     _my_bar = st.progress(0, "Fetching transaction details")
@@ -193,7 +188,6 @@ def return_SCFS_details(num_transactions, transaction_rows):
 
     return filtered_transactions
 
-# @st.cache_data    
 def fetch_data():
     response = db.fetch_data(kwargs={'verbose': True})
     return response
@@ -400,12 +394,9 @@ if __name__ == "__main__":
         st.toast('Initialised authentication model')
         st.write(f'`Your signature is {st.session_state["username"][0:4]}***{st.session_state["username"][-4:]}`')
         
-        """
-        asd asd
-        """
         st.button('fetch')
         data = pd.DataFrame(fetch_data())
-        # st.write(data)
+        st.write(data)
         user_data = retrieve_user_by_signature(data, st.session_state["username"])
         # If data is found, display it
         """### Personal data"""
