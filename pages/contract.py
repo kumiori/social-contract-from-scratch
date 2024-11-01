@@ -158,15 +158,19 @@ def fetch_data(column = "*", verbose=True):
         _data = []
         
         for row in data:
-            # if row.get(column) and row.get(column) != "null":
-            if row and row.get(column) != "null" and row.get(column) is not None:
-                print(row)
-                _data.append(row)
+            if column == "*":
+                if row and row.get(column) != "null":
+                    _data.append(row)
+                else:
+                    empty_values += 1
             else:
-                empty_values += 1
+                if row and row.get(column) != "null" and row.get(column) is not None:
+                    _data.append(row)
+                else:
+                    empty_values += 1
     else:
         st.error(f"No data found in the {table_name} table.")
-    
+
     return _data, empty_values
     
 @st.cache_data(ttl=60)
@@ -485,11 +489,12 @@ def find_inactive_users(df, auto_columns=["id", "updated_at", "signature", "crea
     return list(inactive_users_info.keys()), inactive_users_info
 
 def calculate_data_density(df, signature_column="signature", auto_columns=["id", "updated_at", "signature", "created_at"]):
+    
     # Calculate byte sizes for each entry in the DataFrame
     byte_df = df.map(lambda x: len(str(x).encode('utf-8')) if pd.notnull(x) else 0)
+    # print(byte_df)
     # Drop auto columns and select user-defined session columns for normalization
     session_columns = [col for col in df.columns if col != signature_column and col not in auto_columns]
-    # print(byte_df[["session_1_values", "path_001"]])
     
     # Calculate max values per column and handle columns with all zeros
     max_values = byte_df[session_columns].max(axis=0)
@@ -502,7 +507,6 @@ def calculate_data_density(df, signature_column="signature", auto_columns=["id",
     # Prepare the output data structure
     output_data = []
     for index, row in norm_byte_df.iterrows():
-        
         _signature = df.loc[index, signature_column]
         _label = "Myself" if _signature == st.session_state["username"] else _signature[0:3]
         user_data = {
@@ -623,8 +627,8 @@ if __name__ == "__main__":
     authentifier()
     
     all_data, empty_rows = fetch_data()
+
     df = pd.DataFrame(all_data)
-    
     f"""Empty rows {empty_rows}"""
     # st.table(df.head())
     # st.write(df.columns)    
@@ -633,10 +637,9 @@ if __name__ == "__main__":
     _auto_columns = ["id", "updated_at", "signature", "created_at"]
 
     inactive_users, inactive_users_info = find_inactive_users(df, auto_columns=_auto_columns)
-
     # Call the function to get the desired format
     heatmap_data_density = calculate_data_density(df)
-    # st.json(heatmap_data_density[0:10])
+    st.json(heatmap_data_density[0:10])
     with elements("nivo_charts"):
 
         with mui.Box(sx={"height": 600}):
