@@ -4,6 +4,7 @@ import requests
 import streamlit as st
 from numpy import around
 from email_validator import EmailNotValidError, validate_email
+from collections import Counter
 
 if st.secrets["runtime"]["STATUS"] == "Production":
     st.set_page_config(
@@ -158,7 +159,8 @@ def fetch_data(column = "*", verbose=True):
         
         for row in data:
             # if row.get(column) and row.get(column) != "null":
-            if row and row.get(column) != "null":
+            if row and row.get(column) != "null" and row.get(column) is not None:
+                print(row)
                 _data.append(row)
             else:
                 empty_values += 1
@@ -497,8 +499,6 @@ def calculate_data_density(df, signature_column="signature", auto_columns=["id",
     norm_byte_df = byte_df[session_columns].div(max_values, axis=1)
     
     # Normalize each column (session) by its maximum byte size
-    # norm_byte_df = byte_df[session_columns].div(byte_df[session_columns].max(axis=0), axis=1)
-    # print(norm_byte_df)
     # Prepare the output data structure
     output_data = []
     for index, row in norm_byte_df.iterrows():
@@ -513,6 +513,110 @@ def calculate_data_density(df, signature_column="signature", auto_columns=["id",
         output_data.append(user_data)
     
     return output_data
+
+
+def aggregate_structure_participation_data(data):
+    # Initialize a list to store parsed session data
+    parsed_data = []
+    # Parse each user's session and attach the signature
+    for idx, session_json in data['session_2_structure_participation'].items():
+        session_data = json.loads(session_json)
+        signature = data['signature'][idx]
+        session_data['signature'] = signature
+        parsed_data.append(session_data)
+    
+    # Convert the parsed data to a DataFrame for easier analysis
+    df = pd.json_normalize(parsed_data)
+    # Aggregation metrics
+    aggregation = {
+        # Count unique responses for categorical fields
+        "exclude_criteria": Counter(df['exclude_criteria.value'].dropna()),
+        "strategic_choice": Counter(df['What is a _strategic_ choice?.value'].dropna()),
+        "thoughts": df['Share your thoughts:.value'].dropna().tolist(),  # Collect all comments
+        
+        # Calculate averages for numeric fields
+        "future_outlook": list(df['future_outlook.value'].astype(float).values),
+        "transition_rate": list(df['transition_rate.value'].astype(float).values),
+        
+        # Count preferred modes of participation
+        "preferred_mode_counts": Counter([mode for sublist in df['preferred_mode'].dropna() for mode in sublist])
+    }
+    
+    # Convert aggregation to a readable format for easy interpretation
+    return aggregation
+
+def generate_structure_participation_narrative(data, participants_count, verbose=False):
+    # Unpack the data for clarity
+    exclude_criteria = data["exclude_criteria"]
+    strategic_choice = data["strategic_choice"]
+    thoughts = data["thoughts"]
+    future_outlook = data["future_outlook"]
+    transition_rate = data["transition_rate"]
+    preferred_modes = data["preferred_mode_counts"]
+    
+    # Narrative components
+
+    # Exclusion Criteria Narrative
+    exclusion_responses = exclude_criteria.get("0", 0)
+    exclusion_part = (f"In this gathering, `{participants_count} participants` explore foundational questions about inclusion. "
+                      f"`{exclusion_responses} of them` think that exclusion criteria shouldn't play a role in this social contract, "
+                      f"leaning towards openness without strict boundaries.")
+
+    # Strategic Choice Narrative
+    inclusion_count = strategic_choice.get("Inclusion", 0)
+    exclusion_count = strategic_choice.get("Exclusion", 0)
+    uncertain_count = strategic_choice.get("I don't know", 0)
+
+    if inclusion_count > exclusion_count:
+        strategic_part = (f"Most participants favored inclusion as a guiding principle, though some felt uncertain. "
+                          f"While `{inclusion_count} spoke clearly for inclusion`, `{uncertain_count} weren't quite sure` "
+                          f"where they stood, indicating a need for further conversation.")
+    else:
+        strategic_part = (f"While inclusion resonated with some, there was an honest reflection on the potential need for boundaries. "
+                          f"`{exclusion_count} voiced exclusion` as a strategic choice, suggesting that the group balance openness with discernment.")
+
+    # Thoughts Narrative
+    thought_responses = [thought for thought in thoughts if thought]
+    if thought_responses:
+        thoughts_part = "Some participants shared reflections, expressing the need to `" + ", ".join(thought_responses) + "`."
+    else:
+        thoughts_part = "Participants were introspective, holding space for each other's thoughts without necessarily voicing their own."
+
+    # Future Outlook Narrative
+    dark_count = future_outlook.count(0)
+    gray_count = sum(1 for x in future_outlook if 0 < x < 1)
+    bright_count = future_outlook.count(1)
+
+    if bright_count > dark_count and bright_count > gray_count:
+        future_part = (f"The group's outlook on the future was cautiously optimistic. `{bright_count}` participants saw a positive future, "
+                       f"while {gray_count} felt a mix of hope and uncertainty.")
+    else:
+        future_part = (f"The future brought mixed feelings. `{dark_count} saw a looming darkness`, while others felt hopeful or uncertain. "
+                       f"The range of outlooks painted a picture of both caution and resilience.")
+
+    # Transition Rate Narrative
+    high_transition = sum(1 for rate in transition_rate if rate >= 0.5)
+    low_transition = participants_count - high_transition
+    if high_transition > low_transition:
+        transition_part = (f"Interestingly, a significant portion of the group seemed ready for quick transitions, "
+                           f"with `{high_transition}` seeing change as something to embrace rather than fear.")
+    else:
+        transition_part = (f"Most participants felt a slower approach to change was more sustainable, with `{low_transition} preferring "
+                           f"a gradual transition` rather than abrupt shifts.")
+
+    # Preferred Modes Narrative
+    play_count = preferred_modes.get("Play", 0)
+    listen_count = preferred_modes.get("Listen", 0)
+    preferred_modes_part = (f"When it came to how they engaged, the group leaned into creativity and receptivity. "
+                            f"`{play_count} are drawn to play` as a mode of exploration, while `{listen_count} value listening`, "
+                            f"creating a balance between active participation and attentiveness.")
+
+    # Combine narrative components
+    narrative = (
+        f"{exclusion_part} \n\n {strategic_part}  \n\n {thoughts_part}  \n\n {future_part}  \n\n {transition_part}  \n\n {preferred_modes_part}"
+    )
+    
+    return narrative
 
 if __name__ == "__main__":
     intro()
@@ -611,6 +715,15 @@ if __name__ == "__main__":
     st.write("Signature presence in data: ", presence)
     _my_data = get_row_by_signature(data, st.session_state["username"])
     st.write("My data:", _my_data)
+    
+    df = pd.DataFrame(data)
+    
+    aggregated = aggregate_structure_participation_data(df)
+    
+    st.write(aggregated)
+    
+    _narrative = generate_structure_participation_narrative(aggregated, len(data))
+    st.markdown(_narrative)
     "---"
     rows = []
     
