@@ -123,31 +123,42 @@ def generate_random_points(num_points):
     return [{"id": i, "x": random.uniform(0, 100), "y": random.uniform(0, 100)} for i in range(num_points)]
 
 @st.cache_data(ttl=60)
-def fetch_plenary_data():
+def fetch_plenary_data(verbose=True):
+    if verbose:
+        st.info(f"Fetching plenary data, column plenary_01")
     _data, empty_rows = fetch_data(column="plenary_01")    
     return _data, empty_rows
    
 @st.cache_data(ttl=60)
-def fetch_updated_data():
+def fetch_updated_data(verbose=True):
+    if verbose:
+        st.info(f"Fetching plenary data, column updated_at")
     _data, empty_rows = fetch_data(column="updated_at")    
     return _data, empty_rows
    
 @st.cache_data(ttl=60)
-def fetch_consent_action_data():
+def fetch_consent_action_data(verbose=True):
+    if verbose:
+        st.info(f"Fetching consent action data, column session_4_consent_action")
     _data, empty_rows = fetch_data(column="session_4_consent_action")    
     return _data, empty_rows
     
 @st.cache_data(ttl=60)
-def fetch_data(column = "*, signature"):
+def fetch_data(column = "*", verbose=True):
+    if verbose:
+        st.info(f"Fetching all data from the {db.table_name} table.")
     conn = db.conn
     table_name = db.table_name
     response = conn.table(table_name).select(column + ', signature').execute()
+    empty_values = 0
+    
     if response and response.data:
         data = response.data
         _data = []
-        empty_values = 0
+        
         for row in data:
-            if row.get(column) and row.get(column) != "null":
+            # if row.get(column) and row.get(column) != "null":
+            if row and row.get(column) != "null":
                 _data.append(row)
             else:
                 empty_values += 1
@@ -157,7 +168,9 @@ def fetch_data(column = "*, signature"):
     return _data, empty_values
     
 @st.cache_data(ttl=60)
-def fetch_values_worldview_data():
+def fetch_values_worldview_data(verbose=True):
+    if verbose:
+        st.info(f"Fetching plenary data, column session_1_values, session_1_worldview")
     conn = db.conn
     table_name = db.table_name
     response = conn.table(table_name).select("session_1_values", "session_1_worldview").execute()
@@ -176,17 +189,23 @@ def fetch_values_worldview_data():
     return _data
     
 @st.cache_data(ttl=60)
-def fetch_values_data():
+def fetch_values_data(verbose=True):
+    if verbose:
+        st.info(f"Fetching plenary data, column session_1_values")
     _data, empty_rows = fetch_data(column="session_1_values")    
     return _data, empty_rows
 
 @st.cache_data(ttl=60)
-def fetch_worldview_data():
+def fetch_worldview_data(verbose=True):
+    if verbose:
+        st.info(f"Fetching plenary data, column session_1_worldview")
     _data, empty_rows = fetch_data(column="session_1_worldview")    
     return _data, empty_rows
 
 @st.cache_data(ttl=60)
-def fetch_consent_data():
+def fetch_consent_data(verbose=True):
+    if verbose:
+        st.info(f"Fetching plenary data, column consent_00")
     conn = db.conn
     table_name = db.table_name
     response = conn.table(table_name).select("consent_00").execute()
@@ -444,11 +463,145 @@ def get_row_by_signature(data, signature):
     # Use next() to find the first row where the signature matches
     return next((entry for entry in data if entry.get('signature') == signature), None)
 
+# Define the function to find inactive users based on empty non-auto columns
+def find_inactive_users(df, auto_columns=["id", "updated_at", "signature", "created_at"]):
+    # Identify the user-defined columns by excluding the auto columns
+    user_columns = [col for col in df.columns if col not in auto_columns]
+    
+    # Filter rows where all user-defined columns are empty (indicating inactivity)
+    inactive_users_df = df[df[user_columns].isnull().all(axis=1)]
+
+    # Prepare a dictionary to store signatures and non-null columns (if any)
+    inactive_users_info = {}
+    
+    for index, row in inactive_users_df.iterrows():
+        # Get non-null columns for each inactive user
+        non_null_columns = row[user_columns].dropna().index.tolist()
+        inactive_users_info[row['signature']] = non_null_columns
+    
+    # Return the signatures and the dictionary of non-null columns
+    return list(inactive_users_info.keys()), inactive_users_info
+
+def calculate_data_density(df, signature_column="signature", auto_columns=["id", "updated_at", "signature", "created_at"]):
+    # Calculate byte sizes for each entry in the DataFrame
+    byte_df = df.map(lambda x: len(str(x).encode('utf-8')) if pd.notnull(x) else 0)
+    # Drop auto columns and select user-defined session columns for normalization
+    session_columns = [col for col in df.columns if col != signature_column and col not in auto_columns]
+    # print(byte_df[["session_1_values", "path_001"]])
+    
+    # Calculate max values per column and handle columns with all zeros
+    max_values = byte_df[session_columns].max(axis=0)
+    max_values = max_values.replace(0, 1)  # Replace zero max values with 1 to avoid NaN during division
+    
+    # Normalize each column by its maximum byte size
+    norm_byte_df = byte_df[session_columns].div(max_values, axis=1)
+    
+    # Normalize each column (session) by its maximum byte size
+    # norm_byte_df = byte_df[session_columns].div(byte_df[session_columns].max(axis=0), axis=1)
+    # print(norm_byte_df)
+    # Prepare the output data structure
+    output_data = []
+    for index, row in norm_byte_df.iterrows():
+        
+        _signature = df.loc[index, signature_column]
+        _label = "Myself" if _signature == st.session_state["username"] else _signature[0:3]
+        user_data = {
+            "id": _label,
+            "data": [{"x": session.replace("_", " ").title(), 
+                      "y": row[session]} for session in session_columns]
+        }
+        output_data.append(user_data)
+    
+    return output_data
+
 if __name__ == "__main__":
     intro()
     authentifier()
     
+    all_data, empty_rows = fetch_data()
+    df = pd.DataFrame(all_data)
+    
+    f"""Empty rows {empty_rows}"""
+    # st.table(df.head())
+    # st.write(df.columns)    
+    
+    _columns = ["id", "updated_at", "signature", "personal_data", "path_001", "created_at", "practical_questions_01", "philanthropy_01", "exercise_01", "consent_00", "remote_05", "session_1_values", "session_1_worldview", "session_2_structure_participation", "session_3_relations_systems_healing", "session_4_consent_action", "plenary_01"] 
+    _auto_columns = ["id", "updated_at", "signature", "created_at"]
+
+    inactive_users, inactive_users_info = find_inactive_users(df, auto_columns=_auto_columns)
+
+    # Call the function to get the desired format
+    heatmap_data_density = calculate_data_density(df)
+    # st.json(heatmap_data_density[0:10])
+    with elements("nivo_charts"):
+
+        with mui.Box(sx={"height": 600}):
+            nivo.HeatMap(
+                data=heatmap_data_density,
+                margin={ "top": 100, "right": 90, "bottom": 60, "left": 50 },
+                # colors={'scheme': 'brown_blueGreen'},
+                colors={
+                    'type': 'diverging',
+                    'scheme': 'red_yellow_blue',
+                    'divergeAt': 0.,
+                    'minValue': 0,
+                    'maxValue': 1
+                },
+                valueFormat=">-.0%",
+                # cellComponent="circle",
+                enableLabels = False,
+                axisTop={
+                    "tickSize": 5,
+                    "tickPadding": 5,
+                    "tickRotation": -90,
+                    "legend": 'x',
+                    "legendOffset": 46,
+                    "truncateTickAt": 0
+                },
+                annotations={
+                        "type": 'rect',
+                        "match": {
+                            "id": 'Myself."Personal_Data"'
+                        },
+                        "note": 'Bus in Germany',
+                        "noteX": 120,
+                        "noteY": -130,
+                        "offset": 6,
+                        "noteTextOffset": 5,
+                        "borderRadius": 2
+                },
+                legends = [
+                    {
+                        "anchor": 'bottom',
+                        "translateX": 0,
+                        "translateY": 30,
+                        "length": 400,
+                        "thickness": 8,
+                        "direction": 'row',
+                        "tickPosition": 'after',
+                        "tickSize": 3,
+                        "tickSpacing": 4,
+                        "tickOverlap": False,
+                        "tickFormat": '>-.0%',
+                        "title": 'Energy (data) density →',
+                        "titleAlign": 'start',
+                        "titleOffset": 4
+                    }
+                ]
+            )
+
+        
+        
+    f"""{len(inactive_users)} Inactive users"""
+    if inactive_users:
+        f"""Inactive users: {inactive_users}"""
+        f"""Inactive users info: {inactive_users_info}"""
+    
+    
+    
+    """---"""
     "### Structure and participation"
+    
     data, empty_rows = fetch_data(column="session_2_structure_participation")
     # print length of data and empty rows
     st.write(f"Length of data: {len(data)}")
@@ -471,7 +624,9 @@ if __name__ == "__main__":
     data, empty_rows = fetch_plenary_data()
     st.write(f"Length of data: {len(data)}")
     st.write(f"Empty rows: {empty_rows}")
+
     data_density(data, empty_rows, progress_bar=True)
+
     presence = check_signature_presence_in_data(data, st.session_state["username"])
     st.write("Signature presence in data: ", presence)
 
@@ -643,7 +798,9 @@ if __name__ == "__main__":
 
     # st.table(df)
     # # Create a bar chart for days since update
-    fig = px.bar(df, x='signature', y='days_since_update', title="Days Since Last Update", labels={'days_since_update': 'Days'}, color='days_since_update')
+    fig = px.bar(df, x='signature', y='days_since_update', title="Days Since Last Update",
+                 log_y=True,
+                 labels={'days_since_update': 'Days'}, color='days_since_update')
     fig.update_layout(
         xaxis_title="Date of Update", 
         yaxis_title="Days Since Last Update",
@@ -665,13 +822,43 @@ if __name__ == "__main__":
     st.write("Signature presence in data: ", presence)
     _my_data = get_row_by_signature(data, st.session_state["username"])
     st.write("My data:", _my_data)
+
     "---"
     # st.json(data)
     
-    for entry in data:
-        session = entry.get("session_4_consent_action")
-        st.json(session)
+    # for entry in data:
+    #     session = entry.get("session_4_consent_action")
+    #     st.json(session)
         # st.write(entry.get("session_4_consent_action").get("willingness", {}).get("value"))
+    
+    
+    """
+    #### Willingness
+    'messages': ["I am unwilling! *Does not sound like a good deal,* let's question these fundamentals", 
+                                         "*Plenty of willingness*. And full trust in the authority", 
+                                         "*My willingness is* conditional"]
+    """
+    
+    
+    
+    """
+How Can We Implement Effective Transparency?
+
+1.	**Open Decision-Making:** Decisions, especially those affecting large groups, should be made in an open forum or through participatory mechanisms. This allows for the inclusion of diverse voices and ensures that the rationale behind decisions is clear and understood.
+    """
+    """
+2.	**Clear and Accessible Communication:** Transparency isn't just about making information available, it's about making it accessible and understandable to everyone involved. Whether it's through open-source technology, clear reporting systems, or regular updates, people should be able to easily access and interpret the information they need.
+"""
+    """
+3.	**Collaborative Technologies**: Leveraging technology can enhance transparency. Blockchain, for example, provides immutable and transparent ledgers for financial transactions and contracts. Collaborative platforms allow for real-time tracking of project progress and decision-making, ensuring everyone stays informed and engaged.
+    """
+    """
+4.	**Feedback Loops**: Transparency should also be a two-way street. It's not just about providing information but also creating feedback mechanisms where individuals can voice concerns, offer suggestions, or hold decision-makers accountable. These loops ensure that transparency is dynamic and responsive to the community's needs.
+
+## New Forms of Collaboration
+
+Transparency is the cornerstone of our collaborative systems.
+    """
     
     # df = parse_feedback(data)
     # st.table(df)    
