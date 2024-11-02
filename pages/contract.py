@@ -32,7 +32,7 @@ import hashlib
 import json
 import random
 from datetime import datetime
-
+import numpy as np
 import pandas as pd
 import philoui
 import plotly.express as px
@@ -47,7 +47,7 @@ from philoui.survey import CustomStreamlitSurvey
 from philoui.texts import hash_text, stream_once_then_write, stream_text
 from streamlit_elements import elements, mui, nivo
 from streamlit_extras.add_vertical_space import add_vertical_space
-from streamlit_extras.row import row
+# from streamlit_extras.row import st_row
 from streamlit_gtag import st_gtag
 from streamlit_pills_multiselect import pills
 from streamlit_player import st_player
@@ -173,6 +173,53 @@ def fetch_data(column = "*", verbose=True):
 
     return _data, empty_values
     
+def fetch_analytic_data(verbose=True):
+    conn = db.conn
+    table_name = "social_contract_data_analysis_tracking"
+    response = conn.table(table_name).select('timestamp, density_percentage').execute()
+    
+    current_date = datetime.now()
+
+    # Check if response contains data
+    if response and response.data:
+        # Format the data for Nivo line chart
+        data_points = [
+            {
+                "x": f"{(current_date - datetime.fromisoformat(entry['timestamp'])).days} days ago",
+                "y": entry["density_percentage"]/100
+            }
+            for entry in response.data
+        ]
+        
+        # Add reference points for baseline, calculated relative to the current date
+        reference_points = [
+            {"x": f"{(current_date - datetime(2024, 7, 1)).days} days ago", "y": 0},
+            {"x": f"{(current_date - datetime(2024, 8, 1)).days} days ago", "y": 0},
+            {"x": f"{(current_date - datetime(2024, 8, 15)).days} days ago", "y": .03},
+            {"x": f"{(current_date - datetime(2024, 9, 1)).days} days ago", "y": .06}
+        ]
+        
+        # Combine actual data with reference points
+        combined_data = data_points + reference_points
+        
+        # Sort the data by timestamp (now by relative days ago, still in correct order)
+        combined_data.sort(key=lambda point: int(point["x"].split()[0]), reverse=True)
+        
+        # Structure data for Nivo line chart
+        formatted_data = {
+            "id": "Data Density",
+            "data": combined_data
+        }
+        
+        return [formatted_data]
+    else:
+        if verbose:
+            print("No data found.")
+        return []
+        
+    
+
+
 @st.cache_data(ttl=60)
 def fetch_values_worldview_data(verbose=True):
     if verbose:
@@ -264,7 +311,94 @@ def intro():
     st.markdown(f"## _Today_ is {now.strftime('%A')}, {now.strftime('%-d')} {now.strftime('%B')} {now.strftime('%Y')} - Plenary", unsafe_allow_html=True)
 
     st.divider()
+    
+    analytic = fetch_analytic_data()
+    print(analytic)
+    _data = [
+  {
+    "id": "japan",
+    "color": "hsl(157, 70%, 50%)",
+    "data": [
+      {
+        "x": "plane",
+        "y": 142
+      },
+      {
+        "x": "helicopter",
+        "y": 17
+      },
+      {
+        "x": "boat",
+        "y": 177
+      },
+      {
+        "x": "train",
+        "y": 272
+      },
+      {
+        "x": "subway",
+        "y": 207
+      },
+      {
+        "x": "bus",
+        "y": 268
+      },
+      {
+        "x": "car",
+        "y": 289
+      },
+      {
+        "x": "moto",
+        "y": 297
+      },
+      {
+        "x": "bicycle",
+        "y": 167
+      },
+      {
+        "x": "horse",
+        "y": 288
+      },
+      {
+        "x": "skateboard",
+        "y": 262
+      },
+      {
+        "x": "others",
+        "y": 206
+      }
+    ]
+  },
+    ]
+    """Data density versus time"""
+    with elements("voronoi"):
+        with mui.Box(sx={"height": 100}):
+                nivo.Line(
+                data=analytic,
+                margin={ "top": 20, "right": 110, "bottom": 30, "left": 60 },
+                # xScale={ "type": "point" },
+                colors={'scheme': 'category10'},
+                lineWidth=6,
+                # pointColor=[{ "theme": 'background' }],
+                pointColor="black",
+                pointBorderWidth=2,
+                pointBorderColor=[{ "theme": 'background' }],
+                pointSize={12},
+                yScale={
+                    "type": 'linear',
+                },
+                curve= "basis",
+                enableGridX=False,
+                enablePointLabel=True,
+                yFormat=" >-.0%",
+                axisLeft=False,
+                # pointLabel="analytic.yFormatted",
+                enableGridY=False,
+                # gridYValues={10},
+                )
 
+    
+    
 def data_density(data, empty_rows, progress_bar=False):
     _density = around((len(data) / (len(data) + empty_rows)) * 100, 2)
     st.write(f"Data density: {_density}%") 
@@ -502,7 +636,6 @@ def calculate_data_density(df, signature_column="signature", auto_columns=["id",
     
     # Normalize each column by its maximum byte size
     norm_byte_df = byte_df[session_columns].div(max_values, axis=1)
-    
     # Normalize each column (session) by its maximum byte size
     # Prepare the output data structure
     output_data = []
@@ -515,7 +648,8 @@ def calculate_data_density(df, signature_column="signature", auto_columns=["id",
                       "y": row[session]} for session in session_columns]
         }
         output_data.append(user_data)
-    
+
+
     return output_data
 
 
@@ -622,6 +756,35 @@ def generate_structure_participation_narrative(data, participants_count, verbose
     
     return narrative
 
+def calculate_data_density_float(norm_byte_df, type='nonzero', auto_columns=["id", "updated_at", "signature", "created_at", "signature"]):
+    """
+    Calculate the percentage of non-zero entries in norm_byte_df to give a clearer sense of data density.
+    
+    Parameters:
+    norm_byte_df (pd.DataFrame): A dataframe with normalized byte values for each user and session column.
+    
+    Returns:
+    float: Percentage of non-zero entries, representing data density.
+    """
+    
+    norm_byte_df = norm_byte_df.drop(auto_columns, axis=1)
+    
+    if type == 'nonzero':
+        # Count non-zero entries and total entries
+        non_zero_count = np.count_nonzero(norm_byte_df.values)
+        total_entries = norm_byte_df.size
+        st.write(f"Non-zero count: {non_zero_count}, Total entries: {total_entries}")
+        # Calculate the density as a percentage
+        density_percentage = (non_zero_count / total_entries)
+    elif type == 'frobenius':
+        # Calculate the Frobenius norm of the matrix
+        frobenius_norm = np.linalg.norm(norm_byte_df.values, 'fro')
+        
+        # Calculate the Frobenius norm as a percentage of the maximum possible norm
+        density_percentage = frobenius_norm / np.linalg.norm(np.ones(norm_byte_df.shape), 'fro')
+            
+    return density_percentage
+
 if __name__ == "__main__":
     intro()
     authentifier()
@@ -630,8 +793,6 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(all_data)
     f"""Empty rows {empty_rows}"""
-    # st.table(df.head())
-    # st.write(df.columns)    
     
     _columns = ["id", "updated_at", "signature", "personal_data", "path_001", "created_at", "practical_questions_01", "philanthropy_01", "exercise_01", "consent_00", "remote_05", "session_1_values", "session_1_worldview", "session_2_structure_participation", "session_3_relations_systems_healing", "session_4_consent_action", "plenary_01"] 
     _auto_columns = ["id", "updated_at", "signature", "created_at"]
@@ -639,7 +800,11 @@ if __name__ == "__main__":
     inactive_users, inactive_users_info = find_inactive_users(df, auto_columns=_auto_columns)
     # Call the function to get the desired format
     heatmap_data_density = calculate_data_density(df)
-    st.json(heatmap_data_density[0:10])
+    matrix_norm = calculate_data_density_float(df, type='nonzero')
+    f"""
+    Data density {matrix_norm:.0%}
+    """
+    
     with elements("nivo_charts"):
 
         with mui.Box(sx={"height": 600}):
@@ -717,16 +882,28 @@ if __name__ == "__main__":
     presence = check_signature_presence_in_data(data, st.session_state["username"])
     st.write("Signature presence in data: ", presence)
     _my_data = get_row_by_signature(data, st.session_state["username"])
-    st.write("My data:", _my_data)
+    st.write("#### My data:", _my_data)
     
     df = pd.DataFrame(data)
     
     aggregated = aggregate_structure_participation_data(df)
-    
+    """#### Aggregated counts"""
     st.write(aggregated)
     
     _narrative = generate_structure_participation_narrative(aggregated, len(data))
+    """#### Narrative"""
     st.markdown(_narrative)
+    
+    "Prompt"
+    
+    st.markdown("""
+        <code>Based on the following data from a recent focus group, provide a 1-paragraph poignant, brutally honest, brief, insightful social analysis that captures the group’s collective outlook, values, and approach to collaboration. Highlight the participants’ stance on inclusion, their strategic priorities, their perception of future possibilities, and their codeferred modes of interaction. Aim for a tone that is reflective and observational, pointing out both converging and diverging views within the group.</pre>
+    ...data...
+    
+    """, unsafe_allow_html
+    
+    =True)
+    
     "---"
     rows = []
     

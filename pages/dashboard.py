@@ -11,19 +11,19 @@ if st.secrets["runtime"]["STATUS"] == "Production":
         initial_sidebar_state="collapsed"
     )
 
-st.markdown(
-        """
-    <style>
-        [data-testid="collapsedControl"] {
-            display: none
-        }
-        [data-testid="stHeader"] {
-            display: none
-            }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
+# st.markdown(
+#         """
+#     <style>
+#         [data-testid="collapsedControl"] {
+#             display: none
+#         }
+#         [data-testid="stHeader"] {
+#             display: none
+#             }
+#     </style>
+#     """,
+#         unsafe_allow_html=True,
+#     )
 
 import json
 from datetime import datetime
@@ -188,18 +188,28 @@ def return_SCFS_details(num_transactions, transaction_rows):
 
     return filtered_transactions
 
-def fetch_data():
-    response = db.fetch_data(kwargs={'verbose': True})
-    return response
+def fetch_data_by_signature(verbose=True, signature=None):
+    # response = db.fetch_data(kwargs={'verbose': True})
+    # return response
 
-def retrieve_user_by_signature(df, signature):
-    # Filter the DataFrame based on the 'signature' column
-    matched_row = df.loc[df['signature'] == signature]
-    if not matched_row.empty:
-        return matched_row
-    else:
-        return None
+    # Fetch only data that matches the provided signature
+    if verbose:
+        st.write(f"Fetching data for signature: {signature} from the {db.table_name} table.")
+        
+    response = (
+        db.conn.table(db.table_name)
+        .select("*")
+        .eq("signature", signature)
+        .execute()
+    )
     
+    # Check if any data is returned
+    if response and response.data:
+        return response.data[0]  # Return the first matching row or handle as needed
+    else:
+        st.write(f"No data found for signature: {signature} in the {db.table_name} table.")
+        return None
+
 def create_discourse_personal(personal_data):
     name = personal_data.get("name", {}).get("value", "No name provided")
     email = personal_data.get("email", {}).get("value", "No email provided")
@@ -247,12 +257,14 @@ def create_discourse_personal(personal_data):
     
     return discourse
 
-
 def create_practical_discourse(practical_questions):
     # Personal information
     
     # Go forward status
-    go_forward = practical_questions.get("go_forward", {}).get("value", "No decision provided")
+    st.write(practical_questions)
+    practical_questions = json.loads(practical_questions)
+
+    # go_forward = practical_questions.get("go_forward", {}).get("value", "No decision provided")
     
     # Travel modes and departure location
     travel_modes = practical_questions.get("Travel modes:", {}).get("value", [])
@@ -283,7 +295,7 @@ def create_practical_discourse(practical_questions):
 
 def create_discourse_with_scratches_and_questions(exercise_data):
     # Scratches (reflections)
-    exercise_data = json.loads(exercise_data.to_json())
+    exercise_data = json.loads(exercise_data)
     try:
         # Extract user ID dynamically and parse the JSON string
         user_id = next(iter(exercise_data))
@@ -335,7 +347,8 @@ def create_discourse_with_scratches_and_questions(exercise_data):
     return discourse
 
 def create_discourse_consent(consent_data):
-    consent_data = json.loads(consent_data.to_json())
+    # print(consent_data)
+    consent_data = json.loads(consent_data)
     try:
         # Extract user ID dynamically and parse the JSON string
         user_id = next(iter(consent_data))
@@ -353,10 +366,8 @@ def create_discourse_consent(consent_data):
 
     return discourse
 
-    
-if __name__ == "__main__":
-    
-    intro()
+
+def transaction_stuff():
     num_transactions = 10
     tx_history = get_sumup_transaction_history(num_transactions)
     transaction_rows = []
@@ -387,27 +398,68 @@ if __name__ == "__main__":
         transaction_rows.append(row)
 
     df = pd.DataFrame(transaction_rows)
-    print(df)
-    
+    # print(df)
 
+def find_empty_fields(data):
+    empty_fields = []
+
+    # Check each key-value pair at the top level
+    for key, value in data.items():
+        # print(key, value)
+        # Check if the top-level value is empty or None
+        if value in [None, "null", "", []]:
+            empty_fields.append((key, "Top-level session"))
+        elif isinstance(value, dict):
+            # Check nested dictionary values
+            for sub_key, sub_value in value.items():
+                # Ensure sub_value is a dictionary with "value" and "label" keys
+                if isinstance(sub_value, dict) and sub_value.get("value") in [None, "null", "", []]:
+                    empty_fields.append((sub_key, sub_value.get("label", "No label")))
+        elif isinstance(value, list):
+            # Check each item in the list if it is a dictionary with fields to validate
+            for item in value:
+                if isinstance(item, dict):
+                    for list_key, list_value in item.items():
+                        if list_value in [None, "null", "", []]:
+                            empty_fields.append((list_key, "No label in list item"))
+    return empty_fields
+
+if __name__ == "__main__":
+    
+    intro()
+    
     if st.session_state['authentication_status']:
         st.toast('Initialised authentication model')
         st.write(f'`Your signature is {st.session_state["username"][0:4]}***{st.session_state["username"][-4:]}`')
         
-        st.button('fetch')
-        data = pd.DataFrame(fetch_data())
-        st.write(data)
-        user_data = retrieve_user_by_signature(data, st.session_state["username"])
-        # If data is found, display it
+        user_data = fetch_data_by_signature(signature = st.session_state["username"])
+        st.write(user_data)
+        all_columns = list(user_data.keys())
+        print(all_columns)
+        exclude_columns = ['id', 'updated_at', 'signature', 'created_at']
+
+        progress_columns = [col for col in all_columns if col not in exclude_columns]
+
+        empty_fields = find_empty_fields(user_data)
+        st.write(empty_fields)
+        st.markdown(f"## Progress: {(len(progress_columns) - len(empty_fields))/len(progress_columns):.0%}")
+        st.progress((len(progress_columns) - len(empty_fields))/len(progress_columns))
+        # display missing fields
+        if empty_fields:
+            st.write("### Missing fields:")
+            for field, label in empty_fields:
+                st.write(f"- {field} ({label})")
+        
         """### Personal data"""
         authenticator.logout()
+        
         if user_data is not None:
-            st.write(f"--- User ID: {user_data['id'].values[0]} ---")
-            st.write(f"Updated at: {user_data['updated_at'].values[0]}")
-            
+            st.write(f"--- ID: {user_data['id']} ---")
+            st.write(f"Updated at: {user_data['updated_at']}")
+
             # Personal Details Section
-            st.write(user_data['personal_data'].values[0])
-            personal_data = json.loads(user_data['personal_data'].values[0])
+            st.write(user_data['personal_data'])
+            personal_data = json.loads(user_data['personal_data'])
             st.write("# Personal Details:")
             if personal_data is not None:
                 st.markdown(create_discourse_personal(personal_data))
@@ -426,12 +478,13 @@ if __name__ == "__main__":
             st.write("# Philanthropy:")
             philanthropy = user_data['philanthropy_01']
             if philanthropy is not None:
-                st.json(philanthropy.to_json())
+                st.json(philanthropy)
             else:
                 st.write("No philanthropy data available. [Link to Philanthropy Questionnaire]")
 
             # Exercise Section
             st.write("# Exercise:")
+            st.write(user_data['exercise_01'])
             exercise = user_data['exercise_01']
             if exercise is not None:
                 st.markdown(create_discourse_with_scratches_and_questions(exercise))
@@ -454,9 +507,11 @@ if __name__ == "__main__":
         """
         # Aggregated data
         """
-        st.write(data.columns)
+        # data = pd.DataFrame(user_data)
         
-        st.write(data["updated_at"].to_json())
+        # st.write(data.columns)
+        
+        # st.write(data["updated_at"].to_json())
         
     elif st.session_state['authentication_status'] is False:
         st.error('Access key does not open')
