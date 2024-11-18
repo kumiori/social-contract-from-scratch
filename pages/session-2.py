@@ -120,45 +120,6 @@ if 'tx_tag' not in st.session_state:
 if 'price' not in st.session_state:
     st.session_state.price = .01
 
-philanthropic_profiles = {
-'Communitarian': {
-    'description': '## _**Doing good** makes sense for the community._ My contributions create ripple effects that strengthen social bonds and uplift all those around.',
-    'icon': ':material/group:'
-},
-'Devout': {
-    'description': '## _**Doing good** is the will of a higher power_. My philanthropy is a sacred duty, a way to serve and fulfill my spiritual inspiration.',
-    'icon': ':material/auto_awesome:'
-},
-'Investor': {
-    'description': '## _**Doing good** is good business._ I see philanthropy as an investment, generating returns not just for society, but for the world at large.',
-    'icon': ':material/monetization_on:'
-},
-'Socialite': {
-    'description': '## _**Doing good** is sexy._ My generosity is a symbol of commitment and influence, making waves in social circles while benefiting the greater good.',
-    'icon': ':material/party_mode:'
-},
-'Repayer': {
-    'description': '## _**Time to give back**._ I have received much from society, and now it\'s my turn to return the favor and support the what\'s coming.',
-    'icon': ':material/replay:'
-},
-'Dynast': {
-    'description': '## _**Following family tradition**._ Philanthropy is in my blood, a legacy passed down through generations, and I proudly carry the torch.',
-    'icon': ':material/family_restroom:'
-},
-'Altruist': {
-    'description': '## _**Giving from the heart**._ My generosity expands my boundaries; I give selflessly and with deep compassion, driven by a love for humanity.',
-    'icon': ':material/favorite:'
-},
-'Indifferent': {
-    'description': '## _**I don\'t give a shit about philanthropy**_ or social causes. I believe that everyone should fend for themselves, and I see no reason to contribute.',
-    'icon': ':material/block:'
-},
-'Deflector': {
-    'description': '## _**Social questions are somebody else\'s problem**._ I believe that social issues and philanthropy are for others to worry about, not my concern or responsibility.',
-    'icon': ':material/warning:'
-}
-}  
-
 # Replace with your SumUp API credentials
 API_BASE_URL = 'https://api.sumup.com/v0.1'
 ACCESS_TOKEN = st.secrets["sumup"]["CLIENT_API_SECRET"]

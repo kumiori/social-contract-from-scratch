@@ -358,7 +358,7 @@ Here is a snapshot of current activities and developments. Any insight to share?
         <social.from.scratch@proton.me>
 
             """
-        stream_once_then_write(text)
+        # stream_once_then_write(text)
         # st.markdown(text)
         if st.session_state['authentication_status']:
             st.toast(f'Authenticated successfully {mask_string(st.session_state["username"])}')
