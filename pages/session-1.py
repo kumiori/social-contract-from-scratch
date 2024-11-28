@@ -53,7 +53,8 @@ from streamlit_elements import elements, mui, nivo
 from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.row import row
 from streamlit_gtag import st_gtag
-from streamlit_pills_multiselect import pills
+
+# from streamlit_pills_multiselect import pills
 from streamlit_player import st_player
 from streamlit_timeline import timeline
 from yaml import SafeLoader
@@ -268,7 +269,6 @@ def parse_session_data(data):
 
 # @st.cache_data
 def fetch_data():
-
     conn = db.conn
     table_name = db.table_name
     response = (
@@ -399,7 +399,6 @@ def intro():
 
 
 def authentifier(authenticator):
-
     (
         tab2,
         tab1,
@@ -987,12 +986,11 @@ These are core values that guide the construction of a new social contract."""
         use_container_width=True,
     )
 
-    selected_value = pills(
+    selected_value = st.pills(
         "Select a handful of the values that you most reflect in your actions",
         values,
-        multiselect=True,
-        clearable=True,
-        index=None,
+        selection_mode="multi",
+        default=None,
     )
 
     """
@@ -1322,11 +1320,10 @@ In many African cultures, the **Ubuntu** philosophy represents a worldview that 
 
         # Customize hovertemplate to show Hash (first 6 chars), Worldview, Category, and Statement
         fig.update_traces(
-            hovertemplate=
             # '<b>Hash:</b> %{customdata[0]:.6s}<br>' +  # Show first 6 characters of the hash
             # '<b>Worldview:</b> %{customdata[1]}<br>' +
             # '<b>Category:</b> %{customdata[2]}<br>' +
-            "<b>Statement:</b> %{customdata[3]}<br>"
+            hovertemplate="<b>Statement:</b> %{customdata[3]}<br>"
             + "<b>Resonance:</b> %{marker.color:.2f}<extra></extra>"
         )
         # Attach the customdata (hash values) for the hovertemplate

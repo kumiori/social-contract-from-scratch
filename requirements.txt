@@ -45,7 +45,7 @@ executing==2.0.1
 extra-streamlit-components==0.1.71
 Faker==20.1.0
 fatsecret==0.4.0
-favicon
+favicon==0.7.0
 fonttools==4.45.1
 frozenlist==1.4.1
 fuzzywuzzy==0.18.0
@@ -107,7 +107,7 @@ packaging==23.2
 pandas==2.1.1
 parso==0.8.3
 pexpect==4.9.0
-philoui @ git+https://github.com/kumiori/philoui.git#egg=philoui
+philoui @ git+https://github.com/kumiori/philoui.git@ed218a3fc6c4a71619c56ae80d08393bb0d0c9c8
 Pillow==10.1.0
 pkginfo==1.9.6
 platformdirs==4.0.0
@@ -163,7 +163,7 @@ st-annotated-text==4.0.1
 st-supabase-connection==1.2.0
 stack-data==0.6.3
 storage3==0.6.1
-streamlit==1.37.0
+streamlit==1.40.2
 streamlit-authenticator==0.3.3
 streamlit-camera-input-live==0.2.0
 streamlit-card==0.0.61
@@ -179,7 +179,7 @@ streamlit-lottie==0.0.5
 streamlit-mermaid==0.2.0
 streamlit-modal==0.1.2
 streamlit-pills==0.3.0
-streamlit-pills-multiselect
+streamlit-pills-multiselect==0.6.1
 streamlit-player==0.1.5
 streamlit-selectable-image-gallery==0.0.1
 streamlit-shadcn-ui==0.1.18
