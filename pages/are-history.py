@@ -1,17 +1,49 @@
 import streamlit as st
 import requests
 import time
+import pandas as pd
+
+import philoui
+import streamlit.components.v1 as components
 
 from streamlit_carousel import carousel
+from philoui.io import QuestionnaireDatabase as IODatabase
+from philoui.io import (
+    conn,
+    create_dichotomy,
+    create_equaliser,
+    create_qualitative,
+    create_quantitative,
+)
+from philoui.survey import CustomStreamlitSurvey
+from philoui.texts import hash_text, stream_text
+
+# from streamlit_extras.add_vertical_space import add_vertical_space
+from streamlit_timeline import timeline
+from streamlit_gtag import st_gtag
+from philoui.authentication_v2 import AuthenticateWithKey
+
+# __import__("pdb").set_trace()
+st_gtag(
+    key="gtag_app_REHISTORY",
+    id="G-Q55XHE2GJB",
+    event_name="s&p_main_page",
+    params={
+        "event_category": "apply_s&p",
+        "event_label": "test_s&p",
+        "value": 97,
+    },
+)
 
 #  == "Production"
-if st.secrets["runtime"]["STATUS"] is not None:
-    st.set_page_config(
-        page_title="The Social Contract from Scratch • Relations, Systems & Healing",
-        page_icon="✨",
-        # layout="wide",
-        initial_sidebar_state="collapsed",
-    )
+# if st.secrets["runtime"]["STATUS"] is not None:
+#     __import__("pdb").set_trace()
+#     st.set_page_config(
+#         page_title="The Social Contract from Scratch • Relations, Systems & Healing",
+#         page_icon="✨",
+#         # layout="wide",
+#         initial_sidebar_state="collapsed",
+#     )
 cards = [
     dict(
         title="Why did the transatlantic slave trade tear our roots apart?",
@@ -55,9 +87,56 @@ carousel(items=cards, container_height=400, width=1.0)
 
 
 st.markdown("# History, written in real-time.")
+
+
+"""`fast or slow?`"""
+
+
 """Would you like to play? I have a key and a question for you."""
 "`fast backward to XXXX`"
 st.markdown("## Why African history ...")
+
+config = {
+    "credentials": {"webapp": "are-history", "usernames": {}},
+    "cookie": {
+        "expiry_days": 30,
+        "expiry_minutes": 30,
+        "key": "are_history_cookie",
+        "name": "are_history_cookie",
+    },
+    "preauthorized": {"emails": ""},
+}
+
+authenticator = AuthenticateWithKey(
+    credentials=config["credentials"],
+    cookie_name=config["cookie"]["name"],
+    cookie_key=config["cookie"]["key"],
+    cookie_expiry_days=config["cookie"]["expiry_days"],
+    pre_authorized=config["preauthorized"],
+)
+
+db = IODatabase(conn, "re0history")
+
+fields_connect = {
+    "Form name": "Forwrd to the Past",
+    "Email": "Your Email Address",
+    "Username": "Your Revolutionary Alias",
+    "Password": "Secret Passcode",
+    "Repeat password": "Confirm Your Passcode",
+    "Register": "Retrieve Your Access Key",
+    "Captcha": "Security Check",
+}
+
+fields_forge = {
+    "Form name": "Lost Your Key? Forge a New One",
+    "Email": "Your Email Address",
+    "Username": "Choose Your Alias",
+    "Password": "Set Your Secret Code",
+    "Repeat password": "Confirm Your Code",
+    "Register": "Forge It Now",
+    "Captcha": "Security Check",
+}
+
 
 """Welcome to ___________
 
@@ -140,7 +219,7 @@ Players interact. How do YOU PREFER: Discussion boards, debates, or voting syste
 
 """
 st.markdown("### THE NEXT EVENT HAPPENS IN - The Berlin Conference")
-"""`no choice, given option, otherwise`"""
+"""`no choice, given option, otherwis`"""
 event_time = st.slider(
     "Select the time remaining for the next event (in years):", -60, -(2025 - 1884)
 )
