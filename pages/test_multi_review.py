@@ -84,6 +84,19 @@ def update_review_progress(session_id, new_progress):
         sessions[session_id]["progress"] = new_progress
 
 
+@st.dialog("Terminate")
+def terminate_review(session_id):
+    """Mark the review as over and return the collected responses."""
+    sessions = get_review_sessions()
+    st.success("Review terminated and broadcast to all reviewers!")
+
+    st.markdown("### Review Summary")
+    if session_id in sessions:
+        st.json(sessions[session_id]["responses"])
+        sessions[session_id]["review_over"] = True
+        return sessions[session_id]["responses"]
+
+
 # --- Streamlit App ---
 st.title("Collaborative Document Review Session")
 with st.expander("Debug", expanded=False):
@@ -202,11 +215,13 @@ if "session_id" in st.session_state:
             default=current_value,
             selection_mode="single",
         )
+
         st.write(review_control)
         session_info["responses"][current_index] = review_control
 
         # Navigation buttons
-        col_prev, col_next = st.columns(2)
+        col_prev, col_next, col_term = st.columns(3)
+        msg_area = st.empty()
         with col_prev:
             if st.button("Previous") and current_index > 0:
                 update_review_progress(session_id, current_index - 1)
@@ -217,6 +232,11 @@ if "session_id" in st.session_state:
                 st.rerun()
             # else:
             # session_info["review_over"] = True
+        with col_term:
+            if st.button("Terminate Review"):
+                summary = terminate_review(session_id)
+                # st.write(summary)
+                # msg_area.json(summary)
 
         st.markdown("### My Review")
         if st.button("Clear review"):
